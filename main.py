@@ -1,14 +1,20 @@
 import json
+import math
 
 import requests
 
 URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
+SIZE_LIMIT = 128 ** 3
 
 
 def get_datasets_urls():
     req = requests.get(URL)
     datasets_json = json.loads(req.text)
-    return [dataset["url"] for dataset in datasets_json]
+    return [
+        dataset["url"]
+        for dataset in datasets_json
+        if math.prod(dataset["size"]) < SIZE_LIMIT
+    ]
 
 
 def download_dataset(dataset_url):
