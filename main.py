@@ -34,7 +34,7 @@ def download_datasets(datasets_urls):
         download_dataset(url)
 
 
-def convert_to_vti(raw_file):
+def convert_datasets(raw_file):
     extent, dtype = raw_file.split("_")[-2:]
     extent = [int(dim) for dim in extent.split("x")]
 
@@ -55,19 +55,32 @@ def convert_to_vti(raw_file):
     raw = simple.ImageReader(FileNames=[raw_file])
     raw.DataScalarType = dtype
     raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
+    raw_stem = raw_file.split(".")[0]
+    # vtkImageData (TTK)
     simple.SaveData(
-        raw_file.split(".")[0] + ".vti",
+        raw_stem + ".vti",
         proxy=raw,
         PointDataArrays=["ImageFile"],
     )
-    print("Converted " + raw_file + " to VTI")
+    # Dipha Image Data (Dipha, CubicalRipser)
+    simple.SaveData(
+        raw_stem + ".dipha",
+        proxy=raw,
+    )
+    # Perseus Cubical Grid (Gudhi)
+    simple.SaveData(
+        raw_stem + ".pers",
+        proxy=raw,
+    )
+
+    print("Converted " + raw_file + " to VTI, Dipha and Perseus")
 
 
 def main():
     # datasets_urls = get_datasets_urls()
     # download_datasets(datasets_urls)
     for dataset in glob.glob("*.raw"):
-        convert_to_vti(dataset)
+        convert_datasets(dataset)
 
 
 if __name__ == "__main__":
