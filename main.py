@@ -1,6 +1,7 @@
 import glob
 import json
 import math
+import tarfile
 
 import requests
 from paraview import simple
@@ -19,8 +20,8 @@ def get_datasets_urls():
     ]
 
 
-def download_dataset(dataset_url):
-    dataset_name = dataset_url.split("/")[-1]
+def download_dataset(dataset_url, name=None):
+    dataset_name = name if name is not None else dataset_url.split("/")[-1]
     # https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
     with requests.get(dataset_url, stream=True) as req:
         with open(dataset_name, "wb") as dest:
@@ -76,11 +77,28 @@ def convert_datasets(raw_file):
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
 
 
+def download_software():
+    gh = "https://github.com"
+    tb = "tarball"
+    gudhi_url = f"{gh}/GUDHI/gudhi-devel/{tb}/tags%2Fgudhi-release-3.3.0"
+    cubicalRipser_url = f"{gh}/CubicalRipser/CubicalRipser_3dim/{tb}/master"
+    dipha_url = f"{gh}/DIPHA/dipha/{tb}/master"
+
+    download_dataset(dipha_url, "dipha.tar.gz")
+    download_dataset(gudhi_url, "gudhi.tar.gz")
+    download_dataset(cubicalRipser_url, "CubicalRipser.tar.gz")
+
+    for soft in ["dipha", "gudhi", "CubicalRipser"]:
+        with tarfile.open(soft + ".tar.gz", "r:gz") as src:
+            src.extractall()
+
+
 def main():
     # datasets_urls = get_datasets_urls()
     # download_datasets(datasets_urls)
-    for dataset in glob.glob("*.raw"):
-        convert_datasets(dataset)
+    # for dataset in glob.glob("*.raw"):
+    #     convert_datasets(dataset)
+    download_software()
 
 
 if __name__ == "__main__":
