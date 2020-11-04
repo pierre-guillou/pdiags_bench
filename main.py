@@ -7,16 +7,26 @@ import requests
 from paraview import simple
 
 URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
-SIZE_LIMIT = 128 ** 3
+SIZE_LIMIT_MB = 10
 
 
 def get_datasets_urls():
     req = requests.get(URL)
     datasets_json = json.loads(req.text)
+
+    dtype_size = {
+        "uint8": 1,
+        "int16": 2,
+        "uint16": 2,
+        "float32": 4,
+        "float64": 8,
+    }
+
     return [
         dataset["url"]
         for dataset in datasets_json
-        if math.prod(dataset["size"]) < SIZE_LIMIT
+        if math.prod(dataset["size"]) * dtype_size[dataset["type"]]
+        < (SIZE_LIMIT_MB * 1e6)
     ]
 
 
