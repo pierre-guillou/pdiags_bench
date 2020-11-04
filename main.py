@@ -46,25 +46,19 @@ def download_datasets(datasets_urls):
 
 
 def convert_datasets(raw_file):
-    extent, dtype = raw_file.split("_")[-2:]
+    extent, dtype = raw_file.split(".")[0].split("_")[-2:]
     extent = [int(dim) for dim in extent.split("x")]
 
-    def get_dtype(dtype):
-        if dtype == "uint8":
-            return "unsigned char"
-        elif dtype == "int16":
-            return "signed short"
-        elif dtype == "uint16":
-            return "unsigned short"
-        elif dtype == "float32":
-            return "float"
-        elif dtype == "float64":
-            return "double"
-
-    dtype = get_dtype(dtype.split(".")[0])
+    dtype_pv = {
+        "uint8": "unsigned char",
+        "int16": "signed short",
+        "uint16": "unsigned short",
+        "float32": "float",
+        "float64": "double",
+    }
 
     raw = simple.ImageReader(FileNames=[raw_file])
-    raw.DataScalarType = dtype
+    raw.DataScalarType = dtype_pv[dtype]
     raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
     raw_stem = raw_file.split(".")[0]
     # vtkImageData (TTK)
