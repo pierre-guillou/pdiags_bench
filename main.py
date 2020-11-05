@@ -104,12 +104,23 @@ def download_software():
     return softs
 
 
+def build_software():
+    os.system("make -C CubicalRipser")
+
+    for cmake_soft in ["dipha", "gudhi"]:
+        builddir = "build_" + cmake_soft
+        os.mkdir(builddir)
+        os.system("cmake -S " + cmake_soft + " -B " + builddir)
+        os.system("cmake --build " + builddir)
+
+
 def main():
     # datasets_urls = get_datasets_urls()
     # download_datasets(datasets_urls)
     # for dataset in glob.glob("*.raw"):
     #     convert_datasets(dataset)
-    download_software()
+    # download_software()
+    build_software()
 
 
 if __name__ == "__main__":
