@@ -1,6 +1,7 @@
 import glob
 import json
 import math
+import os
 import tarfile
 
 import requests
@@ -95,6 +96,8 @@ def download_software():
     for soft in ["dipha", "gudhi", "CubicalRipser"]:
         with tarfile.open(soft + ".tar.gz", "r:gz") as src:
             src.extractall()
+            # rename software folders
+            os.rename(src.getmembers()[0].name, soft)
 
 
 def main():
