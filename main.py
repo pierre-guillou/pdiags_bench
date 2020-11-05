@@ -88,18 +88,20 @@ def download_software():
     gh = "https://github.com"
     tb = "tarball"
     gudhi_url = f"{gh}/GUDHI/gudhi-devel/{tb}/tags%2Fgudhi-release-3.3.0"
-    cubicalRipser_url = f"{gh}/CubicalRipser/CubicalRipser_3dim/{tb}/master"
+    CubicalRipser_url = f"{gh}/CubicalRipser/CubicalRipser_3dim/{tb}/master"
     dipha_url = f"{gh}/DIPHA/dipha/{tb}/master"
 
-    download_dataset(dipha_url, "dipha.tar.gz")
-    download_dataset(gudhi_url, "gudhi.tar.gz")
-    download_dataset(cubicalRipser_url, "CubicalRipser.tar.gz")
+    softs = ["dipha", "gudhi", "CubicalRipser"]
 
-    for soft in ["dipha", "gudhi", "CubicalRipser"]:
+    for soft in softs:
+        download_dataset(locals()[soft + "_url"], soft + ".tar.gz")
         with tarfile.open(soft + ".tar.gz", "r:gz") as src:
             src.extractall()
             # rename software folders
             os.rename(src.getmembers()[0].name, soft)
+        print("Extracted " + soft + " archive")
+
+    return softs
 
 
 def main():
