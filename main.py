@@ -109,9 +109,24 @@ def build_software():
 
     for cmake_soft in ["dipha", "gudhi"]:
         builddir = "build_" + cmake_soft
-        os.mkdir(builddir)
+        try:
+            os.mkdir(builddir)
+        except FileExistsError:
+            pass
         os.system("cmake -S " + cmake_soft + " -B " + builddir)
         os.system("cmake --build " + builddir)
+
+    exes = [
+        "build_dipha/dipha",
+        "build_gudhi/src/Bitmap_cubical_complex/utilities/cubical_complex_persistence",
+        "CubicalRipser/CR3",
+    ]
+
+    for exe in exes:
+        if not os.path.isfile(exe):
+            print(exe + " not found")
+
+    return exes
 
 
 def main():
