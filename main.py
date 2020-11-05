@@ -116,17 +116,41 @@ def build_software():
         os.system("cmake -S " + cmake_soft + " -B " + builddir)
         os.system("cmake --build " + builddir)
 
-    exes = [
-        "build_dipha/dipha",
-        "build_gudhi/src/Bitmap_cubical_complex/utilities/cubical_complex_persistence",
-        "CubicalRipser/CR3",
-    ]
 
-    for exe in exes:
+def compute_diagrams():
+    exes = {
+        "dipha": "build_dipha/dipha",
+        "gudhi": "build_gudhi/src/Bitmap_cubical_complex/utilities/cubical_complex_persistence",
+        "CubicalRipser": "CubicalRipser/CR3",
+    }
+
+    for exe in exes.values():
         if not os.path.isfile(exe):
             print(exe + " not found")
 
-    return exes
+    try:
+        os.mkdir("diagrams")
+    except FileExistsError:
+        pass
+
+    for dataset in glob.glob("*.dipha"):
+        exe = exes["dipha"]
+        inp = dataset
+        outp = f"diagrams/{dataset.split('.')[0]}.dipha"
+        os.system(f"mpirun -np 8 {exe} --benchmark --upper_dim 3 {inp} {outp}")
+
+    for dataset in glob.glob("*.dipha"):
+        exe = exes["CubicalRipser"]
+        inp = dataset
+        outp = f"diagrams/{dataset.split('.')[0]}.cr"
+        os.system(f"{exe} {inp} --output {outp}")
+
+    for dataset in glob.glob("*.pers"):
+        exe = exes["gudhi"]
+        inp = dataset
+        outp = f"diagrams/{dataset.split('.')[0]}.gudhi"
+        os.system(f"{exe} {inp}")
+        os.rename(inp + "_persistence", outp)
 
 
 def main():
@@ -135,7 +159,8 @@ def main():
     # for dataset in glob.glob("*.raw"):
     #     convert_datasets(dataset)
     # download_software()
-    build_software()
+    # build_software()
+    compute_diagrams()
 
 
 if __name__ == "__main__":
