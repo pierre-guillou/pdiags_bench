@@ -6,6 +6,7 @@ import math
 import os
 import subprocess
 import tarfile
+import time
 
 import requests
 from paraview import simple
@@ -121,7 +122,10 @@ def build_software():
 def compute_diagrams(nThreads=4):
     exes = {
         "dipha": "build_dipha/dipha",
-        "gudhi": "build_gudhi/src/Bitmap_cubical_complex/utilities/cubical_complex_persistence",
+        "gudhi": (
+            "build_gudhi/src/Bitmap_cubical_complex"
+            "/utilities/cubical_complex_persistence"
+        ),
         "CubicalRipser": "CubicalRipser/CR3",
     }
 
@@ -134,17 +138,25 @@ def compute_diagrams(nThreads=4):
     except FileExistsError:
         pass
 
-    for dataset in glob.glob("*.vti"):
-        inp = dataset
-        outp = f"diagrams/{dataset.split('.')[0]}.vtu"
+    times = dict()
+    for raw in glob.glob("*.raw"):
+        dataset = raw.split(".")[0]
+        times[dataset] = dict()
+
+    for inp in glob.glob("*.vti"):
+        dataset = inp.split(".")[0]
+        outp = f"diagrams/{dataset}.vtu"
         data = simple.XMLImageDataReader(FileName=[inp])
         pdiag = simple.TTKPersistenceDiagram(Input=data)
+        pdiag.ThreadNumber = nThreads
+        start_time = time.time()
         simple.SaveData(outp, simple.CleantoGrid(Input=pdiag))
+        times[dataset]["ttk"] = time.time() - start_time
 
-    for dataset in glob.glob("*.dipha"):
+    for inp in glob.glob("*.dipha"):
         exe = exes["dipha"]
-        inp = dataset
-        outp = f"diagrams/{dataset.split('.')[0]}.dipha"
+        dataset = inp.split(".")[0]
+        outp = f"diagrams/{dataset}.dipha"
         cmd = [
             "mpirun",
             "-np",
@@ -156,22 +168,30 @@ def compute_diagrams(nThreads=4):
             inp,
             outp,
         ]
+        start_time = time.time()
         subprocess.run(cmd, capture_output=True)
+        times[dataset]["dipha"] = time.time() - start_time
 
-    for dataset in glob.glob("*.dipha"):
+    for inp in glob.glob("*.dipha"):
         exe = exes["CubicalRipser"]
-        inp = dataset
-        outp = f"diagrams/{dataset.split('.')[0]}.cr"
+        dataset = inp.split(".")[0]
+        outp = f"diagrams/{dataset}.cr"
         cmd = [exe, inp, "--output", outp]
+        start_time = time.time()
         subprocess.check_call(cmd)
+        times[dataset]["CubicalRipser"] = time.time() - start_time
 
-    for dataset in glob.glob("*.pers"):
+    for inp in glob.glob("*.pers"):
         exe = exes["gudhi"]
-        inp = dataset
-        outp = f"diagrams/{dataset.split('.')[0]}.gudhi"
+        dataset = inp.split(".")[0]
+        outp = f"diagrams/{dataset}.gudhi"
         cmd = [exe, inp]
+        start_time = time.time()
         subprocess.check_call(cmd)
+        times[dataset]["gudhi"] = time.time() - start_time
         os.rename(inp + "_persistence", outp)
+
+    return times
 
 
 def main():
