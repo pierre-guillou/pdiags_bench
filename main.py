@@ -87,14 +87,14 @@ def convert_datasets(raw_file):
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
 
 
-def prepare_datasets(size_limit=SIZE_LIMIT_MB):
+def prepare_datasets(_, size_limit=SIZE_LIMIT_MB):
     datasets_urls = get_datasets_urls(size_limit)
     download_datasets(datasets_urls)
     for dataset in glob.glob("*.raw"):
         convert_datasets(dataset)
 
 
-def download_and_build_software():
+def download_and_build_software(_):
     gh = "https://github.com"
     tb = "tarball"
     gudhi_url = f"{gh}/GUDHI/gudhi-devel/{tb}/tags%2Fgudhi-release-3.3.0"
@@ -125,7 +125,7 @@ def download_and_build_software():
         subprocess.check_call("cmake", "--build", builddir)
 
 
-def compute_diagrams():
+def compute_diagrams(_):
     exes = {
         "dipha": "build_dipha/dipha",
         "gudhi": (
