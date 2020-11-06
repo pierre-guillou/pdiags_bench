@@ -125,7 +125,7 @@ def download_and_build_software():
         subprocess.check_call("cmake", "--build", builddir)
 
 
-def compute_diagrams(nThreads=4):
+def compute_diagrams():
     exes = {
         "dipha": "build_dipha/dipha",
         "gudhi": (
@@ -157,8 +157,6 @@ def compute_diagrams(nThreads=4):
         pdiag.ScalarField = ["POINTS", "ImageFile"]
         pdiag.InputOffsetField = ["POINTS", "ImageFile"]
         pdiag.ComputepairswiththeDiscreteGradient = True
-        pdiag.UseAllCores = False
-        pdiag.ThreadNumber = nThreads
         start_time = time.time()
         simple.SaveData(outp, simple.CleantoGrid(Input=pdiag))
         times[dataset]["ttk"] = time.time() - start_time
@@ -169,8 +167,7 @@ def compute_diagrams(nThreads=4):
         outp = f"diagrams/{dataset}.dipha"
         cmd = [
             "mpirun",
-            "-np",
-            str(nThreads),
+            "--use-hwthread-cpus",
             exe,
             "--benchmark",
             "--upper_dim",
