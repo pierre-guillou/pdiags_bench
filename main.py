@@ -158,7 +158,7 @@ def compute_diagrams(_):
         pdiag.InputOffsetField = ["POINTS", "ImageFile"]
         pdiag.ComputepairswiththeDiscreteGradient = True
         start_time = time.time()
-        simple.SaveData(outp, simple.CleantoGrid(Input=pdiag))
+        simple.SaveData(outp, Input=pdiag)
         times[dataset]["ttk"] = time.time() - start_time
         print("Processed " + dataset + " with TTK")
 
