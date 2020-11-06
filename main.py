@@ -162,6 +162,7 @@ def compute_diagrams(_):
         start_time = time.time()
         simple.SaveData(outp, simple.CleantoGrid(Input=pdiag))
         times[dataset]["ttk"] = time.time() - start_time
+        print("Processed " + dataset + " with TTK")
 
     for inp in glob.glob("*.dipha"):
         exe = exes["dipha"]
@@ -180,6 +181,7 @@ def compute_diagrams(_):
         start_time = time.time()
         subprocess.run(cmd, capture_output=True)
         times[dataset]["dipha"] = time.time() - start_time
+        print("Processed " + dataset + " with dipha")
 
     for inp in glob.glob("*.dipha"):
         exe = exes["CubicalRipser"]
@@ -189,6 +191,7 @@ def compute_diagrams(_):
         start_time = time.time()
         subprocess.check_call(cmd)
         times[dataset]["CubicalRipser"] = time.time() - start_time
+        print("Processed " + dataset + " with CubicalRipser")
 
     for inp in glob.glob("*.pers"):
         exe = exes["gudhi"]
@@ -199,6 +202,7 @@ def compute_diagrams(_):
         subprocess.check_call(cmd)
         times[dataset]["gudhi"] = time.time() - start_time
         os.rename(inp + "_persistence", outp)
+        print("Processed " + dataset + " with Gudhi")
 
     with open("results", "w") as dst:
         dst.write(json.dumps(times))
