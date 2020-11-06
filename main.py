@@ -159,8 +159,12 @@ def compute_diagrams(_):
         pdiag.InputOffsetField = ["POINTS", "ImageFile"]
         pdiag.ComputepairswiththeDiscreteGradient = True
         start_time = time.time()
-        simple.SaveData(outp, Input=pdiag)
+        save = simple.SaveData(outp, Input=pdiag)
         times[dataset]["ttk"] = time.time() - start_time
+        # clean memory
+        simple.Delete(save)
+        simple.Delete(pdiag)
+        simple.Delete(data)
 
     for inp in glob.glob("*.dipha"):
         exe = exes["dipha"]
