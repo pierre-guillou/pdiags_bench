@@ -4,6 +4,7 @@ import glob
 import json
 import math
 import os
+import subprocess
 import tarfile
 
 import requests
@@ -117,7 +118,7 @@ def build_software():
         os.system("cmake --build " + builddir)
 
 
-def compute_diagrams():
+def compute_diagrams(nThreads=4):
     exes = {
         "dipha": "build_dipha/dipha",
         "gudhi": "build_gudhi/src/Bitmap_cubical_complex/utilities/cubical_complex_persistence",
@@ -137,19 +138,32 @@ def compute_diagrams():
         exe = exes["dipha"]
         inp = dataset
         outp = f"diagrams/{dataset.split('.')[0]}.dipha"
-        os.system(f"mpirun -np 8 {exe} --benchmark --upper_dim 3 {inp} {outp}")
+        cmd = [
+            "mpirun",
+            "-np",
+            str(nThreads),
+            exe,
+            "--benchmark",
+            "--upper_dim",
+            str(3),
+            inp,
+            outp,
+        ]
+        subprocess.run(cmd, capture_output=True)
 
     for dataset in glob.glob("*.dipha"):
         exe = exes["CubicalRipser"]
         inp = dataset
         outp = f"diagrams/{dataset.split('.')[0]}.cr"
-        os.system(f"{exe} {inp} --output {outp}")
+        cmd = [exe, inp, "--output", outp]
+        subprocess.check_call(cmd)
 
     for dataset in glob.glob("*.pers"):
         exe = exes["gudhi"]
         inp = dataset
         outp = f"diagrams/{dataset.split('.')[0]}.gudhi"
-        os.system(f"{exe} {inp}")
+        cmd = [exe, inp]
+        subprocess.check_call(cmd)
         os.rename(inp + "_persistence", outp)
 
 
