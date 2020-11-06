@@ -86,7 +86,7 @@ def convert_datasets(raw_file):
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
 
 
-def download_software():
+def download_and_build_software():
     gh = "https://github.com"
     tb = "tarball"
     gudhi_url = f"{gh}/GUDHI/gudhi-devel/{tb}/tags%2Fgudhi-release-3.3.0"
@@ -95,6 +95,7 @@ def download_software():
 
     softs = ["dipha", "gudhi", "CubicalRipser"]
 
+    # download and extract a tarball from GitHub
     for soft in softs:
         download_dataset(locals()[soft + "_url"], soft + ".tar.gz")
         with tarfile.open(soft + ".tar.gz", "r:gz") as src:
@@ -103,10 +104,7 @@ def download_software():
             os.rename(src.getmembers()[0].name, soft)
         print("Extracted " + soft + " archive")
 
-    return softs
-
-
-def build_software():
+    # build the 3 applications
     os.system("make -C CubicalRipser")
 
     for cmake_soft in ["dipha", "gudhi"]:
@@ -201,8 +199,7 @@ def main():
     # download_datasets(datasets_urls)
     # for dataset in glob.glob("*.raw"):
     #     convert_datasets(dataset)
-    # download_software()
-    # build_software()
+    # download_and_build_software()
     compute_diagrams()
 
 
