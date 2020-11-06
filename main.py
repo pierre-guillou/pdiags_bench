@@ -145,11 +145,11 @@ def compute_diagrams(_):
         pass
 
     times = dict()
-    for raw in glob.glob("*.raw"):
+    for raw in sorted(glob.glob("*.raw")):
         dataset = raw.split(".")[0]
         times[dataset] = dict()
 
-    for inp in glob.glob("*.vti"):
+    for inp in sorted(glob.glob("*.vti")):
         dataset = inp.split(".")[0]
         print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
@@ -166,7 +166,7 @@ def compute_diagrams(_):
         simple.Delete(pdiag)
         simple.Delete(data)
 
-    for inp in glob.glob("*.dipha"):
+    for inp in sorted(glob.glob("*.dipha")):
         exe = exes["dipha"]
         dataset = inp.split(".")[0]
         print("Processing " + dataset + " with dipha...")
@@ -185,7 +185,7 @@ def compute_diagrams(_):
         subprocess.run(cmd, capture_output=True)
         times[dataset]["dipha"] = time.time() - start_time
 
-    for inp in glob.glob("*.dipha"):
+    for inp in sorted(glob.glob("*.dipha")):
         exe = exes["CubicalRipser"]
         dataset = inp.split(".")[0]
         if "float" in dataset:
@@ -201,7 +201,7 @@ def compute_diagrams(_):
         except subprocess.CalledProcessError:
             print(dataset + " is too large for CubicalRipser")
 
-    for inp in glob.glob("*.pers"):
+    for inp in sorted(glob.glob("*.pers")):
         exe = exes["gudhi"]
         dataset = inp.split(".")[0]
         print("Processing " + dataset + " with Gudhi...")
