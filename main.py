@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import glob
 import json
 import math
@@ -15,7 +16,7 @@ URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
 SIZE_LIMIT_MB = 10
 
 
-def get_datasets_urls():
+def get_datasets_urls(size_limit_mb):
     req = requests.get(URL)
     datasets_json = json.loads(req.text)
 
@@ -31,7 +32,7 @@ def get_datasets_urls():
         dataset["url"]
         for dataset in datasets_json
         if math.prod(dataset["size"]) * dtype_size[dataset["type"]]
-        < (SIZE_LIMIT_MB * 1e6)
+        < (size_limit_mb * 1e6)
     ]
 
 
@@ -84,6 +85,13 @@ def convert_datasets(raw_file):
     )
 
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
+
+
+def prepare_datasets(size_limit=SIZE_LIMIT_MB):
+    datasets_urls = get_datasets_urls(size_limit)
+    download_datasets(datasets_urls)
+    for dataset in glob.glob("*.raw"):
+        convert_datasets(dataset)
 
 
 def download_and_build_software():
@@ -195,12 +203,30 @@ def compute_diagrams(nThreads=4):
 
 
 def main():
-    # datasets_urls = get_datasets_urls()
-    # download_datasets(datasets_urls)
-    # for dataset in glob.glob("*.raw"):
-    #     convert_datasets(dataset)
-    # download_and_build_software()
-    compute_diagrams()
+    parser = argparse.ArgumentParser(
+        description=(
+            "Compute Persistence Diagrams with TTK, Dipha, Gudhi and "
+            "CubicalRipser on a selection of OpenSciVis datasets"
+        )
+    )
+    subparsers = parser.add_subparsers()
+
+    prep_datasets = subparsers.add_parser("prepare_datasets")
+    prep_datasets.set_defaults(func=prepare_datasets)
+
+    dl_softs = subparsers.add_parser("download_software")
+    dl_softs.set_defaults(func=download_and_build_software)
+
+    get_diags = subparsers.add_parser("compute_diagrams")
+    get_diags.set_defaults(func=compute_diagrams)
+
+    cli_args = parser.parse_args()
+
+    # force use of subcommand, display help without one
+    if "func" in cli_args.__dict__:
+        cli_args.func(cli_args)
+    else:
+        parser.parse_args(["--help"])
 
 
 if __name__ == "__main__":
