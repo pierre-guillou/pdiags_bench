@@ -154,6 +154,10 @@ def compute_diagrams(nThreads=4):
         outp = f"diagrams/{dataset}.vtu"
         data = simple.XMLImageDataReader(FileName=[inp])
         pdiag = simple.TTKPersistenceDiagram(Input=data)
+        pdiag.ScalarField = ["POINTS", "ImageFile"]
+        pdiag.InputOffsetField = ["POINTS", "ImageFile"]
+        pdiag.ComputepairswiththeDiscreteGradient = True
+        pdiag.UseAllCores = False
         pdiag.ThreadNumber = nThreads
         start_time = time.time()
         simple.SaveData(outp, simple.CleantoGrid(Input=pdiag))
