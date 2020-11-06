@@ -191,6 +191,8 @@ def compute_diagrams(nThreads=4):
         times[dataset]["gudhi"] = time.time() - start_time
         os.rename(inp + "_persistence", outp)
 
+    with open("results", "w") as dst:
+        dst.write(json.dumps(times))
     return times
 
 
