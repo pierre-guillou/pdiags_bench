@@ -57,7 +57,7 @@ def convert_dataset(raw_file):
 
     dtype_pv = {
         "uint8": "unsigned char",
-        "int16": "signed short",
+        "int16": "short",
         "uint16": "unsigned short",
         "float32": "float",
         "float64": "double",
