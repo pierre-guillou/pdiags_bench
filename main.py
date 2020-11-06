@@ -51,7 +51,7 @@ def download_datasets(datasets_urls):
         download_dataset(url)
 
 
-def convert_datasets(raw_file):
+def convert_dataset(raw_file):
     extent, dtype = raw_file.split(".")[0].split("_")[-2:]
     extent = [int(dim) for dim in extent.split("x")]
 
@@ -90,8 +90,8 @@ def convert_datasets(raw_file):
 def prepare_datasets(_, size_limit=SIZE_LIMIT_MB):
     datasets_urls = get_datasets_urls(size_limit)
     download_datasets(datasets_urls)
-    for dataset in glob.glob("*.raw"):
-        convert_datasets(dataset)
+    for dataset in datasets_urls:
+        convert_dataset(dataset.split("/")[-1])
 
 
 def download_and_build_software(_):
