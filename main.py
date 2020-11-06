@@ -134,6 +134,13 @@ def compute_diagrams(nThreads=4):
     except FileExistsError:
         pass
 
+    for dataset in glob.glob("*.vti"):
+        inp = dataset
+        outp = f"diagrams/{dataset.split('.')[0]}.vtu"
+        data = simple.XMLImageDataReader(FileName=[inp])
+        pdiag = simple.TTKPersistenceDiagram(Input=data)
+        simple.SaveData(outp, simple.CleantoGrid(Input=pdiag))
+
     for dataset in glob.glob("*.dipha"):
         exe = exes["dipha"]
         inp = dataset
