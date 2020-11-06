@@ -151,6 +151,7 @@ def compute_diagrams(_):
 
     for inp in glob.glob("*.vti"):
         dataset = inp.split(".")[0]
+        print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
         data = simple.XMLImageDataReader(FileName=[inp])
         pdiag = simple.TTKPersistenceDiagram(Input=data)
@@ -160,11 +161,11 @@ def compute_diagrams(_):
         start_time = time.time()
         simple.SaveData(outp, Input=pdiag)
         times[dataset]["ttk"] = time.time() - start_time
-        print("Processed " + dataset + " with TTK")
 
     for inp in glob.glob("*.dipha"):
         exe = exes["dipha"]
         dataset = inp.split(".")[0]
+        print("Processing " + dataset + " with dipha...")
         outp = f"diagrams/{dataset}.dipha"
         cmd = [
             "mpirun",
@@ -179,31 +180,30 @@ def compute_diagrams(_):
         start_time = time.time()
         subprocess.run(cmd, capture_output=True)
         times[dataset]["dipha"] = time.time() - start_time
-        print("Processed " + dataset + " with dipha")
 
     for inp in glob.glob("*.dipha"):
         exe = exes["CubicalRipser"]
         dataset = inp.split(".")[0]
+        print("Processing " + dataset + " with CubicalRipser...")
         outp = f"diagrams/{dataset}.cr"
         cmd = [exe, inp, "--output", outp]
         try:
             start_time = time.time()
             subprocess.check_call(cmd)
             times[dataset]["CubicalRipser"] = time.time() - start_time
-            print("Processed " + dataset + " with CubicalRipser")
         except subprocess.CalledProcessError:
             print(dataset + " is too large for CubicalRipser")
 
     for inp in glob.glob("*.pers"):
         exe = exes["gudhi"]
         dataset = inp.split(".")[0]
+        print("Processing " + dataset + " with Gudhi...")
         outp = f"diagrams/{dataset}.gudhi"
         cmd = [exe, inp]
         start_time = time.time()
         subprocess.check_call(cmd)
         times[dataset]["gudhi"] = time.time() - start_time
         os.rename(inp + "_persistence", outp)
-        print("Processed " + dataset + " with Gudhi")
 
     with open("results", "w") as dst:
         dst.write(json.dumps(times))
