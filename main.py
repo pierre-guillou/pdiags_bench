@@ -33,6 +33,8 @@ def get_datasets_urls(size_limit_mb):
         for dataset in datasets_json
         if math.prod(dataset["size"]) * dtype_size[dataset["type"]]
         < (size_limit_mb * 1e6)
+        # CubicalRipser limitation
+        and all(dim < 510 for dim in dataset["size"])
     ]
 
 
