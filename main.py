@@ -105,7 +105,7 @@ def download_and_build_software():
         print("Extracted " + soft + " archive")
 
     # build the 3 applications
-    os.system("make -C CubicalRipser")
+    subprocess.check_call(["make", "-C", "CubicalRipser"])
 
     for cmake_soft in ["dipha", "gudhi"]:
         builddir = "build_" + cmake_soft
@@ -113,8 +113,8 @@ def download_and_build_software():
             os.mkdir(builddir)
         except FileExistsError:
             pass
-        os.system("cmake -S " + cmake_soft + " -B " + builddir)
-        os.system("cmake --build " + builddir)
+        subprocess.check_call("cmake", "-S", cmake_soft, "-B", builddir)
+        subprocess.check_call("cmake", "--build", builddir)
 
 
 def compute_diagrams(nThreads=4):
