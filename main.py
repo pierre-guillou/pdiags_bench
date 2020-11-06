@@ -13,7 +13,7 @@ import requests
 from paraview import simple
 
 URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
-SIZE_LIMIT_MB = 2000
+SIZE_LIMIT_MB = 500
 
 
 def get_datasets_urls(size_limit_mb):
@@ -33,8 +33,6 @@ def get_datasets_urls(size_limit_mb):
         for dataset in datasets_json
         if math.prod(dataset["size"]) * dtype_size[dataset["type"]]
         < (size_limit_mb * 1e6)
-        # CubicalRipser limitation
-        and all(dim < 510 for dim in dataset["size"])
     ]
 
 
@@ -188,10 +186,13 @@ def compute_diagrams(_):
         dataset = inp.split(".")[0]
         outp = f"diagrams/{dataset}.cr"
         cmd = [exe, inp, "--output", outp]
-        start_time = time.time()
-        subprocess.check_call(cmd)
-        times[dataset]["CubicalRipser"] = time.time() - start_time
-        print("Processed " + dataset + " with CubicalRipser")
+        try:
+            start_time = time.time()
+            subprocess.check_call(cmd)
+            times[dataset]["CubicalRipser"] = time.time() - start_time
+            print("Processed " + dataset + " with CubicalRipser")
+        except subprocess.CalledProcessError:
+            print(dataset + " is too large for CubicalRipser")
 
     for inp in glob.glob("*.pers"):
         exe = exes["gudhi"]
