@@ -188,6 +188,9 @@ def compute_diagrams(_):
     for inp in glob.glob("*.dipha"):
         exe = exes["CubicalRipser"]
         dataset = inp.split(".")[0]
+        if "float" in dataset:
+            # skip large datasets
+            continue
         print("Processing " + dataset + " with CubicalRipser...")
         outp = f"diagrams/{dataset}.cr"
         cmd = [exe, inp, "--output", outp]
