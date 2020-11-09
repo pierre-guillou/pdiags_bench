@@ -153,18 +153,10 @@ def compute_diagrams(_):
         dataset = inp.split(".")[0]
         print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
-        data = simple.XMLImageDataReader(FileName=[inp])
-        pdiag = simple.TTKPersistenceDiagram(Input=data)
-        pdiag.ScalarField = ["POINTS", "ImageFile"]
-        pdiag.InputOffsetField = ["POINTS", "ImageFile"]
-        pdiag.ComputepairswiththeDiscreteGradient = True
+        cmd = ["python", "ttk_diagram.py", inp, outp]
         start_time = time.time()
-        save = simple.SaveData(outp, Input=pdiag)
+        subprocess.check_call(cmd)
         times[dataset]["ttk"] = time.time() - start_time
-        # clean memory
-        simple.Delete(save)
-        simple.Delete(pdiag)
-        simple.Delete(data)
 
     for inp in sorted(glob.glob("*.dipha")):
         exe = exes["dipha"]
