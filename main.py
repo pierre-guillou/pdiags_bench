@@ -209,6 +209,22 @@ def compute_diagrams(_):
     return times
 
 
+def compute_distances(_):
+    # list of datasets that have at least one persistence diagram
+    datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
+
+    for ds in datasets:
+        ttk_diag = ds + ".vtu"
+        dipha_diag = ds + ".dipha"
+        empty_diag = "empty.vtu"
+
+        if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
+            cmd = ["python", "ttk_distance.py", "auction", dipha_diag, ttk_diag]
+            subprocess.run(cmd)
+            cmd = ["python", "ttk_distance.py", "auction", dipha_diag, empty_diag]
+            subprocess.run(cmd)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=(
