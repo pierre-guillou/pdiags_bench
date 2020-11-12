@@ -28,5 +28,6 @@ elif sys.argv[1] == "auction":
 
     gd = simple.GroupDatasets(Input=[diag0, diag1])
     dist = simple.TTKPersistenceDiagramClustering(Input=gd)
+    dist.Maximalcomputationtimes = 10.0
 
 save = simple.SaveData("dist.vtu", Input=dist)
