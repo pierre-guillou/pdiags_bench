@@ -24,10 +24,14 @@ if sys.argv[1] == "bottleneck":
         Persistencediagram2=diag1,
     )
 
+    save = simple.SaveData("dist.vtu", Input=dist)
+
 elif sys.argv[1] == "auction":
 
     gd = simple.GroupDatasets(Input=[diag0, diag1])
     dist = simple.TTKPersistenceDiagramClustering(Input=gd)
     dist.Maximalcomputationtimes = 10.0
-
-save = simple.SaveData("dist.vtu", Input=dist)
+    pairTypes = ["min-saddle pairs", "saddle-saddle pairs", "saddle-max pairs"]
+    for pairType in pairTypes:
+        dist.Criticalpairsusedfortheclustering = pairType
+        save = simple.SaveData("dist.vtu", Input=dist)
