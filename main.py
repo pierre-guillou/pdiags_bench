@@ -67,21 +67,27 @@ def convert_dataset(raw_file):
     raw.DataScalarType = dtype_pv[dtype]
     raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
     raw_stem = raw_file.split(".")[0]
+    # normalize scalar field
+    pdc = simple.TTKPointDataConverter(Input=raw)
+    pdc.PointDataScalarField = ["POINTS", "ImageFile"]
+    pdc.OutputType = "Float"
+    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
+    sfnorm.ScalarField = ["POINTS", "ImageFile"]
     # vtkImageData (TTK)
     simple.SaveData(
         raw_stem + ".vti",
-        proxy=raw,
+        proxy=sfnorm,
         PointDataArrays=["ImageFile"],
     )
     # Dipha Image Data (Dipha, CubicalRipser)
     simple.SaveData(
         raw_stem + ".dipha",
-        proxy=raw,
+        proxy=sfnorm,
     )
     # Perseus Cubical Grid (Gudhi)
     simple.SaveData(
         raw_stem + ".pers",
-        proxy=raw,
+        proxy=sfnorm,
     )
 
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
