@@ -29,7 +29,10 @@ if sys.argv[1] == "bottleneck":
 elif sys.argv[1] == "auction":
 
     gd = simple.GroupDatasets(Input=[diag0, diag1])
-    dist = simple.TTKPersistenceDiagramClustering(Input=gd)
+    thr = simple.Threshold(Input=gd)
+    thr.Scalars = ["CELLS", "Persistence"]
+    thr.ThresholdRange = [0.01, 1.0]
+    dist = simple.TTKPersistenceDiagramClustering(Input=thr)
     dist.Maximalcomputationtimes = 10.0
     pairTypes = ["min-saddle pairs", "saddle-saddle pairs", "saddle-max pairs"]
     for pairType in pairTypes:
