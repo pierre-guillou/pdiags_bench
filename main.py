@@ -253,6 +253,9 @@ def main():
     get_diags = subparsers.add_parser("compute_diagrams")
     get_diags.set_defaults(func=compute_diagrams)
 
+    get_dists = subparsers.add_parser("compute_distances")
+    get_dists.set_defaults(func=compute_distances)
+
     cli_args = parser.parse_args()
 
     # force use of subcommand, display help without one
