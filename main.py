@@ -5,6 +5,7 @@ import glob
 import json
 import math
 import os
+import re
 import subprocess
 import tarfile
 import time
@@ -219,6 +220,10 @@ def compute_distances(_):
     # list of datasets that have at least one persistence diagram
     datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
 
+    pattern = re.compile("Wasserstein distance: \d+\.\d+")
+
+    dists = dict()
+
     for ds in datasets:
         ttk_diag = ds + ".vtu"
         dipha_diag = ds + ".dipha"
@@ -227,12 +232,27 @@ def compute_distances(_):
         if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
             cmd = ["python", "ttk_distance.py", "auction", dipha_diag, ttk_diag]
             print(f"Computing distance between TTK and Dipha diagrams for {ds}")
-            subprocess.run(cmd)
+            proc0 = subprocess.run(cmd, capture_output=True)
             cmd = ["python", "ttk_distance.py", "auction", dipha_diag, empty_diag]
             print(
                 f"Computing distance between Dipha diagram and empty diagram for {ds}"
             )
-            subprocess.run(cmd)
+            proc1 = subprocess.run(cmd, capture_output=True)
+            matches0 = [
+                match.split(" ")[-1] for match in re.findall(pattern, str(proc0.stdout))
+            ]
+            matches1 = [
+                match.split(" ")[-1] for match in re.findall(pattern, str(proc1.stdout))
+            ]
+            pairTypes = ["min-sad", "sad-sad", "sad-max"]
+            dists[ds] = {
+                "ttk-dipha": dict(zip(pairTypes, matches0)),
+                "empty-dipha": dict(zip(pairTypes, matches1)),
+            }
+
+    with open("distances", "w") as dst:
+        dst.write(json.dumps(dists))
+    return dists
 
 
 def main():
