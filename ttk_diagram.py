@@ -9,4 +9,5 @@ pdiag = simple.TTKPersistenceDiagram(Input=data)
 pdiag.ScalarField = ["POINTS", "ImageFile"]
 pdiag.InputOffsetField = ["POINTS", "ImageFile"]
 pdiag.ComputepairswiththeDiscreteGradient = True
+pdiag.IgnoreBoundary = False
 save = simple.SaveData(sys.argv[2], Input=pdiag)
