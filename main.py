@@ -220,7 +220,7 @@ def compute_distances(_):
     # list of datasets that have at least one persistence diagram
     datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
 
-    pattern = re.compile("Wasserstein distance: \d+\.\d+")
+    pattern = re.compile("Wasserstein distance: (\d+\.\d+|\d+)")
 
     dists = dict()
 
