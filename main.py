@@ -139,6 +139,7 @@ def download_and_build_software(_):
 
 def compute_diagrams(_, all_softs=True):
     exes = {
+        "ttk": "ttkPersistenceDiagramCmd",
         "dipha": "build_dipha/dipha",
         "gudhi": (
             "build_gudhi/src/Bitmap_cubical_complex"
@@ -162,13 +163,15 @@ def compute_diagrams(_, all_softs=True):
         times[dataset] = dict()
 
     for inp in sorted(glob.glob("*.vti")):
+        exe = exes["ttk"]
         dataset = inp.split(".")[0]
         print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
-        cmd = ["python", "ttk_diagram.py", inp, outp]
+        cmd = [exe, "-i", inp]
         start_time = time.time()
         subprocess.check_call(cmd)
         times[dataset]["ttk"] = time.time() - start_time
+        os.rename("output_port_0.vtu", outp)
 
     for inp in sorted(glob.glob("*.dipha")):
         exe = exes["dipha"]
