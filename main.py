@@ -262,6 +262,9 @@ def compute_distances(_, method="auction"):
                 "empty-dipha": dict(zip(pairTypes, matches1)),
             }
 
+    # clean pipeline sink
+    os.remove("dist.vtu")
+
     with open("distances", "w") as dst:
         dst.write(json.dumps(dists))
     return dists
