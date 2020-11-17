@@ -249,17 +249,12 @@ def compute_distances(_, method="auction"):
             print(f"Computing Dipha distance to empty diagram for {ds}")
             proc1 = subprocess.run(cmd, capture_output=True)
             if method == "auction":
-                matches0 = [
-                    match.split(" ")[-1]
-                    for match in re.findall(auct_patt, str(proc0.stdout))
-                ]
-                matches1 = [
-                    match.split(" ")[-1]
-                    for match in re.findall(auct_patt, str(proc1.stdout))
-                ]
+                matches0 = re.findall(auct_patt, str(proc0.stdout))
+                matches1 = re.findall(auct_patt, str(proc1.stdout))
+
             elif method == "bottleneck":
-                matches0 = re.search(btnk_patt, str(proc0.stdout)).groups()
-                matches1 = re.search(btnk_patt, str(proc1.stdout)).groups()
+                matches0 = re.findall(btnk_patt, str(proc0.stdout))[0]
+                matches1 = re.findall(btnk_patt, str(proc1.stdout))[0]
 
             pairTypes = ["min-sad", "sad-sad", "sad-max"]
             dists[ds] = {
