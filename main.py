@@ -14,7 +14,7 @@ import requests
 from paraview import simple
 
 URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
-SIZE_LIMIT_MB = 100
+SIZE_LIMIT_MB = 80
 
 
 def get_datasets_urls(size_limit_mb):
