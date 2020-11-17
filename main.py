@@ -52,7 +52,7 @@ def download_datasets(datasets_urls):
         download_dataset(url)
 
 
-def convert_dataset(raw_file):
+def convert_dataset(raw_file, normalize=True):
     extent, dtype = raw_file.split(".")[0].split("_")[-2:]
     extent = [int(dim) for dim in extent.split("x")]
 
@@ -68,27 +68,32 @@ def convert_dataset(raw_file):
     raw.DataScalarType = dtype_pv[dtype]
     raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
     raw_stem = raw_file.split(".")[0]
-    # normalize scalar field
-    pdc = simple.TTKPointDataConverter(Input=raw)
-    pdc.PointDataScalarField = ["POINTS", "ImageFile"]
-    pdc.OutputType = "Float"
-    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
-    sfnorm.ScalarField = ["POINTS", "ImageFile"]
+    outp = raw
+
+    if normalize:
+        # normalize scalar field
+        pdc = simple.TTKPointDataConverter(Input=raw)
+        pdc.PointDataScalarField = ["POINTS", "ImageFile"]
+        pdc.OutputType = "Float"
+        sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
+        sfnorm.ScalarField = ["POINTS", "ImageFile"]
+        outp = sfnorm
+
     # vtkImageData (TTK)
     simple.SaveData(
         raw_stem + ".vti",
-        proxy=sfnorm,
+        proxy=outp,
         PointDataArrays=["ImageFile"],
     )
     # Dipha Image Data (Dipha, CubicalRipser)
     simple.SaveData(
         raw_stem + ".dipha",
-        proxy=sfnorm,
+        proxy=outp,
     )
     # Perseus Cubical Grid (Gudhi)
     simple.SaveData(
         raw_stem + ".pers",
-        proxy=sfnorm,
+        proxy=outp,
     )
 
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
