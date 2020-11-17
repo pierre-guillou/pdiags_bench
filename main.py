@@ -132,7 +132,7 @@ def download_and_build_software(_):
         subprocess.check_call("cmake", "--build", builddir)
 
 
-def compute_diagrams(_):
+def compute_diagrams(_, all_softs=True):
     exes = {
         "dipha": "build_dipha/dipha",
         "gudhi": (
@@ -184,32 +184,33 @@ def compute_diagrams(_):
         subprocess.run(cmd, capture_output=True)
         times[dataset]["dipha"] = time.time() - start_time
 
-    for inp in sorted(glob.glob("*.dipha")):
-        exe = exes["CubicalRipser"]
-        dataset = inp.split(".")[0]
-        if "float" in dataset:
-            # skip large datasets
-            continue
-        print("Processing " + dataset + " with CubicalRipser...")
-        outp = f"diagrams/{dataset}.cr"
-        cmd = [exe, inp, "--output", outp]
-        try:
+    if all_softs:
+        for inp in sorted(glob.glob("*.dipha")):
+            exe = exes["CubicalRipser"]
+            dataset = inp.split(".")[0]
+            if "float" in dataset:
+                # skip large datasets
+                continue
+            print("Processing " + dataset + " with CubicalRipser...")
+            outp = f"diagrams/{dataset}.cr"
+            cmd = [exe, inp, "--output", outp]
+            try:
+                start_time = time.time()
+                subprocess.check_call(cmd)
+                times[dataset]["CubicalRipser"] = time.time() - start_time
+            except subprocess.CalledProcessError:
+                print(dataset + " is too large for CubicalRipser")
+
+        for inp in sorted(glob.glob("*.pers")):
+            exe = exes["gudhi"]
+            dataset = inp.split(".")[0]
+            print("Processing " + dataset + " with Gudhi...")
+            outp = f"diagrams/{dataset}.gudhi"
+            cmd = [exe, inp]
             start_time = time.time()
             subprocess.check_call(cmd)
-            times[dataset]["CubicalRipser"] = time.time() - start_time
-        except subprocess.CalledProcessError:
-            print(dataset + " is too large for CubicalRipser")
-
-    for inp in sorted(glob.glob("*.pers")):
-        exe = exes["gudhi"]
-        dataset = inp.split(".")[0]
-        print("Processing " + dataset + " with Gudhi...")
-        outp = f"diagrams/{dataset}.gudhi"
-        cmd = [exe, inp]
-        start_time = time.time()
-        subprocess.check_call(cmd)
-        times[dataset]["gudhi"] = time.time() - start_time
-        os.rename(inp + "_persistence", outp)
+            times[dataset]["gudhi"] = time.time() - start_time
+            os.rename(inp + "_persistence", outp)
 
     with open("results", "w") as dst:
         dst.write(json.dumps(times))
