@@ -225,7 +225,7 @@ def compute_diagrams(_, all_softs=True):
     return times
 
 
-def compute_distances(_):
+def compute_distances(_, method="auction"):
     # list of datasets that have at least one persistence diagram
     datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
 
@@ -239,10 +239,10 @@ def compute_distances(_):
         empty_diag = "empty.vtu"
 
         if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
-            cmd = ["python", "ttk_distance.py", "auction", dipha_diag, ttk_diag]
+            cmd = ["python", "ttk_distance.py", method, dipha_diag, ttk_diag]
             print(f"Computing distance between TTK and Dipha diagrams for {ds}")
             proc0 = subprocess.run(cmd, capture_output=True)
-            cmd = ["python", "ttk_distance.py", "auction", dipha_diag, empty_diag]
+            cmd = ["python", "ttk_distance.py", method, dipha_diag, empty_diag]
             print(
                 f"Computing distance between Dipha diagram and empty diagram for {ds}"
             )
