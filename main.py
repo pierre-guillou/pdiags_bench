@@ -229,8 +229,11 @@ def compute_distances(_, method="auction"):
     # list of datasets that have at least one persistence diagram
     datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
 
-    pattern = re.compile("Wasserstein distance: (\d+\.\d+|\d+)")
-
+    float_re = r"(\d+\.\d+|\d+)"
+    auct_patt = re.compile(f"Wasserstein distance: {float_re}")
+    btnk_patt = re.compile(
+        rf"diagMax\({float_re}\), diagMin\({float_re}\), diagSad\({float_re}\)"
+    )
     dists = dict()
 
     for ds in datasets:
@@ -243,16 +246,21 @@ def compute_distances(_, method="auction"):
             print(f"Computing distance between TTK and Dipha diagrams for {ds}")
             proc0 = subprocess.run(cmd, capture_output=True)
             cmd = ["python", "ttk_distance.py", method, dipha_diag, empty_diag]
-            print(
-                f"Computing distance between Dipha diagram and empty diagram for {ds}"
-            )
+            print(f"Computing Dipha distance to empty diagram for {ds}")
             proc1 = subprocess.run(cmd, capture_output=True)
-            matches0 = [
-                match.split(" ")[-1] for match in re.findall(pattern, str(proc0.stdout))
-            ]
-            matches1 = [
-                match.split(" ")[-1] for match in re.findall(pattern, str(proc1.stdout))
-            ]
+            if method == "auction":
+                matches0 = [
+                    match.split(" ")[-1]
+                    for match in re.findall(auct_patt, str(proc0.stdout))
+                ]
+                matches1 = [
+                    match.split(" ")[-1]
+                    for match in re.findall(auct_patt, str(proc1.stdout))
+                ]
+            elif method == "bottleneck":
+                matches0 = re.search(btnk_patt, str(proc0.stdout)).groups()
+                matches1 = re.search(btnk_patt, str(proc1.stdout)).groups()
+
             pairTypes = ["min-sad", "sad-sad", "sad-max"]
             dists[ds] = {
                 "ttk-dipha": dict(zip(pairTypes, matches0)),
