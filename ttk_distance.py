@@ -44,7 +44,4 @@ elif sys.argv[1] == "auction":
     thr.ThresholdRange = [thr_bound, 1.0]
     dist = simple.TTKPersistenceDiagramClustering(Input=thr)
     dist.Maximalcomputationtimes = 10.0
-    pairTypes = ["min-saddle pairs", "saddle-saddle pairs", "saddle-max pairs"]
-    for pairType in pairTypes:
-        dist.Criticalpairsusedfortheclustering = pairType
-        save = simple.SaveData("dist.vtu", Input=dist)
+    save = simple.SaveData("dist.vtu", Input=dist)

@@ -228,7 +228,9 @@ def compute_distances(_, method="auction"):
     datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
 
     float_re = r"(\d+\.\d+|\d+)"
-    auct_patt = re.compile(f"Wasserstein distance: {float_re}")
+    auct_patt = re.compile(
+        rf"[Min-saddle|Saddle-saddle|Saddle-max] cost\s+:\s+{float_re}"
+    )
     btnk_patt = re.compile(
         rf"diagMax\({float_re}\), diagMin\({float_re}\), diagSad\({float_re}\)"
     )
