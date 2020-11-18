@@ -99,10 +99,11 @@ def convert_dataset(raw_file, normalize=True):
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
 
 
-def prepare_datasets(_, size_limit=SIZE_LIMIT_MB):
-    datasets_urls = get_datasets_urls(size_limit)
-    download_datasets(datasets_urls)
-    for dataset in datasets_urls:
+def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=True):
+    if download:
+        datasets_urls = get_datasets_urls(size_limit)
+        download_datasets(datasets_urls)
+    for dataset in sorted(glob.glob("*.raw")):
         convert_dataset(dataset.split("/")[-1])
 
 
