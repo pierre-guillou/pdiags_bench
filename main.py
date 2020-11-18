@@ -158,13 +158,11 @@ def compute_diagrams(_, all_softs=True):
         pass
 
     times = dict()
-    for raw in sorted(glob.glob("*.raw")):
-        dataset = raw.split(".")[0]
-        times[dataset] = dict()
 
     for inp in sorted(glob.glob("*.vti")):
         exe = exes["ttk"]
         dataset = inp.split(".")[0]
+        times[dataset] = dict()
         print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
         cmd = [exe, "-i", inp]
