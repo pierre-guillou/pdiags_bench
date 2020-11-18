@@ -256,6 +256,10 @@ def compute_distances(_, method="auction"):
                 matches0 = re.findall(btnk_patt, str(proc0.stdout))[0]
                 matches1 = re.findall(btnk_patt, str(proc1.stdout))[0]
 
+            # parse string to float
+            matches0 = [float(m) for m in matches0]
+            matches1 = [float(m) for m in matches1]
+
             pairTypes = ["min-sad", "sad-sad", "sad-max"]
             dists[ds] = {
                 "ttk-dipha": dict(zip(pairTypes, matches0)),
