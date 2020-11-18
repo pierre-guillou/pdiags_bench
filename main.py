@@ -229,11 +229,9 @@ def compute_distances(_, method="auction"):
 
     float_re = r"(\d+\.\d+|\d+)"
     auct_patt = re.compile(
-        rf"[Min-saddle|Saddle-saddle|Saddle-max] cost\s+:\s+{float_re}"
+        rf"(?:Min-saddle|Saddle-saddle|Saddle-max) cost\s+:\s+{float_re}"
     )
-    btnk_patt = re.compile(
-        rf"diagMax\({float_re}\), diagMin\({float_re}\), diagSad\({float_re}\)"
-    )
+    btnk_patt = re.compile(rf"diag(?:Max|Min|Sad)\({float_re}\)")
     dists = dict()
 
     for ds in datasets:
@@ -248,13 +246,11 @@ def compute_distances(_, method="auction"):
             cmd = ["python", "ttk_distance.py", method, dipha_diag, empty_diag]
             print(f"Computing Dipha distance to empty diagram for {ds}")
             proc1 = subprocess.run(cmd, capture_output=True)
-            if method == "auction":
-                matches0 = re.findall(auct_patt, str(proc0.stdout))
-                matches1 = re.findall(auct_patt, str(proc1.stdout))
 
-            elif method == "bottleneck":
-                matches0 = re.findall(btnk_patt, str(proc0.stdout))[0]
-                matches1 = re.findall(btnk_patt, str(proc1.stdout))[0]
+            # match distance figures
+            pattern = auct_patt if method == "auction" else btnk_patt
+            matches0 = re.findall(pattern, str(proc0.stdout))
+            matches1 = re.findall(pattern, str(proc1.stdout))
 
             # parse string to float
             matches0 = [float(m) for m in matches0]
