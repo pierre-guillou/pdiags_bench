@@ -160,6 +160,10 @@ def dipha_print_pairs(dipha_diag):
         print(" #Saddle-Saddle pairs:", nptypes.get(1, 0))
         print(" #Saddle-Max pairs:", nptypes.get(2, 0))
         print(" #Total:", sum(nptypes.values()))
+        print(" #Minima:", nptypes.get(0, 0))
+        print(" #1-Saddles:", nptypes.get(1, 0) + nptypes.get(0, 0))
+        print(" #2-Saddles:", nptypes.get(1, 0) + nptypes.get(2, 0))
+        print(" #Maxima:", nptypes.get(2, 0))
 
 
 def compute_diagrams(_, all_softs=True):
