@@ -134,6 +134,34 @@ def download_and_build_software(_):
         subprocess.check_call("cmake", "--build", builddir)
 
 
+def dipha_print_pairs(dipha_diag):
+    with open(dipha_diag, "rb") as src:
+        magic = int.from_bytes(src.read(8), "little", signed=True)
+        if magic != 8067171840:
+            print("Not a Dipha file")
+            return
+        dtype = int.from_bytes(src.read(8), "little", signed=True)
+        if dtype != 2:
+            print("Not a Dipha Persistence Diagram")
+            return
+        npairs = int.from_bytes(src.read(8), "little", signed=True)
+        if npairs < 0:
+            print("Negative number of persistence pairs")
+            return
+        nptypes = dict()
+        for i in range(npairs):
+            ptype = int.from_bytes(src.read(8), "little", signed=True)
+            src.read(8)  # birth
+            src.read(8)  # death
+            nptypes[ptype] = nptypes.get(ptype, 0) + 1
+        nptypes[0] = nptypes.get(0, 0) + nptypes.get(-1, 0)
+        del nptypes[-1]
+        print(" #Min-Saddle pairs:", nptypes.get(0, 0))
+        print(" #Saddle-Saddle pairs:", nptypes.get(1, 0))
+        print(" #Saddle-Max pairs:", nptypes.get(2, 0))
+        print(" #Total:", sum(nptypes.values()))
+
+
 def compute_diagrams(_, all_softs=True):
     exes = {
         "ttk": "ttkPersistenceDiagramCmd",
@@ -186,6 +214,7 @@ def compute_diagrams(_, all_softs=True):
         start_time = time.time()
         subprocess.run(cmd, capture_output=True)
         times[dataset]["dipha"] = time.time() - start_time
+        dipha_print_pairs(outp)
 
     if all_softs:
         for inp in sorted(glob.glob("*.dipha")):
