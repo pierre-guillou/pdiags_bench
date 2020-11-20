@@ -80,11 +80,7 @@ def convert_dataset(raw_file, normalize=True):
         outp = sfnorm
 
     # vtkImageData (TTK)
-    simple.SaveData(
-        raw_stem + ".vti",
-        proxy=outp,
-        PointDataArrays=["ImageFile"],
-    )
+    simple.SaveData(raw_stem + ".vti", proxy=outp)
     # Dipha Image Data (Dipha, CubicalRipser)
     simple.SaveData(
         raw_stem + ".dipha",
