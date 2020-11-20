@@ -190,7 +190,7 @@ def compute_diagrams(_, all_softs=True):
         times[dataset] = dict()
         print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
-        cmd = [exe, "-i", inp]
+        cmd = [exe, "-i", inp, "-d", "4"]
         start_time = time.time()
         subprocess.check_call(cmd)
         times[dataset]["ttk"] = time.time() - start_time
