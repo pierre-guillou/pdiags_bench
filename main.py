@@ -177,7 +177,7 @@ def compute_diagrams(_, all_softs=True):
         "CubicalRipser": "CubicalRipser/CR3",
     }
 
-    for exe in exes.values():
+    for exe in list(exes.values())[1:]:
         if not os.path.isfile(exe):
             print(exe + " not found")
 
