@@ -20,19 +20,23 @@ def use_networkx():
                 acc.add(neigh)
 
     with open("saddle2_graph.csv", "rb") as src:
-        G = nx.readwrite.edgelist.read_edgelist(
-            src, nodetype=str, create_using=nx.DiGraph
-        )
-        unG = nx.Graph(G)
-        paths = list(nx.all_shortest_paths(unG, "149267_s1", "162498_s2"))
-        paths += list(nx.all_shortest_paths(unG, "149267_s1", "121833_s2"))
+        G = nx.readwrite.edgelist.read_edgelist(src, nodetype=str)
+        src = "16957_s1"
+        dst = "28209_s2"
+        visited_bfs = [src, dst]
+        with open("visited") as vis:
+            for line in vis:
+                visited_bfs.append(line.strip())
+        G = nx.subgraph(G, visited_bfs)
+        paths = list(nx.all_shortest_paths(G, src, dst))
         for path in paths:
             print(path)
+        G = nx.subgraph(G, sum(paths, list()))
+
         # neighs = set([src, dst])
         # get_neighs(G, [src], neighs)
         # get_neighs(G, neighs.copy(), neighs)
         # get_neighs(G, neighs.copy(), neighs)
-        G = nx.subgraph(G, sum(paths, list()))
         color_map = list()
         for node in G:
             if "_s1" in node:
