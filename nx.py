@@ -28,6 +28,10 @@ def use_networkx():
 
     with open("saddle2_graph.csv", "rb") as src:
         G = nx.readwrite.edgelist.read_edgelist(src, nodetype=str)
+        # graph is bipartite
+        nx.set_node_attributes(
+            G, {node: (0 if "_s1" in node else 1) for node in G}, name="bipartite"
+        )
         src = "16957_s1"
         dst = "28209_s2"
         visited_bfs = [src, dst]
