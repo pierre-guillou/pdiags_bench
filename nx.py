@@ -39,15 +39,12 @@ def use_networkx():
             for line in vis:
                 visited_bfs.append(line.strip())
         G = nx.subgraph(G, visited_bfs)
-        paths = list(nx.all_shortest_paths(G, src, dst))
+        paths = list(nx.all_simple_paths(G, src, dst, cutoff=17))
         for path in paths:
             print(path)
-        G = nx.subgraph(G, sum(paths, list()))
-
-        # neighs = set([src, dst])
-        # get_neighs(G, [src], neighs)
-        # get_neighs(G, neighs.copy(), neighs)
-        # get_neighs(G, neighs.copy(), neighs)
+        neighs = set(sum(paths, list()))
+        # get_neighs(G, paths[0], neighs)
+        G = nx.subgraph(G, neighs)
         color_map = list()
         for node in G:
             if "_s1" in node:
