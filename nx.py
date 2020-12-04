@@ -4,14 +4,21 @@ from paraview import simple
 
 
 def use_networkx():
-    def print_cc(G):
+    def print_graph_stats(G):
         cc_size = dict()
         n_cc = nx.number_connected_components(G)
+        print(nx.info(G))
+        print("#Neighs\t#Nodes")
+        for i, v in enumerate(nx.degree_histogram(G)):
+            if v != 0:
+                print(f" {i}\t{v}")
+        density = nx.density(G)
+        print(f"Density: {density}")
         print(f"#Connected Components: {n_cc}")
         print("#Nodes\t#Components")
         for cc in nx.connected_components(G):
             cc_size[len(cc)] = cc_size.get(len(cc), 0) + 1
-        for k, v in cc_size.items():
+        for k, v in sorted(cc_size.items(), key=lambda item: item[1]):
             print(f" {k}\t{v}")
 
     def get_neighs(G, nodes, acc=set()):
