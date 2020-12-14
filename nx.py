@@ -26,25 +26,13 @@ def use_networkx():
             for neigh in nx.all_neighbors(G, node):
                 acc.add(neigh)
 
-    with open("saddle2_graph.csv", "rb") as src:
-        G = nx.readwrite.edgelist.read_edgelist(src, nodetype=str)
-        # graph is bipartite
-        nx.set_node_attributes(
-            G, {node: (0 if "_s1" in node else 1) for node in G}, name="bipartite"
-        )
-        src = "16957_s1"
-        dst = "28209_s2"
-        visited_bfs = [src, dst]
-        with open("visited") as vis:
-            for line in vis:
-                visited_bfs.append(line.strip())
-        G = nx.subgraph(G, visited_bfs)
-        paths = list(nx.all_simple_paths(G, src, dst, cutoff=17))
-        for path in paths:
-            print(path)
-        neighs = set(sum(paths, list()))
-        # get_neighs(G, paths[0], neighs)
-        G = nx.subgraph(G, neighs)
+    def get_neighborhood(G, seeds, radius=1):
+        neighs = set(seeds)
+        for i in range(radius):
+            get_neighs(G, neighs.copy(), neighs)
+        return nx.subgraph(G, neighs)
+
+    def display_graph(G):
         color_map = list()
         for node in G:
             if "_s1" in node:
@@ -53,8 +41,35 @@ def use_networkx():
                 color_map.append("orange")
             else:
                 color_map.append("green")
-        nx.draw_networkx(G, nx.spectral_layout(G), node_color=color_map)
+        nx.draw_networkx(
+            G,
+            # nx.spectral_layout(G),
+            node_color=color_map,
+            node_size=100,
+            font_size=8,
+        )
         plt.show()
+
+    with open("saddle2_graph.csv", "rb") as src:
+        G = nx.readwrite.edgelist.read_edgelist(src, nodetype=str)
+        # graph is bipartite
+        nx.set_node_attributes(
+            G, {node: (0 if "_s1" in node else 1) for node in G}, name="bipartite"
+        )
+        # src = "597_s1"
+        # dst = "431_s2"
+        # visited_bfs = [src, dst]
+        # with open("visited") as vis:
+        #     for line in vis:
+        #         visited_bfs.append(line.strip())
+        # G = nx.subgraph(G, visited_bfs)
+        paths = list(nx.all_simple_paths(G, "592544_s1", "672529_s2", cutoff=10))
+        for path in paths:
+            print(path)
+        nodes_path = set(sum(paths, list()))
+        # G = nx.subgraph(G, nodes_path)
+        G = get_neighborhood(G, nodes_path, 1)
+        display_graph(G)
 
 
 def use_mds():
