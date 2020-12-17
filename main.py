@@ -188,6 +188,13 @@ def compute_diagrams(_, all_softs=True):
 
     times = dict()
 
+    def ttk_compute_time(ttk_output):
+        ttk_output = ttk_output.decode()
+        ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+        ttk_output = ansi_escape.sub("", ttk_output)
+        compute_time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
+        return float(re.search(compute_time_re, ttk_output, re.MULTILINE).group(1))
+
     for inp in sorted(glob.glob("*.vti")):
         exe = exes["ttk"]
         dataset = inp.split(".")[0]
@@ -195,10 +202,20 @@ def compute_diagrams(_, all_softs=True):
         print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
         cmd = [exe, "-i", inp, "-d", "4"]
-        start_time = time.time()
-        subprocess.check_call(cmd)
-        times[dataset]["ttk"] = time.time() - start_time
+        proc = subprocess.run(cmd, capture_output=True)
+        times[dataset]["ttk"] = ttk_compute_time(proc.stdout)
         os.rename("output_port_0.vtu", outp)
+
+    def dipha_compute_time(dipha_output, dipha_exec_time):
+        dipha_output = dipha_output.decode()
+        read_re = r"^\s+(\d+\.\d+|\d+).*complex.load_binary"
+        write_re = r"^\s+(\d+\.\d+|\d+).*save_persistence_diagram"
+        patterns = [read_re, write_re]
+        overhead = [
+            float(re.search(pat, dipha_output, re.MULTILINE).group(1))
+            for pat in patterns
+        ]
+        return round(dipha_exec_time - sum(overhead), 3)
 
     for inp in sorted(glob.glob("*.dipha")):
         exe = exes["dipha"]
@@ -216,8 +233,9 @@ def compute_diagrams(_, all_softs=True):
             outp,
         ]
         start_time = time.time()
-        subprocess.run(cmd, capture_output=True)
-        times[dataset]["dipha"] = time.time() - start_time
+        proc = subprocess.run(cmd, capture_output=True)
+        dipha_exec_time = time.time() - start_time
+        times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
         dipha_print_pairs(outp)
 
     if all_softs:
