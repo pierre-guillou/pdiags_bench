@@ -16,7 +16,7 @@ def load_diagram(diag):
 
 diag0 = load_diagram(sys.argv[2])
 diag1 = load_diagram(sys.argv[3])
-thr_bound = 0.1
+thr_bound = 0.01
 
 
 if sys.argv[1] == "bottleneck":
