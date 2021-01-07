@@ -166,6 +166,25 @@ def dipha_print_pairs(dipha_diag):
         print(" #Maxima:", nptypes.get(2, 0))
 
 
+def ttk_print_pairs(ttk_output):
+    ttk_output = ttk_output.decode()
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    ttk_output = ansi_escape.sub("", ttk_output)
+    patterns = [
+        "Min-saddle pairs",
+        "Saddle-saddle pairs",
+        "Saddle-max pairs",
+        "Minima",
+        "1-saddles",
+        "2-saddles",
+        "Maxima",
+    ]
+    for pat in patterns:
+        pat_re = fr"\[DiscreteGradient\].*#{pat}.*:.(\d+)"
+        res = re.search(pat_re, ttk_output, re.MULTILINE).group(1)
+        print(f" #{pat}:", res)
+
+
 def compute_diagrams(_, all_softs=True):
     exes = {
         "ttk": "ttkPersistenceDiagramCmd",
@@ -204,6 +223,7 @@ def compute_diagrams(_, all_softs=True):
         cmd = [exe, "-i", inp, "-d", "4"]
         proc = subprocess.run(cmd, capture_output=True)
         times[dataset]["ttk"] = ttk_compute_time(proc.stdout)
+        ttk_print_pairs(proc.stdout)
         os.rename("output_port_0.vtu", outp)
 
     def dipha_compute_time(dipha_output, dipha_exec_time):
