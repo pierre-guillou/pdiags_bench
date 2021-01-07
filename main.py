@@ -52,7 +52,7 @@ def download_datasets(datasets_urls):
         download_dataset(url)
 
 
-def convert_dataset(raw_file, normalize=True):
+def convert_dataset(raw_file):
     extent, dtype = raw_file.split(".")[0].split("_")[-2:]
     extent = [int(dim) for dim in extent.split("x")]
 
@@ -68,16 +68,18 @@ def convert_dataset(raw_file, normalize=True):
     raw.DataScalarType = dtype_pv[dtype]
     raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
     raw_stem = raw_file.split(".")[0]
-    outp = raw
 
-    if normalize:
-        # normalize scalar field
-        pdc = simple.TTKPointDataConverter(Input=raw)
-        pdc.PointDataScalarField = ["POINTS", "ImageFile"]
-        pdc.OutputType = "Float"
-        sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
-        sfnorm.ScalarField = ["POINTS", "ImageFile"]
-        outp = sfnorm
+    # convert input scalar field to float
+    pdc = simple.TTKPointDataConverter(Input=raw)
+    pdc.PointDataScalarField = ["POINTS", "ImageFile"]
+    pdc.OutputType = "Float"
+    # compute order array
+    arrprec = simple.TTKArrayPreconditioning(Input=pdc)
+    arrprec.PointDataArrays = ["ImageFile"]
+    # trash input scalar field/only keep order array
+    pa = simple.PassArrays(Input=arrprec)
+    pa.PointDataArrays = ["ImageFile_Order"]
+    outp = pa
 
     # vtkImageData (TTK)
     simple.SaveData(raw_stem + ".vti", proxy=outp)
