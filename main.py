@@ -185,7 +185,7 @@ def ttk_print_pairs(ttk_output):
         print(f" #{pat}:", res)
 
 
-def compute_diagrams(_, all_softs=True):
+def compute_diagrams(_, all_softs=False):
     exes = {
         "ttk": "ttkPersistenceDiagramCmd",
         "dipha": "build_dipha/dipha",
