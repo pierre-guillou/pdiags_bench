@@ -79,7 +79,12 @@ def convert_dataset(raw_file):
     # trash input scalar field/only keep order array
     pa = simple.PassArrays(Input=arrprec)
     pa.PointDataArrays = ["ImageFile_Order"]
-    outp = pa
+    pdc2 = simple.TTKPointDataConverter(Input=pa)
+    pdc2.PointDataScalarField = ["POINTS", "ImageFile_Order"]
+    pdc2.OutputType = "Float"
+    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc2)
+    sfnorm.ScalarField = ["POINTS", "ImageFile_Order"]
+    outp = sfnorm
 
     # vtkImageData (TTK)
     simple.SaveData(raw_stem + ".vti", proxy=outp)
