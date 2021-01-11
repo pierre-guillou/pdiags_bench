@@ -9,7 +9,7 @@ def load_diagram(diag):
     if diag.endswith("vtu"):
         return simple.XMLUnstructuredGridReader(FileName=diag)
     elif diag.endswith("dipha") or diag.endswith("cr"):
-        return simple.TTKDiphaPersistenceDiagramReader(FileName=diag)
+        return simple.TTKDiphaFileFormatReader(FileName=diag)
     elif diag.endswith("gudhi"):
         return simple.TTKGudhiPersistenceDiagramReader(FileName=diag)
 
