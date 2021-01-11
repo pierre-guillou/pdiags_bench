@@ -88,34 +88,22 @@ def convert_dataset(raw_file):
     pdc.PointDataScalarField = ["POINTS", "ImageFile"]
     pdc.OutputType = "Float"
 
-    # 1. raw scalar field (in float)
-    write_output(pdc, raw_stem + "_input")
+    # add random perturbation
+    ra = simple.RandomAttributes(Input=pdc)
+    ra.DataType = "Float"
+    ra.ComponentRange = [0.0, 1.0]
+    ra.GeneratePointScalars = 1
+    ra.GenerateCellVectors = 0
+    ad = simple.AppendAttributes(Input=[ra, pdc])
+    calc = simple.Calculator(Input=ad)
+    calc.Function = "RandomPointScalars+ImageFile"
+    pa = simple.PassArrays(Input=calc)
+    pa.PointDataArrays = ["Result"]
 
-    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
-    sfnorm.ScalarField = ["POINTS", "ImageFile"]
+    sfnorm = simple.TTKScalarFieldNormalizer(Input=pa)
+    sfnorm.ScalarField = ["POINTS", "Result"]
 
-    # 2. normalized input scalar field
-    write_output(sfnorm, raw_stem + "_input_sfnorm")
-
-    # compute order array
-    arrprec = simple.TTKArrayPreconditioning(Input=pdc)
-    arrprec.PointDataArrays = ["ImageFile"]
-    # trash input scalar field/only keep order array
-    pa = simple.PassArrays(Input=arrprec)
-    pa.PointDataArrays = ["ImageFile_Order"]
-    pdc2 = simple.TTKPointDataConverter(Input=pa)
-    pdc2.PointDataScalarField = ["POINTS", "ImageFile_Order"]
-    pdc2.OutputType = "Float"
-
-    # 3. order field (in float)
-    write_output(pdc2, raw_stem + "_order")
-
-    sfnorm2 = simple.TTKScalarFieldNormalizer(Input=pdc2)
-    sfnorm2.ScalarField = ["POINTS", "ImageFile_Order"]
-
-    # 4. normalized order field
-    write_output(sfnorm2, raw_stem + "_order_sfnorm")
-
+    write_output(sfnorm, raw_stem + "_input_pert_sfnorm")
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
 
 
