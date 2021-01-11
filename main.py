@@ -64,6 +64,20 @@ def convert_dataset(raw_file):
         "float64": "double",
     }
 
+    def write_output(outp, fname):
+        # vtkImageData (TTK)
+        simple.SaveData(fname + ".vti", proxy=outp)
+        # Dipha Image Data (Dipha, CubicalRipser)
+        simple.SaveData(
+            fname + ".dipha",
+            proxy=outp,
+        )
+        # Perseus Cubical Grid (Gudhi)
+        simple.SaveData(
+            fname + ".pers",
+            proxy=outp,
+        )
+
     raw = simple.ImageReader(FileNames=[raw_file])
     raw.DataScalarType = dtype_pv[dtype]
     raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
@@ -73,6 +87,16 @@ def convert_dataset(raw_file):
     pdc = simple.TTKPointDataConverter(Input=raw)
     pdc.PointDataScalarField = ["POINTS", "ImageFile"]
     pdc.OutputType = "Float"
+
+    # 1. raw scalar field (in float)
+    write_output(pdc, raw_stem + "_input")
+
+    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
+    sfnorm.ScalarField = ["POINTS", "ImageFile"]
+
+    # 2. normalized input scalar field
+    write_output(sfnorm, raw_stem + "_input_sfnorm")
+
     # compute order array
     arrprec = simple.TTKArrayPreconditioning(Input=pdc)
     arrprec.PointDataArrays = ["ImageFile"]
@@ -82,22 +106,15 @@ def convert_dataset(raw_file):
     pdc2 = simple.TTKPointDataConverter(Input=pa)
     pdc2.PointDataScalarField = ["POINTS", "ImageFile_Order"]
     pdc2.OutputType = "Float"
-    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc2)
-    sfnorm.ScalarField = ["POINTS", "ImageFile_Order"]
-    outp = sfnorm
 
-    # vtkImageData (TTK)
-    simple.SaveData(raw_stem + ".vti", proxy=outp)
-    # Dipha Image Data (Dipha, CubicalRipser)
-    simple.SaveData(
-        raw_stem + ".dipha",
-        proxy=outp,
-    )
-    # Perseus Cubical Grid (Gudhi)
-    simple.SaveData(
-        raw_stem + ".pers",
-        proxy=outp,
-    )
+    # 3. order field (in float)
+    write_output(pdc2, raw_stem + "_order")
+
+    sfnorm2 = simple.TTKScalarFieldNormalizer(Input=pdc2)
+    sfnorm2.ScalarField = ["POINTS", "ImageFile_Order"]
+
+    # 4. normalized order field
+    write_output(sfnorm2, raw_stem + "_order_sfnorm")
 
     print("Converted " + raw_file + " to VTI, Dipha and Perseus")
 
