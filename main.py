@@ -71,11 +71,13 @@ def convert_dataset(raw_file):
         "float64": "double",
     }
 
+    create_dir("datasets")
+
     def write_output(outp, fname):
         # vtkUnstructuredGrid (TTK)
-        simple.SaveData(fname + ".vtu", proxy=outp)
+        simple.SaveData("datasets/" + fname + ".vtu", proxy=outp)
         # Dipha Explicit Complex (Dipha, CubicalRipser)
-        simple.SaveData(fname + ".dipha", proxy=outp)
+        simple.SaveData("datasets/" + fname + ".dipha", proxy=outp)
 
     raw = simple.ImageReader(FileNames=[raw_file])
     raw.DataScalarType = dtype_pv[dtype]
@@ -209,9 +211,13 @@ def compute_diagrams(_, all_softs=False):
         compute_time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
         return float(re.search(compute_time_re, ttk_output, re.MULTILINE).group(1))
 
-    for inp in sorted(glob.glob("*.vtu")):
+    def dataset_name(dsfile):
+        """File name without extension and without directory"""
+        return dsfile.split(".")[0].split("/")[-1]
+
+    for inp in sorted(glob.glob("datasets/*.vtu")):
         exe = exes["ttk"]
-        dataset = inp.split(".")[0]
+        dataset = dataset_name(inp)
         times[dataset] = dict()
         print("Processing " + dataset + " with TTK...")
         outp = f"diagrams/{dataset}.vtu"
@@ -232,9 +238,9 @@ def compute_diagrams(_, all_softs=False):
         ]
         return round(dipha_exec_time - sum(overhead), 3)
 
-    for inp in sorted(glob.glob("*.dipha")):
+    for inp in sorted(glob.glob("datasets/*.dipha")):
         exe = exes["dipha"]
-        dataset = inp.split(".")[0]
+        dataset = dataset_name(inp)
         print("Processing " + dataset + " with dipha...")
         outp = f"diagrams/{dataset}.dipha"
         cmd = [
@@ -254,9 +260,9 @@ def compute_diagrams(_, all_softs=False):
         dipha_print_pairs(outp)
 
     if all_softs:
-        for inp in sorted(glob.glob("*.dipha")):
+        for inp in sorted(glob.glob("datasets/*.dipha")):
             exe = exes["CubicalRipser"]
-            dataset = inp.split(".")[0]
+            dataset = dataset_name(inp)
             if "float" in dataset:
                 # skip large datasets
                 continue
@@ -270,9 +276,9 @@ def compute_diagrams(_, all_softs=False):
             except subprocess.CalledProcessError:
                 print(dataset + " is too large for CubicalRipser")
 
-        for inp in sorted(glob.glob("*.pers")):
+        for inp in sorted(glob.glob("datasets/*.pers")):
             exe = exes["gudhi"]
-            dataset = inp.split(".")[0]
+            dataset = dataset_name(inp)
             print("Processing " + dataset + " with Gudhi...")
             outp = f"diagrams/{dataset}.gudhi"
             cmd = [exe, inp]
