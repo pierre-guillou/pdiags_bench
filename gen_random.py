@@ -1,8 +1,10 @@
+import sys
+
 from paraview import simple
 
 fug = simple.FastUniformGrid()
-ext = 40
-fug.WholeExtent = [0, ext, 0, ext, 0, ext]
+ext = int(sys.argv[1]) if len(sys.argv) > 0 else 8
+fug.WholeExtent = [0, ext - 1, 0, ext - 1, 0, ext - 1]
 
 rattr = simple.RandomAttributes(Input=fug)
 rattr.DataType = "Float"
