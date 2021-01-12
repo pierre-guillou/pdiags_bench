@@ -65,18 +65,10 @@ def convert_dataset(raw_file):
     }
 
     def write_output(outp, fname):
-        # vtkImageData (TTK)
-        simple.SaveData(fname + ".vti", proxy=outp)
-        # Dipha Image Data (Dipha, CubicalRipser)
-        simple.SaveData(
-            fname + ".dipha",
-            proxy=outp,
-        )
-        # Perseus Cubical Grid (Gudhi)
-        simple.SaveData(
-            fname + ".pers",
-            proxy=outp,
-        )
+        # vtkUnstructuredGrid (TTK)
+        simple.SaveData(fname + ".vtu", proxy=outp)
+        # Dipha Explicit Complex (Dipha, CubicalRipser)
+        simple.SaveData(fname + ".dipha", proxy=outp)
 
     raw = simple.ImageReader(FileNames=[raw_file])
     raw.DataScalarType = dtype_pv[dtype]
@@ -87,24 +79,14 @@ def convert_dataset(raw_file):
     pdc = simple.TTKPointDataConverter(Input=raw)
     pdc.PointDataScalarField = ["POINTS", "ImageFile"]
     pdc.OutputType = "Float"
+    # normalize scalar field
+    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
+    sfnorm.ScalarField = ["POINTS", "ImageFile"]
+    # tetrahedralize grid
+    tetrah = simple.Tetrahedralize(Input=sfnorm)
 
-    # add random perturbation
-    ra = simple.RandomAttributes(Input=pdc)
-    ra.DataType = "Float"
-    ra.ComponentRange = [0.0, 1.0]
-    ra.GeneratePointScalars = 1
-    ra.GenerateCellVectors = 0
-    ad = simple.AppendAttributes(Input=[ra, pdc])
-    calc = simple.Calculator(Input=ad)
-    calc.Function = "RandomPointScalars+ImageFile"
-    pa = simple.PassArrays(Input=calc)
-    pa.PointDataArrays = ["Result"]
-
-    sfnorm = simple.TTKScalarFieldNormalizer(Input=pa)
-    sfnorm.ScalarField = ["POINTS", "Result"]
-
-    write_output(sfnorm, raw_stem + "_input_pert_sfnorm")
-    print("Converted " + raw_file + " to VTI, Dipha and Perseus")
+    write_output(tetrah, raw_stem + "_input_sfnorm")
+    print("Converted " + raw_file + " to VTU and Dipha")
 
 
 def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=True):
@@ -226,7 +208,7 @@ def compute_diagrams(_, all_softs=False):
         compute_time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
         return float(re.search(compute_time_re, ttk_output, re.MULTILINE).group(1))
 
-    for inp in sorted(glob.glob("*.vti")):
+    for inp in sorted(glob.glob("*.vtu")):
         exe = exes["ttk"]
         dataset = inp.split(".")[0]
         times[dataset] = dict()
