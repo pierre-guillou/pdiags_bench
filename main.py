@@ -98,7 +98,7 @@ def convert_dataset(raw_file):
     print("Converted " + raw_file + " to VTU and Dipha")
 
 
-def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=True):
+def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=False):
     if download:
         datasets_urls = get_datasets_urls(size_limit)
         download_datasets(datasets_urls)
