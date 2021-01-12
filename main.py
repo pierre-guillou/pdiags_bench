@@ -185,10 +185,13 @@ def dipha_print_pairs(dipha_diag):
         print(" #Maxima:", nptypes.get(2, 0))
 
 
-def ttk_print_pairs(ttk_output):
-    ttk_output = ttk_output.decode()
+def escape_ansi_chars(txt):
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-    ttk_output = ansi_escape.sub("", ttk_output)
+    return ansi_escape.sub("", txt)
+
+
+def ttk_print_pairs(ttk_output):
+    ttk_output = escape_ansi_chars(ttk_output.decode())
     patterns = [
         "Min-saddle pairs",
         "Saddle-saddle pairs",
@@ -202,6 +205,88 @@ def ttk_print_pairs(ttk_output):
         pat_re = fr"\[DiscreteGradient\].*#{pat}.*:.(\d+)"
         res = re.search(pat_re, ttk_output, re.MULTILINE).group(1)
         print(f" #{pat}:", res)
+
+
+def dataset_name(dsfile):
+    """File name without extension and without directory"""
+    return dsfile.split(".")[0].split("/")[-1]
+
+
+def compute_ttk(fname, exe, times):
+    dataset = dataset_name(fname)
+    print("Processing " + dataset + " with TTK...")
+    outp = f"diagrams/{dataset}.vtu"
+    cmd = [exe, "-i", fname, "-d", "4"]
+    proc = subprocess.run(cmd, capture_output=True)
+
+    def ttk_compute_time(ttk_output):
+        ttk_output = escape_ansi_chars(ttk_output.decode())
+        time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
+        return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
+
+    times[dataset]["ttk"] = ttk_compute_time(proc.stdout)
+    ttk_print_pairs(proc.stdout)
+    os.rename("output_port_0.vtu", outp)
+
+
+def compute_dipha(fname, exe, times):
+    dataset = dataset_name(fname)
+    print("Processing " + dataset + " with dipha...")
+    outp = f"diagrams/{dataset}.dipha"
+    cmd = [
+        "mpirun",
+        "--use-hwthread-cpus",
+        exe,
+        "--benchmark",
+        "--upper_dim",
+        str(3),
+        fname,
+        outp,
+    ]
+    start_time = time.time()
+    proc = subprocess.run(cmd, capture_output=True)
+    dipha_exec_time = time.time() - start_time
+
+    def dipha_compute_time(dipha_output, dipha_exec_time):
+        dipha_output = dipha_output.decode()
+        read_re = r"^\s+(\d+\.\d+|\d+).*complex.load_binary"
+        write_re = r"^\s+(\d+\.\d+|\d+).*save_persistence_diagram"
+        patterns = [read_re, write_re]
+        overhead = [
+            float(re.search(pat, dipha_output, re.MULTILINE).group(1))
+            for pat in patterns
+        ]
+        return round(dipha_exec_time - sum(overhead), 3)
+
+    times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
+    dipha_print_pairs(outp)
+
+
+def compute_cubrips(fname, exe, times):
+    dataset = dataset_name(fname)
+    if "float" in dataset:
+        # skip large datasets
+        return
+    print("Processing " + dataset + " with CubicalRipser...")
+    outp = f"diagrams/{dataset}.cr"
+    cmd = [exe, fname, "--output", outp]
+    try:
+        start_time = time.time()
+        subprocess.check_call(cmd)
+        times[dataset]["CubicalRipser"] = time.time() - start_time
+    except subprocess.CalledProcessError:
+        print(dataset + " is too large for CubicalRipser")
+
+
+def compute_gudhi(fname, exe, times):
+    dataset = dataset_name(fname)
+    print("Processing " + dataset + " with Gudhi...")
+    outp = f"diagrams/{dataset}.gudhi"
+    cmd = [exe, fname]
+    start_time = time.time()
+    subprocess.check_call(cmd)
+    times[dataset]["gudhi"] = time.time() - start_time
+    os.rename(fname + "_persistence", outp)
 
 
 def compute_diagrams(_, all_softs=False):
@@ -219,92 +304,26 @@ def compute_diagrams(_, all_softs=False):
         if not os.path.isfile(exe):
             print(exe + " not found")
 
+    # output diagrams directory
     create_dir("diagrams")
 
+    # store computation times
     times = dict()
 
-    def ttk_compute_time(ttk_output):
-        ttk_output = ttk_output.decode()
-        ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-        ttk_output = ansi_escape.sub("", ttk_output)
-        compute_time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
-        return float(re.search(compute_time_re, ttk_output, re.MULTILINE).group(1))
+    for fname in sorted(glob.glob("datasets/*")):
+        # initialize compute times table
+        times[dataset_name(fname)] = dict()
 
-    def dataset_name(dsfile):
-        """File name without extension and without directory"""
-        return dsfile.split(".")[0].split("/")[-1]
-
-    for inp in sorted(glob.glob("datasets/*.vtu")):
-        exe = exes["ttk"]
-        dataset = dataset_name(inp)
-        times[dataset] = dict()
-        print("Processing " + dataset + " with TTK...")
-        outp = f"diagrams/{dataset}.vtu"
-        cmd = [exe, "-i", inp, "-d", "4"]
-        proc = subprocess.run(cmd, capture_output=True)
-        times[dataset]["ttk"] = ttk_compute_time(proc.stdout)
-        ttk_print_pairs(proc.stdout)
-        os.rename("output_port_0.vtu", outp)
-
-    def dipha_compute_time(dipha_output, dipha_exec_time):
-        dipha_output = dipha_output.decode()
-        read_re = r"^\s+(\d+\.\d+|\d+).*complex.load_binary"
-        write_re = r"^\s+(\d+\.\d+|\d+).*save_persistence_diagram"
-        patterns = [read_re, write_re]
-        overhead = [
-            float(re.search(pat, dipha_output, re.MULTILINE).group(1))
-            for pat in patterns
-        ]
-        return round(dipha_exec_time - sum(overhead), 3)
-
-    for inp in sorted(glob.glob("datasets/*.dipha")):
-        exe = exes["dipha"]
-        dataset = dataset_name(inp)
-        print("Processing " + dataset + " with dipha...")
-        outp = f"diagrams/{dataset}.dipha"
-        cmd = [
-            "mpirun",
-            "--use-hwthread-cpus",
-            exe,
-            "--benchmark",
-            "--upper_dim",
-            str(3),
-            inp,
-            outp,
-        ]
-        start_time = time.time()
-        proc = subprocess.run(cmd, capture_output=True)
-        dipha_exec_time = time.time() - start_time
-        times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
-        dipha_print_pairs(outp)
-
-    if all_softs:
-        for inp in sorted(glob.glob("datasets/*.dipha")):
-            exe = exes["CubicalRipser"]
-            dataset = dataset_name(inp)
-            if "float" in dataset:
-                # skip large datasets
-                continue
-            print("Processing " + dataset + " with CubicalRipser...")
-            outp = f"diagrams/{dataset}.cr"
-            cmd = [exe, inp, "--output", outp]
-            try:
-                start_time = time.time()
-                subprocess.check_call(cmd)
-                times[dataset]["CubicalRipser"] = time.time() - start_time
-            except subprocess.CalledProcessError:
-                print(dataset + " is too large for CubicalRipser")
-
-        for inp in sorted(glob.glob("datasets/*.pers")):
-            exe = exes["gudhi"]
-            dataset = dataset_name(inp)
-            print("Processing " + dataset + " with Gudhi...")
-            outp = f"diagrams/{dataset}.gudhi"
-            cmd = [exe, inp]
-            start_time = time.time()
-            subprocess.check_call(cmd)
-            times[dataset]["gudhi"] = time.time() - start_time
-            os.rename(inp + "_persistence", outp)
+    for fname in sorted(glob.glob("datasets/*")):
+        ext = fname.split(".")[-1]
+        if ext == "vtu" or ext == "vti":
+            compute_ttk(fname, exes["ttk"], times)
+        elif ext == "dipha":
+            compute_dipha(fname, exes["dipha"], times)
+        elif all_softs and ext == "dipha":
+            compute_cubrips(fname, exes["CubicalRipser"], times)
+        elif all_softs and ext == "pers":
+            compute_gudhi(fname, exes["gudhi"], times)
 
     with open("results", "w") as dst:
         dst.write(json.dumps(times))
