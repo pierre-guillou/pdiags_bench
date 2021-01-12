@@ -73,11 +73,18 @@ def convert_dataset(raw_file):
 
     create_dir("datasets")
 
-    def write_output(outp, fname):
-        # vtkUnstructuredGrid (TTK)
-        simple.SaveData("datasets/" + fname + ".vtu", proxy=outp)
-        # Dipha Explicit Complex (Dipha, CubicalRipser)
-        simple.SaveData("datasets/" + fname + ".dipha", proxy=outp)
+    def write_output(outp, fname, explicit):
+        fname = "datasets/" + fname
+        if explicit:
+            # vtkUnstructuredGrid (TTK)
+            simple.SaveData(fname + ".vtu", proxy=outp)
+        else:
+            # vtkImageData (TTK)
+            simple.SaveData(fname + ".vti", proxy=outp)
+            # Perseus Cubical Grid (Gudhi)
+            simple.SaveData(fname + ".pers", proxy=outp)
+        # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
+        simple.SaveData(fname + ".dipha", proxy=outp)
 
     raw = simple.ImageReader(FileNames=[raw_file])
     raw.DataScalarType = dtype_pv[dtype]
@@ -101,18 +108,16 @@ def convert_dataset(raw_file):
     # normalize order field
     sfnorm2 = simple.TTKScalarFieldNormalizer(Input=pdc2)
     sfnorm2.ScalarField = ["POINTS", "ImageFile_Order"]
-    # tetrahedralize grid
-    tetrah = simple.Tetrahedralize(Input=sfnorm2)
-
     # trash input scalar field, save order field
-    pa = simple.PassArrays(Input=tetrah)
+    pa = simple.PassArrays(Input=sfnorm2)
     pa.PointDataArrays = ["ImageFile_Order"]
-    write_output(pa, raw_stem + "_order_sfnorm")
+    # save implicit grid
+    write_output(pa, raw_stem + "_order_sfnorm_impl", False)
 
-    # trash order field, save input scalar field
-    pa2 = simple.PassArrays(Input=tetrah)
-    pa2.PointDataArrays = ["ImageFile"]
-    write_output(pa2, raw_stem + "_input_sfnorm")
+    # tetrahedralize grid
+    tetrah = simple.Tetrahedralize(Input=pa)
+    # save explicit mesh
+    write_output(tetrah, raw_stem + "_order_sfnorm_expl", True)
 
     print("Converted " + raw_file + " to VTU and Dipha")
 
