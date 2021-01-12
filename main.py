@@ -52,6 +52,13 @@ def download_datasets(datasets_urls):
         download_dataset(url)
 
 
+def create_dir(dirname):
+    try:
+        os.mkdir(dirname)
+    except FileExistsError:
+        pass
+
+
 def convert_dataset(raw_file):
     extent, dtype = raw_file.split(".")[0].split("_")[-2:]
     extent = [int(dim) for dim in extent.split("x")]
@@ -120,10 +127,7 @@ def download_and_build_software(_):
 
     for cmake_soft in ["dipha", "gudhi"]:
         builddir = "build_" + cmake_soft
-        try:
-            os.mkdir(builddir)
-        except FileExistsError:
-            pass
+        create_dir(builddir)
         subprocess.check_call("cmake", "-S", cmake_soft, "-B", builddir)
         subprocess.check_call("cmake", "--build", builddir)
 
@@ -194,10 +198,7 @@ def compute_diagrams(_, all_softs=False):
         if not os.path.isfile(exe):
             print(exe + " not found")
 
-    try:
-        os.mkdir("diagrams")
-    except FileExistsError:
-        pass
+    create_dir("diagrams")
 
     times = dict()
 
