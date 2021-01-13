@@ -353,7 +353,7 @@ def compute_distances(_, method="auction"):
 
         if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
             cmd = ["python", "ttk_distance.py", method, dipha_diag, ttk_diag]
-            print(f"Computing distance between TTK and Dipha diagrams for {ds}")
+            print(f"Computing distance between TTK and Dipha for {ds}")
             proc0 = subprocess.run(cmd, capture_output=True)
             cmd = ["python", "ttk_distance.py", method, dipha_diag, empty_diag]
             print(f"Computing Dipha distance to empty diagram for {ds}")
