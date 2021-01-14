@@ -11,15 +11,8 @@ def generate_explicit(inp, out):
     # compute order field
     arrprec = simple.TTKArrayPreconditioning(Input=rand)
     arrprec.PointDataArrays = ["RandomPointScalars"]
-    # convert order field to float
-    pdc2 = simple.TTKPointDataConverter(Input=arrprec)
-    pdc2.PointDataScalarField = ["POINTS", "RandomPointScalars_Order"]
-    pdc2.OutputType = "Float"
-    # normalize order field
-    sfnorm2 = simple.TTKScalarFieldNormalizer(Input=pdc2)
-    sfnorm2.ScalarField = ["POINTS", "RandomPointScalars_Order"]
     # trash input scalar field, save order field
-    pa = simple.PassArrays(Input=sfnorm2)
+    pa = simple.PassArrays(Input=arrprec)
     pa.PointDataArrays = ["RandomPointScalars_Order"]
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
