@@ -72,7 +72,7 @@ def main(diag0, diag1, show_diff=False):
 
 if __name__ == "__main__":
     if len(sys.argv) == 3:
-        main(sys.argv[1], sys.argv[2])
+        main(sys.argv[1], sys.argv[2], True)
     else:
         expl_diags = sorted(glob.glob("diagrams/*_order_sfnorm_expl*"))
         for i in range(len(expl_diags) // 2):
