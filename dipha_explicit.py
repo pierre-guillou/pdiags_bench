@@ -48,16 +48,21 @@ def main(file):
             )
         for i in range(dim + 1):
             os = offsets_simplices[i]
-            print(f"  Offsets {i}-cells: {os[0]}, {os[-1]}")
+            print(os)
+            if len(os):
+                print(f"  Offsets {i}-cells: {os[0]}, {os[-1]}")
         nentries = int.from_bytes(src.read(8), "little", signed=True)
         print(f"Non-null boundary matrix entries: {nentries}")
         bmat = list()
         for i in range(nentries):
             bmat.append(int.from_bytes(src.read(8), "little", signed=True))
         assert len(bmat) == nentries
-        assert nentries == offsets[-1] + dim + 1
-        print(bmat[slice(0, 10)])
-        print(bmat[slice(-100, -1)])
+        # assert nentries == offsets[-1] + dim + 1
+        for i in range(dim + 1):
+            os = offsets_simplices[i]
+            if len(os):
+                print(bmat[os[0] : os[-1]])
+
 
 
 if __name__ == "__main__":
