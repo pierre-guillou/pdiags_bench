@@ -56,19 +56,6 @@ def use_networkx():
         nx.set_node_attributes(
             G, {node: (0 if "_s1" in node else 1) for node in G}, name="bipartite"
         )
-        # src = "597_s1"
-        # dst = "431_s2"
-        # visited_bfs = [src, dst]
-        # with open("visited") as vis:
-        #     for line in vis:
-        #         visited_bfs.append(line.strip())
-        # G = nx.subgraph(G, visited_bfs)
-        paths = list(nx.all_simple_paths(G, "592544_s1", "672529_s2", cutoff=10))
-        for path in paths:
-            print(path)
-        nodes_path = set(sum(paths, list()))
-        # G = nx.subgraph(G, nodes_path)
-        G = get_neighborhood(G, nodes_path, 1)
         display_graph(G)
 
 
