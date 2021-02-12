@@ -2,38 +2,53 @@ import struct
 import sys
 
 
+def check_type(src):
+    magic = int.from_bytes(src.read(8), "little", signed=True)
+    if magic != 8067171840:
+        print("Not a Dipha file")
+        return
+    dtype = int.from_bytes(src.read(8), "little", signed=True)
+    if dtype != 0:
+        print("Not a Dipha Explicit Complex")
+        return
+    mtype = int.from_bytes(src.read(8), "little", signed=True)
+    if mtype == 0:
+        print("Boundary matrix")
+    elif mtype == 1:
+        print("Co-boundary matrix")
+    else:
+        print("Incorrect matrix type")
+        return
+
+
+def check_cells(src):
+    ncells = int.from_bytes(src.read(8), "little", signed=True)
+    print(f"Number of cells: {ncells}")
+    dim = int.from_bytes(src.read(8), "little", signed=True)
+    print(f"Global dataset dimension: {dim}")
+    dims = [0, 0, 0, 0]
+    for i in range(ncells):
+        cdim = int.from_bytes(src.read(8), "little", signed=True)
+        dims[cdim] += 1
+    for i in range(dim + 1):
+        print(f"  {dims[i]} cells of dimension {i}")
+    values = list()
+    for i in range(ncells):
+        values.append(struct.unpack("d", src.read(8))[0])
+    vals_per_dim = values[0 : dims[0]]
+    print(f"  Values {0}-cells: {vals_per_dim}")
+    off = dims[0]
+    for i in range(1, dim + 1):
+        vals_per_dim = values[off : off + dims[i]]
+        off += dims[i]
+        print(f"  Values {i}-cells: {vals_per_dim}")
+    return ncells, dim, dims
+
+
 def main(file):
     with open(file, "rb") as src:
-        magic = int.from_bytes(src.read(8), "little", signed=True)
-        if magic != 8067171840:
-            print("Not a Dipha file")
-            return
-        dtype = int.from_bytes(src.read(8), "little", signed=True)
-        if dtype != 0:
-            print("Not a Dipha Explicit Complex")
-            return
-        mtype = int.from_bytes(src.read(8), "little", signed=True)
-        if mtype == 0:
-            print("Boundary matrix")
-        elif mtype == 1:
-            print("Co-boundary matrix")
-        else:
-            print("Incorrect matrix type")
-            return
-        ncells = int.from_bytes(src.read(8), "little", signed=True)
-        print(f"Number of cells: {ncells}")
-        dim = int.from_bytes(src.read(8), "little", signed=True)
-        print(f"Global dataset dimension: {dim}")
-        dims = [0, 0, 0, 0]
-        for i in range(ncells):
-            cdim = int.from_bytes(src.read(8), "little", signed=True)
-            dims[cdim] += 1
-        for i in range(dim + 1):
-            print(f"  {dims[i]} cells of dimension {i}")
-        values = list()
-        for i in range(ncells):
-            values.append(struct.unpack("d", src.read(8))[0])
-        print(f"Min: {min(values)}, max: {max(values)}")
+        check_type(src)
+        ncells, dim, dims = check_cells(src)
         offsets = list()
         for i in range(ncells):
             offsets.append(int.from_bytes(src.read(8), "little", signed=True))
@@ -48,20 +63,21 @@ def main(file):
             )
         for i in range(dim + 1):
             os = offsets_simplices[i]
-            print(os)
             if len(os):
-                print(f"  Offsets {i}-cells: {os[0]}, {os[-1]}")
+                print(f"  Offsets {i}-cells: {os}")
         nentries = int.from_bytes(src.read(8), "little", signed=True)
         print(f"Non-null boundary matrix entries: {nentries}")
         bmat = list()
         for i in range(nentries):
             bmat.append(int.from_bytes(src.read(8), "little", signed=True))
         assert len(bmat) == nentries
-        # assert nentries == offsets[-1] + dim + 1
-        for i in range(dim + 1):
-            os = offsets_simplices[i]
+        off = 0
+        for i in range(1, dim):
+            os = offsets_simplices[i + 1]
             if len(os):
-                print(bmat[os[0] : os[-1]])
+                print(f"  Entries {i}-cells: {bmat[off : os[0]]}")
+            off = os[0]
+        print(f"  Entries {dim}-cells: {bmat[off : nentries]}")
 
 
 def test(file):
