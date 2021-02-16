@@ -34,7 +34,7 @@ def read_diag(diag):
             continue
         pairs[j].append(pts.GetPoint(2 * i + 1)[0:2])
     for pr in pairs:
-        pr.sort()
+        pr.sort(key=lambda x: x[1])
     return pairs
 
 
@@ -61,7 +61,7 @@ def compare_pairs(pairs0, pairs1, type, show_diff):
                     print(d)
 
 
-def main(diag0, diag1, show_diff=False):
+def main(diag0, diag1, show_diff=True):
     print(f"Comparing {diag0} and {diag1}...")
     pairs0 = read_diag(diag0)
     pairs1 = read_diag(diag1)
