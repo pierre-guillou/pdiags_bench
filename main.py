@@ -8,7 +8,7 @@ import re
 import subprocess
 import time
 
-from paraview import simple
+import convert_datasets
 
 URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
 SIZE_LIMIT_MB = 80
@@ -21,72 +21,10 @@ def create_dir(dirname):
         pass
 
 
-def convert_dataset(raw_file):
-    extent, dtype = raw_file.split(".")[0].split("_")[-2:]
-    extent = [int(dim) for dim in extent.split("x")]
-
-    dtype_pv = {
-        "uint8": "unsigned char",
-        "int16": "short",
-        "uint16": "unsigned short",
-        "float32": "float",
-        "float64": "double",
-    }
-
-    create_dir("datasets")
-
-    def write_output(outp, fname, explicit):
-        fname = "datasets/" + fname
-        if explicit:
-            # vtkUnstructuredGrid (TTK)
-            simple.SaveData(fname + ".vtu", proxy=outp)
-        else:
-            # vtkImageData (TTK)
-            simple.SaveData(fname + ".vti", proxy=outp)
-            # Perseus Cubical Grid (Gudhi)
-            simple.SaveData(fname + ".pers", proxy=outp)
-        # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
-        simple.SaveData(fname + ".dipha", proxy=outp)
-
-    raw = simple.ImageReader(FileNames=[raw_file])
-    raw.DataScalarType = dtype_pv[dtype]
-    raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
-    raw_stem = raw_file.split(".")[0]
-
-    # convert input scalar field to float
-    pdc = simple.TTKPointDataConverter(Input=raw)
-    pdc.PointDataScalarField = ["POINTS", "ImageFile"]
-    pdc.OutputType = "Float"
-    # normalize scalar field
-    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
-    sfnorm.ScalarField = ["POINTS", "ImageFile"]
-    # compute order field
-    arrprec = simple.TTKArrayPreconditioning(Input=sfnorm)
-    arrprec.PointDataArrays = ["ImageFile"]
-    # convert order field to float
-    pdc2 = simple.TTKPointDataConverter(Input=arrprec)
-    pdc2.PointDataScalarField = ["POINTS", "ImageFile_Order"]
-    pdc2.OutputType = "Float"
-    # normalize order field
-    sfnorm2 = simple.TTKScalarFieldNormalizer(Input=pdc2)
-    sfnorm2.ScalarField = ["POINTS", "ImageFile_Order"]
-    # trash input scalar field, save order field
-    pa = simple.PassArrays(Input=sfnorm2)
-    pa.PointDataArrays = ["ImageFile_Order"]
-    # save implicit grid
-    write_output(pa, raw_stem + "_order_sfnorm_impl", False)
-
-    # tetrahedralize grid
-    tetrah = simple.Tetrahedralize(Input=pa)
-    # save explicit mesh
-    write_output(tetrah, raw_stem + "_order_sfnorm_expl", True)
-
-    print("Converted " + raw_file + " to VTU and Dipha")
-
-
 def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=False):
+    create_dir("datasets")
     for dataset in sorted(glob.glob("*.raw")):
-        convert_dataset(dataset.split("/")[-1])
+        convert_datasets.main(dataset.split("/")[-1], "datasets")
 
 
 def dipha_print_pairs(dipha_diag):
