@@ -195,6 +195,7 @@ def compute_diagrams(_, all_softs=False):
     for exe in list(exes.values())[1:]:
         if not os.path.isfile(exe):
             print(exe + " not found")
+            all_softs = False
 
     # output diagrams directory
     create_dir("diagrams")
