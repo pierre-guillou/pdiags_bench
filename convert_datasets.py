@@ -55,8 +55,6 @@ def main(raw_file, out_dir=""):
     # trash input scalar field, save order field
     pa = simple.PassArrays(Input=sfnorm2)
     pa.PointDataArrays = ["ImageFile_Order"]
-    # save implicit grid
-    write_output(pa, raw_stem + "_order_sfnorm_impl", out_dir, False)
 
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
