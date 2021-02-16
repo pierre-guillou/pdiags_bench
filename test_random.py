@@ -1,3 +1,5 @@
+import time
+
 from paraview import simple
 
 import compare_diags
@@ -29,16 +31,19 @@ def generate_explicit(inp, out, rs):
 
 def main():
     fname = "random_order_sfnorm_expl"
-    for i in range(8, 50):
-        gen_random.main(i, "rand")
+    for i in range(0, 8):
+        print(i)
+        gen_random.main(4, "rand")
         ds = "datasets/" + fname
-        generate_explicit("random.vti", ds)
+        generate_explicit("random.vti", ds, i)
+        return
         tm = dict()
         tm[fname.split("/")[-1]] = dict()
         compute_diags.compute_ttk(ds + ".vtu", "ttkPersistenceDiagramCmd", tm)
         compute_diags.compute_dipha(ds + ".dipha", "build_dipha/dipha", tm)
         diag = "diagrams/" + fname
-        compare_diags.main(diag + ".vtu", diag + ".dipha")
+        compare_diags.main(diag + ".vtu", diag + ".dipha", True)
+        time.sleep(2)
 
 
 if __name__ == "__main__":
