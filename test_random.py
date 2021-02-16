@@ -5,7 +5,7 @@ import gen_random
 import main as compute_diags
 
 
-def generate_explicit(inp, out):
+def generate_explicit(inp, out, rs):
     # read random.vti
     rand = simple.XMLImageDataReader(FileName=inp)
     # compute order field
@@ -14,8 +14,12 @@ def generate_explicit(inp, out):
     # trash input scalar field, save order field
     pa = simple.PassArrays(Input=arrprec)
     pa.PointDataArrays = ["RandomPointScalars_Order"]
+    # randomize scalar field?
+    ir = simple.TTKIdentifierRandomizer(Input=pa)
+    ir.ScalarField = ["POINTS", "RandomPointScalars_Order"]
+    ir.RandomSeed = rs
     # tetrahedralize grid
-    tetrah = simple.Tetrahedralize(Input=pa)
+    tetrah = simple.Tetrahedralize(Input=ir)
 
     # vtkUnstructuredGrid (TTK)
     simple.SaveData(out + ".vtu", proxy=tetrah)
