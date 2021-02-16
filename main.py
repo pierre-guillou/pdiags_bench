@@ -86,11 +86,18 @@ def dataset_name(dsfile):
     return dsfile.split(".")[0].split("/")[-1]
 
 
-def compute_ttk(fname, exe, times):
+def compute_ttk(fname, exe, times, dipha_offload=False):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with TTK...")
+    if dipha_offload:
+        print("Processing " + dataset + " with TTK offloading to Dipha...")
+    else:
+        print("Processing " + dataset + " with TTK...")
     outp = f"diagrams/{dataset}.vtu"
     cmd = [exe, "-i", fname, "-d", "4"]
+    key = "ttk"
+    if dipha_offload:
+        cmd.append("-wd")
+        key = "ttk-dipha"
     proc = subprocess.run(cmd, capture_output=True)
 
     def ttk_compute_time(ttk_output):
@@ -98,8 +105,19 @@ def compute_ttk(fname, exe, times):
         time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
         return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
 
-    times[dataset]["ttk"] = ttk_compute_time(proc.stdout)
-    ttk_print_pairs(proc.stdout)
+    def ttk_overhead_time(ttk_output):
+        ttk_output = escape_ansi_chars(ttk_output.decode())
+        time_re = (
+            r"\[DiscreteGradient\] Wrote Dipha explicit complex.*\[(\d+\.\d+|\d+)s"
+        )
+        return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
+
+    times[dataset][key] = ttk_compute_time(proc.stdout)
+    if dipha_offload:
+        times[dataset][key] -= ttk_overhead_time(proc.stdout)
+        dipha_print_pairs("/tmp/output.dipha")
+    else:
+        ttk_print_pairs(proc.stdout)
     os.rename("output_port_0.vtu", outp)
 
 
@@ -191,7 +209,8 @@ def compute_diagrams(_, all_softs=False):
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
         if ext == "vtu" or ext == "vti":
-            compute_ttk(fname, exes["ttk"], times)
+            compute_ttk(fname, exes["ttk"], times, False)
+            compute_ttk(fname, exes["ttk"], times, True)
         elif ext == "dipha":
             compute_dipha(fname, exes["dipha"], times)
         elif all_softs and ext == "dipha":
