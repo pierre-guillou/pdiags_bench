@@ -117,7 +117,7 @@ def compute_ttk(fname, exe, times, dipha_offload=False, one_thread=False):
     times[dataset][key] = ttk_compute_time(proc.stdout)
     if dipha_offload:
         times[dataset][key] -= ttk_overhead_time(proc.stdout)
-        dipha_print_pairs("/tmp/output.dipha")
+        dipha_print_pairs("output.dipha")
     else:
         ttk_print_pairs(proc.stdout)
     os.rename("output_port_0.vtu", outp)
