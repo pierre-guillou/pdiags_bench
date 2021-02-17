@@ -86,7 +86,7 @@ def dataset_name(dsfile):
     return dsfile.split(".")[0].split("/")[-1]
 
 
-def compute_ttk(fname, exe, times, dipha_offload=False):
+def compute_ttk(fname, exe, times, dipha_offload=False, one_thread=False):
     dataset = dataset_name(fname)
     if dipha_offload:
         print("Processing " + dataset + " with TTK offloading to Dipha...")
@@ -94,6 +94,8 @@ def compute_ttk(fname, exe, times, dipha_offload=False):
         print("Processing " + dataset + " with TTK...")
     outp = f"diagrams/{dataset}.vtu"
     cmd = [exe, "-i", fname, "-d", "4"]
+    if one_thread:
+        cmd.extend(["-t", "1"])
     key = "ttk"
     if dipha_offload:
         cmd.append("-wd")
@@ -121,20 +123,26 @@ def compute_ttk(fname, exe, times, dipha_offload=False):
     os.rename("output_port_0.vtu", outp)
 
 
-def compute_dipha(fname, exe, times):
+def compute_dipha(fname, exe, times, one_thread=False):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with dipha...")
     outp = f"diagrams/{dataset}.dipha"
-    cmd = [
-        "mpirun",
-        "--use-hwthread-cpus",
-        exe,
-        "--benchmark",
-        "--upper_dim",
-        str(3),
-        fname,
-        outp,
-    ]
+    if one_thread:
+        cmd = [
+            exe,
+            "--benchmark",
+            fname,
+            outp,
+        ]
+    else:
+        cmd = [
+            "mpirun",
+            "--use-hwthread-cpus",
+            exe,
+            "--benchmark",
+            fname,
+            outp,
+        ]
     start_time = time.time()
     proc = subprocess.run(cmd, capture_output=True)
     dipha_exec_time = time.time() - start_time
@@ -207,13 +215,15 @@ def compute_diagrams(_, all_softs=False):
         # initialize compute times table
         times[dataset_name(fname)] = dict()
 
+    one_thread = False
+
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
         if ext == "vtu" or ext == "vti":
-            compute_ttk(fname, exes["ttk"], times, False)
-            compute_ttk(fname, exes["ttk"], times, True)
+            compute_ttk(fname, exes["ttk"], times, False, one_thread)
+            compute_ttk(fname, exes["ttk"], times, True, one_thread)
         elif ext == "dipha":
-            compute_dipha(fname, exes["dipha"], times)
+            compute_dipha(fname, exes["dipha"], times, one_thread)
         elif all_softs and ext == "dipha":
             compute_cubrips(fname, exes["CubicalRipser"], times)
         elif all_softs and ext == "pers":
