@@ -166,5 +166,8 @@ def test(file):
 
 
 if __name__ == "__main__":
-    test("hello.dipha")
-    main("hello.dipha")
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    else:
+        test("hello.dipha")
+        main("hello.dipha")
