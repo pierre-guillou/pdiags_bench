@@ -1,4 +1,5 @@
 #!/bin/bash
+#PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=64
 #PBS -l walltime=00:05:00
@@ -37,4 +38,4 @@ mpirun -np 64 \
 cp -p output.dipha dipha.out dipha.err $PBS_O_WORKDIR || exit 1
 
 #clean the temporary directory
-rm -rf "$SCRATCH”/*
+rm -rf "$SCRATCH"/*
