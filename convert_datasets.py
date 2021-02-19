@@ -14,8 +14,8 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".vti", proxy=outp)
         # Perseus Cubical Grid (Gudhi)
         simple.SaveData(fname + ".pers", proxy=outp)
-    # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
-    simple.SaveData(fname + ".dipha", proxy=outp)
+    # # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
+    # simple.SaveData(fname + ".dipha", proxy=outp)
 
 
 def main(raw_file, out_dir=""):
