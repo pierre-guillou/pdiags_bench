@@ -21,8 +21,6 @@ mkdir -p $SCRATCH
 
 # working directory
 WD=$HOME/pdiags_bench
-# dataset
-DS=aneurism_256x256x256_uint8_order_sfnorm_impl
 
 # copy some input files to  $SCRATCH directory
 cp -r $WD/raws $SCRATCH
@@ -36,6 +34,11 @@ export PATH=$INSTDIR/bin:$WD/build_dipha:$TTK_BUILD/bin:$PATH
 export PYTHONPATH=$INSTDIR/lib64/$PY38:$INSTDIR/lib/$PY38:$TTK_BUILD/lib64/$PY38
 export PV_PLUGIN_PATH=$TTK_BUILD/lib64/TopologyToolKit
 nthreads=64
+out=$WD/$PBS_JOBNAME.out
+err=$WD/$PBS_JOBNAME.err
+
+# clean log files
+rm $out $err
 
 # execute your program
 cd $SCRATCH || exit 1
@@ -44,26 +47,26 @@ cd $SCRATCH || exit 1
 mkdir datasets
 
 for raw in raws/*.raw; do
-    python $WD/convert_datasets.py $raw datasets
+    echo "Converting $raw..."
+    time python $WD/convert_datasets.py $raw datasets
 done
 
 for vtu in datasets/*.vtu; do
+    echo "Processing $vtu with TTK..." >> $out
     omplace -nt $nthreads \
-            ttkPersistenceDiagramCmd \
-            -i $vtu -t $nthreads \
-            1>> $PBS_JOBNAME.out 2>> $PBS_JOBNAME.err
+            ttkPersistenceDiagramCmd -i $vtu -t $nthreads \
+            1>> $out 2>> $err
 done
 
 for dipha in datasets/*.dipha; do
+    echo "Processing $dipha with Dipha..." >> $out
     mpirun -np $nthreads --oversubscribe \
-           dipha \
-           --benchmark --upper_dim 3 \
-           $dipha output.dipha \
-           1>> $PBS_JOBNAME.out 2>> $PBS_JOBNAME.err
+           dipha --benchmark --upper_dim 3 $dipha output.dipha \
+           1>> $out 2>> $err
 done
 
 # copy some output files to submission directory
-cp -p $PBS_JOBNAME.out $PBS_JOBNAME.err $PBS_O_WORKDIR || exit 1
+# cp -p $PBS_JOBNAME.out $PBS_JOBNAME.err $PBS_O_WORKDIR || exit 1
 
 # clean the temporary directory
 rm -rf "$SCRATCH"/*
