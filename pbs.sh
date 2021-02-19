@@ -25,7 +25,7 @@ WD=$HOME/pdiags_bench
 DS=aneurism_256x256x256_uint8_order_sfnorm_impl
 
 # copy some input files to  $SCRATCH directory
-cp $WD/datasets/*  $SCRATCH
+cp -r $WD/raws $SCRATCH
 
 # env variables
 INSTDIR=/home/guilloup/install
@@ -39,20 +39,30 @@ export PV_PLUGIN_PATH=$TTK_BUILD/lib64/TopologyToolKit
 # execute your program
 cd $SCRATCH || exit 1
 
-omplace -nt 64 \
-        ttkPersistenceDiagramCmd \
-        -i $DS.vti -t 64 \
-        1> $PBS_JOBNAME.out 2> $PBS_JOBNAME.err
+# prepare datasets
+mkdir datasets
 
-mpirun -np 64 --oversubscribe \
-       dipha \
-       --benchmark \
-       --upper_dim 3 \
-       $DS.dipha output.dipha \
-       1>> $PBS_JOBNAME.out 2>> $PBS_JOBNAME.err
+for raw in raws/*.raw; do
+    python $WD/convert_datasets.py $raw datasets
+done
+
+for vtu in datasets/*.vtu; do
+    omplace -nt 64 \
+            ttkPersistenceDiagramCmd \
+            -i $vtu -t 64 \
+            1>> $PBS_JOBNAME.out 2>> $PBS_JOBNAME.err
+done
+
+for dipha in datasets/*.dipha; do
+    mpirun -np 64 --oversubscribe \
+           dipha \
+           --benchmark --upper_dim 3 \
+           $dipha output.dipha \
+           1>> $PBS_JOBNAME.out 2>> $PBS_JOBNAME.err
+done
 
 # copy some output files to submission directory
-cp -p output_port_0.vtu output.dipha $PBS_JOBNAME.out $PBS_JOBNAME.err $PBS_O_WORKDIR || exit 1
+cp -p $PBS_JOBNAME.out $PBS_JOBNAME.err $PBS_O_WORKDIR || exit 1
 
 # clean the temporary directory
 rm -rf "$SCRATCH"/*
