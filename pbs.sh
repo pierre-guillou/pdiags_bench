@@ -8,7 +8,8 @@
 
 # load appropriate modules
 module purge
-module load openMPI gcc mpt
+# mpt must be loaded before openMPI to avoid mixing MPI implementations
+module load mpt openMPI gcc
 
 # move to PBS_O_WORKDIR
 cd $PBS_O_WORKDIR
