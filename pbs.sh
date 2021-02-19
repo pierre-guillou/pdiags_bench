@@ -35,6 +35,7 @@ export LD_LIBRARY_PATH=$INSTDIR/lib64:$INSTDIR/lib:$TTK_BUILD/lib64:$LD_LIBARY_P
 export PATH=$INSTDIR/bin:$WD/build_dipha:$TTK_BUILD/bin:$PATH
 export PYTHONPATH=$INSTDIR/lib64/$PY38:$INSTDIR/lib/$PY38:$TTK_BUILD/lib64/$PY38
 export PV_PLUGIN_PATH=$TTK_BUILD/lib64/TopologyToolKit
+nthreads=64
 
 # execute your program
 cd $SCRATCH || exit 1
@@ -47,14 +48,14 @@ for raw in raws/*.raw; do
 done
 
 for vtu in datasets/*.vtu; do
-    omplace -nt 64 \
+    omplace -nt $nthreads \
             ttkPersistenceDiagramCmd \
-            -i $vtu -t 64 \
+            -i $vtu -t $nthreads \
             1>> $PBS_JOBNAME.out 2>> $PBS_JOBNAME.err
 done
 
 for dipha in datasets/*.dipha; do
-    mpirun -np 64 --oversubscribe \
+    mpirun -np $nthreads --oversubscribe \
            dipha \
            --benchmark --upper_dim 3 \
            $dipha output.dipha \
