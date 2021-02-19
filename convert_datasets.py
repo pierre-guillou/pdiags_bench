@@ -39,27 +39,17 @@ def main(raw_file, out_dir=""):
     pdc = simple.TTKPointDataConverter(Input=raw)
     pdc.PointDataScalarField = ["POINTS", "ImageFile"]
     pdc.OutputType = "Float"
-    # normalize scalar field
-    sfnorm = simple.TTKScalarFieldNormalizer(Input=pdc)
-    sfnorm.ScalarField = ["POINTS", "ImageFile"]
     # compute order field
-    arrprec = simple.TTKArrayPreconditioning(Input=sfnorm)
+    arrprec = simple.TTKArrayPreconditioning(Input=pdc)
     arrprec.PointDataArrays = ["ImageFile"]
-    # convert order field to float
-    pdc2 = simple.TTKPointDataConverter(Input=arrprec)
-    pdc2.PointDataScalarField = ["POINTS", "ImageFile_Order"]
-    pdc2.OutputType = "Float"
-    # normalize order field
-    sfnorm2 = simple.TTKScalarFieldNormalizer(Input=pdc2)
-    sfnorm2.ScalarField = ["POINTS", "ImageFile_Order"]
     # trash input scalar field, save order field
-    pa = simple.PassArrays(Input=sfnorm2)
+    pa = simple.PassArrays(Input=arrprec)
     pa.PointDataArrays = ["ImageFile_Order"]
 
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
     # save explicit mesh
-    write_output(tetrah, raw_stem + "_order_sfnorm_expl", out_dir, True)
+    write_output(tetrah, raw_stem + "_order_expl", out_dir, True)
 
     print("Converted " + raw_file + " to VTU and Dipha")
 
