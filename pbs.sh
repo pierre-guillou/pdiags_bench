@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=64
-#PBS -l walltime=00:05:00
+#PBS -l walltime=00:50:00
 #PBS -N dipha_bench
 #PBS -j oe
 
