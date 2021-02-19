@@ -53,7 +53,7 @@ for raw in raws/*.raw; do
     vtu=datasets/${raw_stem%.raw}_order_expl.vtu
     echo "Processing $vtu with TTK..." >> $out
     omplace -nt $nthreads \
-            ttkPersistenceDiagramCmd -i $vtu -t $nthreads \
+            ttkPersistenceDiagramCmd -i $vtu -t $nthreads -ed \
             1>> $out 2>> $err
     dipha=${vtu%.vtu}.dipha
     echo "Processing $dipha with Dipha..." >> $out
