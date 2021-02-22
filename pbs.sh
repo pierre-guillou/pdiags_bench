@@ -57,7 +57,7 @@ for raw in raws/*.raw; do
     dipha=${vtu%.vtu}.dipha
     echo "Processing $dipha with Dipha..." >> $out
     mpirun -np $NCPUS --oversubscribe \
-           dipha --benchmark --upper_dim 3 $dipha output.dipha \
+           dipha --upper_dim 3 $dipha output.dipha \
            1>> $out 2>> $err
     rm $dipha $vtu
 done
