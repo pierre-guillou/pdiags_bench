@@ -33,7 +33,6 @@ export LD_LIBRARY_PATH=$INSTDIR/lib64:$INSTDIR/lib:$TTK_BUILD/lib64:$LD_LIBARY_P
 export PATH=$INSTDIR/bin:$WD/build_dipha:$TTK_BUILD/bin:$PATH
 export PYTHONPATH=$INSTDIR/lib64/$PY38:$INSTDIR/lib/$PY38:$TTK_BUILD/lib64/$PY38
 export PV_PLUGIN_PATH=$TTK_BUILD/lib64/TopologyToolKit
-nthreads=64
 out=$WD/$PBS_JOBNAME.out
 err=$WD/$PBS_JOBNAME.err
 
@@ -52,12 +51,12 @@ for raw in raws/*.raw; do
     raw_stem=${raw#raws/}
     vtu=datasets/${raw_stem%.raw}_order_expl.vtu
     echo "Processing $vtu with TTK..." >> $out
-    omplace -nt $nthreads \
-            ttkPersistenceDiagramCmd -i $vtu -t $nthreads -ed \
+    omplace -nt $NCPUS \
+            ttkPersistenceDiagramCmd -i $vtu -t $NCPUS -ed \
             1>> $out 2>> $err
     dipha=${vtu%.vtu}.dipha
     echo "Processing $dipha with Dipha..." >> $out
-    mpirun -np $nthreads --oversubscribe \
+    mpirun -np $NCPUS --oversubscribe \
            dipha --benchmark --upper_dim 3 $dipha output.dipha \
            1>> $out 2>> $err
     rm $dipha $vtu
