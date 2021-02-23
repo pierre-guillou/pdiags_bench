@@ -33,11 +33,6 @@ export LD_LIBRARY_PATH=$INSTDIR/lib64:$INSTDIR/lib:$TTK_BUILD/lib64:$LD_LIBARY_P
 export PATH=$INSTDIR/bin:$WD/build_dipha:$TTK_BUILD/bin:$PATH
 export PYTHONPATH=$INSTDIR/lib64/$PY38:$INSTDIR/lib/$PY38:$TTK_BUILD/lib64/$PY38
 export PV_PLUGIN_PATH=$TTK_BUILD/lib64/TopologyToolKit
-out=$WD/$PBS_JOBNAME.out
-err=$WD/$PBS_JOBNAME.err
-
-# clean log files
-rm $out $err
 
 # execute your program
 cd $SCRATCH || exit 1
@@ -49,6 +44,8 @@ for raw in raws/*.raw; do
     echo "Converting $raw..."
     time python $WD/convert_datasets.py $raw datasets
     raw_stem=${raw#raws/}
+    out=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.out
+    err=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.err
     vtu=datasets/${raw_stem%.raw}_order_expl.vtu
     echo "Processing $vtu with TTK..." >> $out
     omplace -nt $NCPUS \
