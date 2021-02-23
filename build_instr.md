@@ -20,4 +20,4 @@
 
 * GCC and SGI MPT
   + module load gcc/8.2 mpt/2.18
-  + CC=gcc CXX=g++ ccmake -DTTK_ENABLE_CPU_OPTIMIZATIONS=OFF..
+  + CC=gcc CXX=g++ ccmake -DTTK_ENABLE_CPU_OPTIMIZATIONS=OFF -DTTK_ENABLE_KAMIKAZE=ON ..
