@@ -86,10 +86,15 @@ def dataset_name(dsfile):
     return dsfile.split(".")[0].split("/")[-1]
 
 
-def compute_ttk(fname, exe, times, dipha_offload=False, one_thread=False):
+def compute_ttk(
+    fname, exe, times, dipha_offload=False, hybrid_pp=False, one_thread=False
+):
     dataset = dataset_name(fname)
     if dipha_offload:
-        print("Processing " + dataset + " with TTK offloading to Dipha...")
+        if hybrid_pp:
+            print("Processing " + dataset + " with TTK (hybrid++ mode)...")
+        else:
+            print("Processing " + dataset + " with TTK (hybrid mode)...")
     else:
         print("Processing " + dataset + " with TTK...")
     outp = f"diagrams/{dataset}.vtu"
@@ -99,7 +104,10 @@ def compute_ttk(fname, exe, times, dipha_offload=False, one_thread=False):
     key = "ttk"
     if dipha_offload:
         cmd.append("-wd")
-        key = "ttk-dipha"
+        key = "ttk-hybrid"
+        if hybrid_pp:
+            cmd.append("-dpp")
+            key = "ttk-hybrid++"
     proc = subprocess.run(cmd, capture_output=True)
 
     def ttk_compute_time(ttk_output):
@@ -220,8 +228,33 @@ def compute_diagrams(_, all_softs=False):
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
         if ext == "vtu" or ext == "vti":
-            compute_ttk(fname, exes["ttk"], times, False, one_thread)
-            compute_ttk(fname, exes["ttk"], times, True, one_thread)
+            # our algo
+            compute_ttk(
+                fname,
+                exes["ttk"],
+                times,
+                dipha_offload=False,
+                hybrid_pp=False,
+                one_thread=one_thread,
+            )
+            # ttk-hybrid: offload Morse-Smale complex to Dipha
+            compute_ttk(
+                fname,
+                exes["ttk"],
+                times,
+                dipha_offload=True,
+                hybrid_pp=False,
+                one_thread=one_thread,
+            )
+            # ttk-hybrid++: offload saddle connectors to Dipha
+            compute_ttk(
+                fname,
+                exes["ttk"],
+                times,
+                dipha_offload=True,
+                hybrid_pp=True,
+                one_thread=one_thread,
+            )
         elif ext == "dipha":
             compute_dipha(fname, exes["dipha"], times, one_thread)
         elif all_softs and ext == "dipha":
