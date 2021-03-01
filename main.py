@@ -8,6 +8,7 @@ import re
 import subprocess
 import time
 
+import compare_diags
 import convert_datasets
 
 URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
@@ -65,20 +66,11 @@ def escape_ansi_chars(txt):
 
 
 def ttk_print_pairs(ttk_output):
-    ttk_output = escape_ansi_chars(ttk_output.decode())
-    patterns = [
-        "Min-saddle pairs",
-        "Saddle-saddle pairs",
-        "Saddle-max pairs",
-        "Minima",
-        "1-saddles",
-        "2-saddles",
-        "Maxima",
-    ]
-    for pat in patterns:
-        pat_re = fr"\[DiscreteGradient\].*#{pat}.*:.(\d+)"
-        res = re.search(pat_re, ttk_output, re.MULTILINE).group(1)
-        print(f" #{pat}:", res)
+    pairs = compare_diags.read_diag("output_port_0.vtu")
+    print(f" #Min-saddle pairs: {len(pairs[0])}")
+    print(f" #Saddle-saddle pairs: {len(pairs[1])}")
+    print(f" #Saddle-max pairs: {len(pairs[2])}")
+    print(f" Total: {sum(map(len, pairs))}")
 
 
 def dataset_name(dsfile):
@@ -123,11 +115,7 @@ def compute_ttk(
         return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
 
     times[dataset][key] = ttk_compute_time(proc.stdout)
-    if dipha_offload:
-        times[dataset][key] -= ttk_overhead_time(proc.stdout)
-        dipha_print_pairs("output.dipha")
-    else:
-        ttk_print_pairs(proc.stdout)
+    ttk_print_pairs(proc.stdout)
     os.rename("output_port_0.vtu", outp)
 
 
