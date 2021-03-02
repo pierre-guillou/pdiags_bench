@@ -3,6 +3,7 @@
 import argparse
 import glob
 import json
+import math
 import os
 import re
 import subprocess
@@ -34,6 +35,11 @@ def ttk_dipha_print_pairs(diag):
     print(f" #Saddle-saddle pairs: {len(pairs[1])}")
     print(f" #Saddle-max pairs: {len(pairs[2])}")
     print(f" Total: {sum(map(len, pairs))}")
+    return {
+        "#Min-saddle": len(pairs[0]),
+        "#Saddle-saddle": len(pairs[1]),
+        "#Saddle-max": len(pairs[2]),
+    }
 
 
 def escape_ansi_chars(txt):
@@ -122,8 +128,9 @@ def compute_dipha(fname, exe, times, one_thread=False):
         ]
         return round(dipha_exec_time - sum(overhead), 3)
 
+    ret = ttk_dipha_print_pairs(outp)
+    times[dataset] |= ret
     times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
-    ttk_dipha_print_pairs(outp)
 
 
 def compute_cubrips(fname, exe, times):
@@ -177,7 +184,14 @@ def compute_diagrams(_, all_softs=False):
 
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
-        times[dataset_name(fname)] = dict()
+        try:
+            # compute number of vertices from dataset name
+            pattern = re.compile(r"_\d+x\d+x\d+_")
+            extent = re.search(pattern, fname).group().strip("_")
+            nVerts = math.prod([int(dim) for dim in extent.split("x")])
+            times[dataset_name(fname)] = {"#Vertices": nVerts}
+        except AttributeError:
+            times[dataset_name(fname)] = dict()
 
     one_thread = False
 
