@@ -4,6 +4,7 @@ import argparse
 import glob
 import json
 import math
+import multiprocessing
 import os
 import re
 import subprocess
@@ -182,18 +183,21 @@ def compute_diagrams(_, all_softs=False):
     # store computation times
     times = dict()
 
+    one_thread = False
+
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
+        times[dataset_name(fname)] = {
+            "#Threads": 1 if one_thread else multiprocessing.cpu_count()
+        }
         try:
             # compute number of vertices from dataset name
             pattern = re.compile(r"_\d+x\d+x\d+_")
             extent = re.search(pattern, fname).group().strip("_")
             nVerts = math.prod([int(dim) for dim in extent.split("x")])
-            times[dataset_name(fname)] = {"#Vertices": nVerts}
+            times[dataset_name(fname)]["#Vertices"] = nVerts
         except AttributeError:
-            times[dataset_name(fname)] = dict()
-
-    one_thread = False
+            pass
 
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
