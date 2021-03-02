@@ -49,8 +49,14 @@ for raw in raws/*.raw; do
     vtu=datasets/${raw_stem%.raw}_order_expl.vtu
     echo "Processing $vtu with TTK..." >> $out
     omplace -nt $NCPUS \
-            ttkPersistenceDiagramCmd -i $vtu -t $NCPUS \
+            ttkPersistenceDiagramCmd -i $vtu -t $NCPUS -ed -da \
             1>> $out 2>> $err
+    dipha=${vtu%.vtu}.dipha
+    echo "Processing $dipha with Dipha..." >> $out
+    mpirun -np $NCPUS --oversubscribe \
+           dipha --upper_dim 3 $dipha output.dipha \
+           1>> $out 2>> $err
+    rm $dipha $vtu
 done
 
 # copy some output files to submission directory
