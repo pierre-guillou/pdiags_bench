@@ -28,49 +28,17 @@ def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=False):
         convert_datasets.main(dataset.split("/")[-1], "datasets")
 
 
-def dipha_print_pairs(dipha_diag):
-    with open(dipha_diag, "rb") as src:
-        magic = int.from_bytes(src.read(8), "little", signed=True)
-        if magic != 8067171840:
-            print("Not a Dipha file")
-            return
-        dtype = int.from_bytes(src.read(8), "little", signed=True)
-        if dtype != 2:
-            print("Not a Dipha Persistence Diagram")
-            return
-        npairs = int.from_bytes(src.read(8), "little", signed=True)
-        if npairs < 0:
-            print("Negative number of persistence pairs")
-            return
-        nptypes = dict()
-        for i in range(npairs):
-            ptype = int.from_bytes(src.read(8), "little", signed=True)
-            src.read(8)  # birth
-            src.read(8)  # death
-            nptypes[ptype] = nptypes.get(ptype, 0) + 1
-        nptypes[0] = nptypes.get(0, 0) + nptypes.get(-1, 0)
-        del nptypes[-1]
-        print(" #Min-Saddle pairs:", nptypes.get(0, 0))
-        print(" #Saddle-Saddle pairs:", nptypes.get(1, 0))
-        print(" #Saddle-Max pairs:", nptypes.get(2, 0))
-        print(" #Total:", sum(nptypes.values()))
-        print(" #Minima:", nptypes.get(0, 0))
-        print(" #1-Saddles:", nptypes.get(1, 0) + nptypes.get(0, 0))
-        print(" #2-Saddles:", nptypes.get(1, 0) + nptypes.get(2, 0))
-        print(" #Maxima:", nptypes.get(2, 0))
+def ttk_dipha_print_pairs(diag):
+    pairs = compare_diags.read_diag(diag)
+    print(f" #Min-saddle pairs: {len(pairs[0])}")
+    print(f" #Saddle-saddle pairs: {len(pairs[1])}")
+    print(f" #Saddle-max pairs: {len(pairs[2])}")
+    print(f" Total: {sum(map(len, pairs))}")
 
 
 def escape_ansi_chars(txt):
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
     return ansi_escape.sub("", txt)
-
-
-def ttk_print_pairs(ttk_output):
-    pairs = compare_diags.read_diag("output_port_0.vtu")
-    print(f" #Min-saddle pairs: {len(pairs[0])}")
-    print(f" #Saddle-saddle pairs: {len(pairs[1])}")
-    print(f" #Saddle-max pairs: {len(pairs[2])}")
-    print(f" Total: {sum(map(len, pairs))}")
 
 
 def dataset_name(dsfile):
@@ -115,8 +83,8 @@ def compute_ttk(
         return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
 
     times[dataset][key] = ttk_compute_time(proc.stdout)
-    ttk_print_pairs(proc.stdout)
     os.rename("output_port_0.vtu", outp)
+    ttk_dipha_print_pairs(outp)
 
 
 def compute_dipha(fname, exe, times, one_thread=False):
@@ -155,7 +123,7 @@ def compute_dipha(fname, exe, times, one_thread=False):
         return round(dipha_exec_time - sum(overhead), 3)
 
     times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
-    dipha_print_pairs(outp)
+    ttk_dipha_print_pairs(outp)
 
 
 def compute_cubrips(fname, exe, times):
