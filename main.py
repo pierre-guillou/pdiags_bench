@@ -161,7 +161,7 @@ def compute_gudhi(fname, exe, times):
     os.rename(fname + "_persistence", outp)
 
 
-def compute_diagrams(_, all_softs=False):
+def compute_diagrams(_, all_softs=True):
     exes = {
         "ttk": "ttkPersistenceDiagramCmd",
         "dipha": "build_dipha/dipha",
@@ -229,9 +229,9 @@ def compute_diagrams(_, all_softs=False):
                 hybrid_pp=True,
                 one_thread=one_thread,
             )
-        elif ext == "dipha":
+        elif ext == "dipha" and "expl" in fname:
             compute_dipha(fname, exes["dipha"], times, one_thread)
-        elif all_softs and ext == "dipha":
+        elif all_softs and ext == "dipha" and "impl" in fname:
             compute_cubrips(fname, exes["CubicalRipser"], times)
         elif all_softs and ext == "pers":
             compute_gudhi(fname, exes["gudhi"], times)
