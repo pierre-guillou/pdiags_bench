@@ -145,7 +145,7 @@ def compute_cubrips(fname, exe, times):
     try:
         start_time = time.time()
         subprocess.check_call(cmd)
-        times[dataset]["CubicalRipser"] = time.time() - start_time
+        times[dataset]["CubicalRipser"] = round(time.time() - start_time, 3)
     except subprocess.CalledProcessError:
         print(dataset + " is too large for CubicalRipser")
 
@@ -157,7 +157,7 @@ def compute_gudhi(fname, exe, times):
     cmd = [exe, fname]
     start_time = time.time()
     subprocess.check_call(cmd)
-    times[dataset]["gudhi"] = time.time() - start_time
+    times[dataset]["gudhi"] = round(time.time() - start_time, 3)
     os.rename(fname.split("/")[-1] + "_persistence", outp)
 
 
@@ -188,7 +188,9 @@ def compute_diagrams(_, all_softs=True):
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
         times[dataset_name(fname)] = {
-            "#Threads": 1 if one_thread else multiprocessing.cpu_count()
+            "#Threads": 1
+            if one_thread or "impl" in fname
+            else multiprocessing.cpu_count()
         }
         try:
             # compute number of vertices from dataset name
