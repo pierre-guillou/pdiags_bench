@@ -10,8 +10,6 @@ def write_output(outp, fname, out_dir, explicit):
         # vtkUnstructuredGrid (TTK)
         simple.SaveData(fname + ".vtu", proxy=outp)
     else:
-        # vtkImageData (TTK)
-        simple.SaveData(fname + ".vti", proxy=outp)
         # Perseus Cubical Grid (Gudhi)
         simple.SaveData(fname + ".pers", proxy=outp)
     # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
