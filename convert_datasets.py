@@ -14,8 +14,8 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".vti", proxy=outp)
         # Perseus Cubical Grid (Gudhi)
         simple.SaveData(fname + ".pers", proxy=outp)
-    # # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
-    # simple.SaveData(fname + ".dipha", proxy=outp)
+    # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
+    simple.SaveData(fname + ".dipha", proxy=outp)
 
 
 def main(raw_file, out_dir=""):
@@ -45,6 +45,8 @@ def main(raw_file, out_dir=""):
     # trash input scalar field, save order field
     pa = simple.PassArrays(Input=arrprec)
     pa.PointDataArrays = ["ImageFile_Order"]
+    # save implicit mesh
+    write_output(pa, raw_stem + "_order_impl", out_dir, False)
 
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
