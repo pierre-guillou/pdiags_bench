@@ -158,7 +158,7 @@ def compute_gudhi(fname, exe, times):
     start_time = time.time()
     subprocess.check_call(cmd)
     times[dataset]["gudhi"] = time.time() - start_time
-    os.rename(fname + "_persistence", outp)
+    os.rename(fname.split("/")[-1] + "_persistence", outp)
 
 
 def compute_diagrams(_, all_softs=True):
