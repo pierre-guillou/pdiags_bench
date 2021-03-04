@@ -43,8 +43,6 @@ def main(raw_file, out_dir=""):
     # trash input scalar field, save order field
     pa = simple.PassArrays(Input=arrprec)
     pa.PointDataArrays = ["ImageFile_Order"]
-    # save implicit mesh
-    write_output(pa, raw_stem + "_order_impl", out_dir, False)
 
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)

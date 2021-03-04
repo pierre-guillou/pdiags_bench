@@ -65,7 +65,7 @@ def compute_ttk(
     else:
         print("Processing " + dataset + " with TTK...")
     outp = f"diagrams/{dataset}.vtu"
-    cmd = [exe, "-i", fname, "-d", "4"]
+    cmd = ["omplace", "-nt", "64", exe, "-i", fname, "-d", "4", "-t", "64"]
     if one_thread:
         cmd.extend(["-t", "1"])
     key = "ttk"
@@ -91,7 +91,6 @@ def compute_ttk(
 
     times[dataset][key] = ttk_compute_time(proc.stdout)
     os.rename("output_port_0.vtu", outp)
-    ttk_dipha_print_pairs(outp)
 
 
 def compute_dipha(fname, exe, times, one_thread=False):
@@ -108,7 +107,9 @@ def compute_dipha(fname, exe, times, one_thread=False):
     else:
         cmd = [
             "mpirun",
-            "--use-hwthread-cpus",
+            "-np",
+            "64",
+            "--oversubscribe",
             exe,
             "--benchmark",
             fname,
@@ -129,8 +130,6 @@ def compute_dipha(fname, exe, times, one_thread=False):
         ]
         return round(dipha_exec_time - sum(overhead), 3)
 
-    ret = ttk_dipha_print_pairs(outp)
-    times[dataset] |= ret
     times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
 
 
@@ -163,8 +162,8 @@ def compute_gudhi(fname, exe, times):
 
 def compute_diagrams(_, all_softs=True):
     exes = {
-        "ttk": "ttkPersistenceDiagramCmd",
-        "dipha": "build_dipha/dipha",
+        "ttk": "/home/guilloup/ttk-guillou/build/bin/ttkPersistenceDiagramCmd",
+        "dipha": "/home/guilloup/pdiags_bench/build_dipha/dipha",
         "gudhi": (
             "build_gudhi/src/Bitmap_cubical_complex"
             "/utilities/cubical_complex_persistence"

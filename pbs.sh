@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=64
-#PBS -l walltime=00:50:00
+#PBS -l walltime=03:00:00
 #PBS -N dipha_bench
 #PBS -j oe
 
@@ -40,27 +40,14 @@ cd $SCRATCH || exit 1
 # prepare datasets
 mkdir datasets
 
-for raw in raws/*.raw; do
-    echo "Converting $raw..."
-    time python $WD/convert_datasets.py $raw datasets
-    raw_stem=${raw#raws/}
-    out=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.out
-    err=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.err
-    vtu=datasets/${raw_stem%.raw}_order_expl.vtu
-    echo "Processing $vtu with TTK..." >> $out
-    omplace -nt $NCPUS \
-            ttkPersistenceDiagramCmd -i $vtu -t $NCPUS -ed -da \
-            1>> $out 2>> $err
-    dipha=${vtu%.vtu}.dipha
-    echo "Processing $dipha with Dipha..." >> $out
-    mpirun -np $NCPUS --oversubscribe \
-           dipha --upper_dim 3 $dipha output.dipha \
-           1>> $out 2>> $err
-    rm $dipha $vtu
-done
+out=$WD/log/${PBS_JOBID}_${NCPUS}.out
+err=$WD/log/${PBS_JOBID}_${NCPUS}.err
+
+time python $WD/main.py prepare_datasets 1> $out 2> $err
+time python $WD/main.py compute_diagrams 1> $out 2> $err
 
 # copy some output files to submission directory
-# cp -p $PBS_JOBNAME.out $PBS_JOBNAME.err $PBS_O_WORKDIR || exit 1
+cp -p results $PBS_O_WORKDIR || exit 1
 
 # clean the temporary directory
 rm -rf "$SCRATCH"/*
