@@ -26,8 +26,8 @@ def create_dir(dirname):
 
 def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=False):
     create_dir("datasets")
-    for dataset in sorted(glob.glob("*.raw")):
-        convert_datasets.main(dataset.split("/")[-1], "datasets")
+    for dataset in sorted(glob.glob("raws/*.raw")):
+        convert_datasets.main(dataset, "datasets")
 
 
 def ttk_dipha_print_pairs(diag):
