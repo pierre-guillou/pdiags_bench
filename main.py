@@ -121,14 +121,9 @@ def compute_dipha(fname, exe, times, one_thread=False):
 
     def dipha_compute_time(dipha_output, dipha_exec_time):
         dipha_output = dipha_output.decode()
-        read_re = r"^\s+(\d+\.\d+|\d+).*complex.load_binary"
-        write_re = r"^\s+(\d+\.\d+|\d+).*save_persistence_diagram"
-        patterns = [read_re, write_re]
-        overhead = [
-            float(re.search(pat, dipha_output, re.MULTILINE).group(1))
-            for pat in patterns
-        ]
-        return round(dipha_exec_time - sum(overhead), 3)
+        pat = r"^Computation lasted (\d+.\d+|\d+)s$"
+        time = re.search(pat, dipha_output, re.MULTILINE).group(1)
+        return round(float(time), 3)
 
     times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
 
