@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=64
-#PBS -l walltime=03:00:00
+#PBS -l walltime=00:30:00
 #PBS -N dipha_bench
 #PBS -j oe
 
@@ -22,8 +22,8 @@ mkdir -p $SCRATCH
 # working directory
 WD=$HOME/pdiags_bench
 
-# copy some input files to  $SCRATCH directory
-cp -r $WD/raws $SCRATCH
+# copy prepared datasets into $SCRATCH directory
+cp -r $WD/datasets $SCRATCH
 
 # env variables
 INSTDIR=/home/guilloup/install
@@ -37,13 +37,9 @@ export PV_PLUGIN_PATH=$TTK_BUILD/lib64/TopologyToolKit
 # execute your program
 cd $SCRATCH || exit 1
 
-# prepare datasets
-mkdir datasets
-
 out=$WD/log/${PBS_JOBID}_${NCPUS}.out
 err=$WD/log/${PBS_JOBID}_${NCPUS}.err
 
-time python $WD/main.py prepare_datasets 1> $out 2> $err
 time python $WD/main.py compute_diagrams 1> $out 2> $err
 
 # copy some output files to submission directory
