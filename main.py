@@ -97,7 +97,7 @@ def compute_dipha(fname, exe, times, one_thread=False):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with dipha...")
     outp = f"diagrams/{dataset}.dipha"
-    if one_thread:
+    if True:
         cmd = [
             exe,
             "--benchmark",
@@ -107,9 +107,9 @@ def compute_dipha(fname, exe, times, one_thread=False):
     else:
         cmd = [
             "mpirun",
+            "--oversubscribe",
             "-np",
             "64",
-            "--oversubscribe",
             exe,
             "--benchmark",
             fname,
@@ -157,8 +157,8 @@ def compute_gudhi(fname, exe, times):
 
 def compute_diagrams(_, all_softs=True):
     exes = {
-        "ttk": "/home/guilloup/ttk-guillou/build/bin/ttkPersistenceDiagramCmd",
-        "dipha": "/home/guilloup/pdiags_bench/build_dipha/dipha",
+        "ttk": "ttkPersistenceDiagramCmd",
+        "dipha": "dipha",
         "gudhi": (
             "build_gudhi/src/Bitmap_cubical_complex"
             "/utilities/cubical_complex_persistence"
@@ -291,6 +291,24 @@ def main():
             "CubicalRipser on a selection of OpenSciVis datasets"
         )
     )
+
+    cmd = [
+        "mpirun",
+        "--oversubscribe",
+        "-np",
+        "8",
+        "dipha",
+        "--benchmark",
+        "datasets/fuel_64x64x64_uint8_order_expl.dipha",
+        "output.dipha",
+    ]
+    subprocess.run(cmd)
+    cmd[6] = "datasets/hydrogen_atom_128x128x128_uint8_order_expl.dipha",
+    subprocess.run(cmd)
+    cmd[6] = "datasets/marschner_lobb_41x41x41_uint8_order_expl.dipha",
+    subprocess.run(cmd)
+    return
+
     subparsers = parser.add_subparsers()
 
     prep_datasets = subparsers.add_parser("prepare_datasets")
