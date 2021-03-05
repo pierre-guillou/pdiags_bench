@@ -129,24 +129,17 @@ def compute_dipha(fname, exe, times, one_thread=False):
             fname,
             outp,
         ]
-    start_time = time.time()
     proc = subprocess.run(cmd, capture_output=True)  # no timeout here?
-    dipha_exec_time = time.time() - start_time
 
-    def dipha_compute_time(dipha_output, dipha_exec_time):
+    def dipha_compute_time(dipha_output):
         dipha_output = dipha_output.decode()
-        read_re = r"^\s+(\d+\.\d+|\d+).*complex.load_binary"
-        write_re = r"^\s+(\d+\.\d+|\d+).*save_persistence_diagram"
-        patterns = [read_re, write_re]
-        overhead = [
-            float(re.search(pat, dipha_output, re.MULTILINE).group(1))
-            for pat in patterns
-        ]
-        return round(dipha_exec_time - sum(overhead), 3)
+        pat = r"^Computation lasted (\d+.\d+|\d+)s$"
+        time = re.search(pat, dipha_output, re.MULTILINE).group(1)
+        return round(float(time), 3)
 
     ret = ttk_dipha_print_pairs(outp)
     times[dataset] |= ret
-    times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
+    times[dataset]["dipha"] = dipha_compute_time(proc.stdout)
     store_log(proc.stdout, dataset, "dipha")
 
 
