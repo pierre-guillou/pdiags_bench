@@ -2,6 +2,8 @@ import sys
 
 from paraview import simple
 
+RESAMPL = 192
+
 
 def write_output(outp, fname, out_dir, explicit):
     if out_dir:
@@ -39,7 +41,7 @@ def main(raw_file, out_dir=""):
     pdc.OutputType = "Float"
     # resample to 192^3
     rsi = simple.ResampleToImage(Input=pdc)
-    rsi.SamplingDimensions = [192, 192, 192]
+    rsi.SamplingDimensions = [RESAMPL, RESAMPL, RESAMPL]
     # compute order field
     arrprec = simple.TTKArrayPreconditioning(Input=rsi)
     arrprec.PointDataArrays = ["ImageFile"]

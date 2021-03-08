@@ -198,14 +198,7 @@ def compute_diagrams(_, all_softs=True):
             if one_thread or "impl" in fname
             else multiprocessing.cpu_count()
         }
-        try:
-            # compute number of vertices from dataset name
-            pattern = re.compile(r"_\d+x\d+x\d+_")
-            extent = re.search(pattern, fname).group().strip("_")
-            nVerts = math.prod([int(dim) for dim in extent.split("x")])
-            times[dataset_name(fname)]["#Vertices"] = nVerts
-        except AttributeError:
-            pass
+        times[dataset_name(fname)]["#Vertices"] = convert_datasets.RESAMPL ** 3
 
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
