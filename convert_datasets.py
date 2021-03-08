@@ -51,8 +51,10 @@ def main(raw_file, out_dir=""):
 
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
+    # remove vtkGhostType arrays (only applies on vtu & vtp)
+    rgi = simple.RemoveGhostInformation(Input=tetrah)
     # save explicit mesh
-    write_output(tetrah, raw_stem + "_order_expl", out_dir, True)
+    write_output(rgi, raw_stem + "_order_expl", out_dir, True)
 
     print("Converted " + raw_file + " to VTU and Dipha")
 
