@@ -37,8 +37,11 @@ def main(raw_file, out_dir=""):
     pdc = simple.TTKPointDataConverter(Input=raw)
     pdc.PointDataScalarField = ["POINTS", "ImageFile"]
     pdc.OutputType = "Float"
+    # resample to 192^3
+    rsi = simple.ResampleToImage(Input=pdc)
+    rsi.SamplingDimensions = [192, 192, 192]
     # compute order field
-    arrprec = simple.TTKArrayPreconditioning(Input=pdc)
+    arrprec = simple.TTKArrayPreconditioning(Input=rsi)
     arrprec.PointDataArrays = ["ImageFile"]
     # trash input scalar field, save order field
     pa = simple.PassArrays(Input=arrprec)
