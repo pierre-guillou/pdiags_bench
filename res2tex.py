@@ -46,6 +46,18 @@ def main(fname, standalone=False):
         for i, val in enumerate(curr):
             if i != 0 and val == curr[0]:
                 curr[i] = "Err."
+        # find the min execution time and put it in bold
+        times = []
+        for i, val in enumerate(curr):
+            if "#" in cols[i]:
+                continue
+            try:
+                times.append((i, float(val)))
+            except ValueError:
+                pass
+        m = min(times, key=lambda x: x[1])
+        curr[m[0]] = r"\textbf{" + curr[m[0]] + r"}"
+        # append current line
         res.append("  " + " & ".join(curr) + r" \\")
     res.append(r"  \bottomrule")
     res.append(r"\end{tabular}")
