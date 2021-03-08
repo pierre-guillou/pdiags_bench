@@ -27,7 +27,13 @@ def create_dir(dirname):
 def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=False):
     create_dir("datasets")
     for dataset in sorted(glob.glob("raws/*.raw")):
-        convert_datasets.main(dataset, "datasets")
+        # reduce RAM usage by isolating datasets manipulation in
+        # separate processes
+        p = multiprocessing.Process(
+            target=convert_datasets.main, args=(dataset, "datasets")
+        )
+        p.start()
+        p.join()
 
 
 def ttk_dipha_print_pairs(diag):
