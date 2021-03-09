@@ -13,9 +13,6 @@ import time
 import compare_diags
 import convert_datasets
 
-URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
-SIZE_LIMIT_MB = 80
-
 
 def create_dir(dirname):
     try:
