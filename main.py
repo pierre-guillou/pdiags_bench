@@ -198,7 +198,9 @@ def compute_diagrams(_, all_softs=True):
             if one_thread or "impl" in fname
             else multiprocessing.cpu_count()
         }
-        times[dataset_name(fname)]["#Vertices"] = convert_datasets.RESAMPL ** 3
+        times[dataset_name(fname)]["#Vertices"] = "x".join(
+            [str(convert_datasets.RESAMPL)] * 3
+        )
 
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
