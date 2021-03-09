@@ -1,5 +1,7 @@
 import argparse
 import json
+import os
+import subprocess
 
 
 def add_standalone(fname, res=list()):
@@ -75,13 +77,23 @@ def gen_table(fname, res=list()):
     return res
 
 
-def main(fname, standalone=False):
+def main(fname, standalone=False, generate=False):
     res = list()
-    if standalone:
+    if standalone or generate:
         res = add_standalone(fname, res)
     else:
         res = gen_table(fname, res)
-    print("\n".join(res))
+    if generate:
+        with open("tmp.tex", "w") as dst:
+            dst.write("\n".join(res))
+        cmd = ["latexmk", "-pdf", "tmp.tex"]
+        subprocess.run(cmd)
+        cmd = ["latexmk", "-c"]
+        subprocess.run(cmd)
+        os.remove("tmp.tex")
+        os.rename("tmp.pdf", fname + ".pdf")
+    else:
+        print("\n".join(res))
 
 
 if __name__ == "__main__":
@@ -95,5 +107,11 @@ if __name__ == "__main__":
         action="store_true",
         help="Embed output in standalone LaTeX file",
     )
+    parser.add_argument(
+        "-g",
+        "--generate",
+        action="store_true",
+        help="Generate a standalone PDF",
+    )
     args = parser.parse_args()
-    main(args.JSON_File, args.standalone)
+    main(args.JSON_File, args.standalone, args.generate)
