@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -S /bin/bash
 #PBS -q alpha
-#PBS -l select=1:ncpus=64
+#PBS -l select=1:ncpus=128
 #PBS -l walltime=00:50:00
 #PBS -N dipha_bench
 #PBS -j oe
@@ -47,16 +47,13 @@ for raw in raws/*.raw; do
     out=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.out
     err=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.err
     vtu=datasets/${raw_stem%.raw}_order_expl.vtu
-    echo "Processing $vtu with TTK..." >> $out
-    omplace -nt $NCPUS \
-            ttkPersistenceDiagramCmd -i $vtu -t $NCPUS -ed -da \
-            1>> $out 2>> $err
-    dipha=${vtu%.vtu}.dipha
-    echo "Processing $dipha with Dipha..." >> $out
-    mpirun -np $NCPUS --oversubscribe \
-           dipha --upper_dim 3 $dipha output.dipha \
-           1>> $out 2>> $err
-    rm $dipha $vtu
+    for nt in 1 16 32 48 64 80 96 112 128; do
+        echo "Processing $vtu with TTK with $nt threads..." >> $out
+        omplace -nt $nt \
+                ttkPersistenceDiagramCmd -i $vtu -t $nt \
+                1>> $out 2>> $err
+        rm $vtu
+    done
 done
 
 # copy some output files to submission directory
