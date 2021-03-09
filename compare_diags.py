@@ -13,8 +13,10 @@ def read_file(fname):
     ext = fname.split(".")[-1]
     if ext == "vtu":
         reader = vtk.vtkXMLUnstructuredGridReader()
-    elif ext == "dipha":
+    elif ext == "dipha" or ext == "cr":
         reader = ttk.ttkDiphaReader()
+    elif ext == "gudhi":
+        reader = ttk.ttkGudhiPersistenceDiagramReader()
     else:
         return None
     reader.SetFileName(fname)
