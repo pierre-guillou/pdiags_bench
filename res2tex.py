@@ -2,7 +2,34 @@ import argparse
 import json
 
 
-def main(fname, standalone=False):
+def add_standalone(fname, res=list()):
+    res.append(r"\documentclass{standalone}")
+    res.append("")
+    res.append(r"\usepackage{booktabs}")
+    res.append("")
+    res.append(r"\begin{document}")
+    res.append("")
+
+    gen_table(fname, res)
+
+    res.append("")
+    res.append(r"\end{document}")
+    return res
+
+
+def find_min_time(vals, cols):
+    times = []
+    for i, val in enumerate(vals):
+        if "#" in cols[i]:
+            continue
+        try:
+            times.append((i, float(val)))
+        except ValueError:
+            pass
+    return min(times, key=lambda x: x[1])
+
+
+def gen_table(fname, res=list()):
     with open(fname, "r") as src:
         data = json.load(src)
     # use dicts to get an ordered sets
@@ -22,21 +49,13 @@ def main(fname, standalone=False):
     cols_dict = {name: i for i, name in enumerate(cols)}
     cols = cols_escape
     lines = list(lines)
-    res = []
-    if standalone:
-        res.append(r"\documentclass{standalone}")
-        res.append("")
-        res.append(r"\usepackage{booktabs}")
-        res.append("")
-        res.append(r"\begin{document}")
-        res.append("")
     res.append(r"\begin{tabular}[ht]{l" + "c" * (len(cols) - 1) + "}")
     res.append(r"  \toprule")
     res.append("  " + " & ".join(cols) + r" \\")
     res.append(r"  \midrule")
     res.append("")
     for ds in lines:
-        curr = ["\\_".join(ds.split("_"))] * len(cols)
+        curr = [ds.split("_")[0]] * len(cols)
         for it, val in data[ds + "_order_expl"].items():
             curr[cols_dict[it]] = str(val)
         for it, val in data[ds + "_order_impl"].items():
@@ -47,23 +66,21 @@ def main(fname, standalone=False):
             if i != 0 and val == curr[0]:
                 curr[i] = "Err."
         # find the min execution time and put it in bold
-        times = []
-        for i, val in enumerate(curr):
-            if "#" in cols[i]:
-                continue
-            try:
-                times.append((i, float(val)))
-            except ValueError:
-                pass
-        m = min(times, key=lambda x: x[1])
+        m = find_min_time(curr, cols)
         curr[m[0]] = r"\textbf{" + curr[m[0]] + r"}"
         # append current line
         res.append("  " + " & ".join(curr) + r" \\")
     res.append(r"  \bottomrule")
     res.append(r"\end{tabular}")
+    return res
+
+
+def main(fname, standalone=False):
+    res = list()
     if standalone:
-        res.append("")
-        res.append(r"\end{document}")
+        res = add_standalone(fname, res)
+    else:
+        res = gen_table(fname, res)
     print("\n".join(res))
 
 
