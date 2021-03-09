@@ -152,6 +152,7 @@ def compute_cubrips(fname, exe, times):
         start_time = time.time()
         subprocess.check_call(cmd)
         times[dataset]["CubicalRipser"] = round(time.time() - start_time, 3)
+        ttk_dipha_print_pairs(outp)
     except subprocess.CalledProcessError:
         print(dataset + " is too large for CubicalRipser")
 
@@ -165,6 +166,7 @@ def compute_gudhi(fname, exe, times):
     subprocess.check_call(cmd)
     times[dataset]["gudhi"] = round(time.time() - start_time, 3)
     os.rename(fname.split("/")[-1] + "_persistence", outp)
+    ttk_dipha_print_pairs(outp)
 
 
 def compute_diagrams(_, all_softs=True):
