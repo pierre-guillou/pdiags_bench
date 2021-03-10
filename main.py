@@ -3,7 +3,6 @@
 import argparse
 import glob
 import json
-import math
 import multiprocessing
 import os
 import re
@@ -21,7 +20,7 @@ def create_dir(dirname):
         pass
 
 
-def prepare_datasets(_, size_limit=SIZE_LIMIT_MB, download=False):
+def prepare_datasets(_):
     create_dir("datasets")
     for dataset in sorted(glob.glob("raws/*.raw")):
         # reduce RAM usage by isolating datasets manipulation in
