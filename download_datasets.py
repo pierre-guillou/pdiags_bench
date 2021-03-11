@@ -6,7 +6,7 @@ import os
 import requests
 
 URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
-SIZE_LIMIT_MB = 256
+SIZE_LIMIT_MB = 1024
 
 
 def get_datasets_urls(size_limit_mb):
