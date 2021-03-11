@@ -1,6 +1,7 @@
 import glob
 import json
 import math
+import os
 
 import requests
 
@@ -42,9 +43,15 @@ def download_dataset(dataset_url, dest_dir=""):
 
 
 def main():
+    dest_dir = "raws"
+    try:
+        os.mkdir(dest_dir)
+    except FileExistsError:
+        pass
+
     ds_urls = get_datasets_urls(SIZE_LIMIT_MB)
     for url in ds_urls:
-        download_dataset(url, "raws/")
+        download_dataset(url, dest_dir + "/")
 
 
 if __name__ == "__main__":
