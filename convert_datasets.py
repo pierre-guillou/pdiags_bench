@@ -18,25 +18,34 @@ def write_output(outp, fname, out_dir, explicit):
     simple.SaveData(fname + ".dipha", proxy=outp)
 
 
+def read_file(input_file):
+    extension = input_file.split(".")[-1]
+    if extension == "vti":
+        return simple.XMLImageDataReader(FileName=input_file)
+    elif extension == "raw":
+        extent, dtype = input_file.split(".")[0].split("_")[-2:]
+        extent = [int(dim) for dim in extent.split("x")]
+
+        dtype_pv = {
+            "uint8": "unsigned char",
+            "int16": "short",
+            "uint16": "unsigned short",
+            "float32": "float",
+            "float64": "double",
+        }
+
+        raw = simple.ImageReader(FileNames=[input_file])
+        raw.DataScalarType = dtype_pv[dtype]
+        raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
+        return raw
+
+
 def main(raw_file, out_dir=""):
-    extent, dtype = raw_file.split(".")[0].split("_")[-2:]
-    extent = [int(dim) for dim in extent.split("x")]
-
-    dtype_pv = {
-        "uint8": "unsigned char",
-        "int16": "short",
-        "uint16": "unsigned short",
-        "float32": "float",
-        "float64": "double",
-    }
-
-    raw = simple.ImageReader(FileNames=[raw_file])
-    raw.DataScalarType = dtype_pv[dtype]
-    raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
     raw_stem = raw_file.split(".")[0].split("/")[-1]
+    reader = read_file(raw_file)
 
     # convert input scalar field to float
-    pdc = simple.TTKPointDataConverter(Input=raw)
+    pdc = simple.TTKPointDataConverter(Input=reader)
     pdc.PointDataScalarField = ["POINTS", "ImageFile"]
     pdc.OutputType = "Float"
     # resample to 192^3
