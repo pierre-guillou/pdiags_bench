@@ -58,6 +58,12 @@ def dataset_name(dsfile):
 TIMEOUT_S = 1800  # 30 min
 
 
+def store_log(log, ds_name, app):
+    file_name = f"logs/{ds_name}.{app}.log"
+    with open(file_name, "w") as dst:
+        dst.write(log.decode())
+
+
 def compute_ttk(
     fname, exe, times, dipha_offload=False, hybrid_pp=False, one_thread=False
 ):
@@ -98,6 +104,7 @@ def compute_ttk(
         times[dataset][key] = ttk_compute_time(proc.stdout)
         os.rename("output_port_0.vtu", outp)
         ttk_dipha_print_pairs(outp)
+        store_log(proc.stdout, dataset, key)
     except subprocess.TimeoutExpired:
         print("Timeout reached, computation aborted")
 
@@ -140,6 +147,7 @@ def compute_dipha(fname, exe, times, one_thread=False):
     ret = ttk_dipha_print_pairs(outp)
     times[dataset] |= ret
     times[dataset]["dipha"] = dipha_compute_time(proc.stdout, dipha_exec_time)
+    store_log(proc.stdout, dataset, "dipha")
 
 
 def compute_cubrips(fname, exe, times):
@@ -194,6 +202,8 @@ def compute_diagrams(_, all_softs=True):
 
     # output diagrams directory
     create_dir("diagrams")
+    # log directory
+    create_dir("logs")
 
     # store computation times
     times = dict()
