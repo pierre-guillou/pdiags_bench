@@ -1,4 +1,9 @@
-*.raw
-*.dipha
-*.pers
-*.vti
+/raws
+/datasets
+/diagrams
+/logs
+/build_*
+/__pycache__
+/CubicalRipser
+/dipha
+/gudhi-*
