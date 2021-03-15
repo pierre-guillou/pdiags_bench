@@ -57,7 +57,8 @@ def gen_table(fname, res=list()):
     res.append(r"  \midrule")
     res.append("")
     for ds in lines:
-        curr = [ds.split("_")[0]] * len(cols)
+        ds_name = r"\_".join(ds.split("_")[:-2])
+        curr = [ds_name] * len(cols)
         for it, val in data[ds + "_order_expl"].items():
             curr[cols_dict[it]] = str(val)
         for it, val in data[ds + "_order_impl"].items():
