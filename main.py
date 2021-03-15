@@ -90,14 +90,18 @@ def compute_ttk(
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output.decode())
         time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
-        return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
+        time = float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
+        overhead = ttk_overhead_time(ttk_output)
+        return time - overhead
 
     def ttk_overhead_time(ttk_output):
-        ttk_output = escape_ansi_chars(ttk_output.decode())
         time_re = (
             r"\[DiscreteGradient\] Wrote Dipha explicit complex.*\[(\d+\.\d+|\d+)s"
         )
-        return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
+        try:
+            return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
+        except AttributeError:
+            return 0.0
 
     try:
         proc = subprocess.run(cmd, capture_output=True, timeout=TIMEOUT_S)
