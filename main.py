@@ -145,9 +145,6 @@ def compute_dipha(fname, exe, times, one_thread=False):
 
 def compute_cubrips(fname, exe, times):
     dataset = dataset_name(fname)
-    if "float" in dataset:
-        # skip large datasets
-        return
     print("Processing " + dataset + " with CubicalRipser...")
     outp = f"diagrams/{dataset}.cr"
     cmd = [exe, fname, "--output", outp]
