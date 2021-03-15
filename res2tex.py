@@ -66,7 +66,7 @@ def gen_table(fname, res=list()):
         # consistency check
         for i, val in enumerate(curr):
             if i != 0 and val == curr[0]:
-                curr[i] = "Err."
+                curr[i] = r"+30min"
         # find the min execution time and put it in bold
         m = find_min_time(curr, cols)
         curr[m[0]] = r"\textbf{" + curr[m[0]] + r"}"
