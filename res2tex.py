@@ -8,6 +8,7 @@ def add_standalone(fname, res=list()):
     res.append(r"\documentclass{standalone}")
     res.append("")
     res.append(r"\usepackage{booktabs}")
+    res.append(r"\usepackage[table]{xcolor}")
     res.append("")
     res.append(r"\begin{document}")
     res.append("")
@@ -19,7 +20,7 @@ def add_standalone(fname, res=list()):
     return res
 
 
-def find_min_time(vals, cols):
+def sort_times(vals, cols):
     times = []
     for i, val in enumerate(vals):
         if "#" in cols[i]:
@@ -28,7 +29,7 @@ def find_min_time(vals, cols):
             times.append((i, float(val)))
         except ValueError:
             pass
-    return min(times, key=lambda x: x[1])
+    return sorted(times, key=lambda x: x[1])
 
 
 def gen_table(fname, res=list()):
@@ -68,9 +69,11 @@ def gen_table(fname, res=list()):
         for i, val in enumerate(curr):
             if i != 0 and val == curr[0]:
                 curr[i] = r"+30min"
-        # find the min execution time and put it in bold
-        m = find_min_time(curr, cols)
-        curr[m[0]] = r"\textbf{" + curr[m[0]] + r"}"
+        # sort times in increasing order
+        colors = ["green", "lime", "yellow", "orange", "red!75", "purple"]
+        stimes = sort_times(curr, cols)
+        for t, c in zip(stimes, colors):
+            curr[t[0]] = r"\cellcolor{" + c + "}" + curr[t[0]]
         # append current line
         res.append("  " + " & ".join(curr) + r" \\")
     res.append(r"  \bottomrule")
