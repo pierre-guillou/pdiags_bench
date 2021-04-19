@@ -1,0 +1,12 @@
+[tool.poetry]
+name = "pdiags_bench"
+version = "0.1.0"
+description = "Benchmark of persistence diagrams software"
+authors = ["Pierre Guillou <pierre.guillou@lip6.fr>"]
+license = "GPL-3.0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+ripser = "^0.6.0"
+dionysus = "^2.0"
+gudhi = "^3.4.1"
