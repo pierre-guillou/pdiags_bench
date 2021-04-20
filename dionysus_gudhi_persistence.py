@@ -1,4 +1,3 @@
-import enum
 import time
 
 import dionysus
@@ -40,89 +39,79 @@ def read_simplicial_complex(dataset):
     return dims, values, (edges, triangles, tetras)
 
 
-def compute_persistence_dionysus(dims, values, cpx):
+class Dionysus_Filtration:
+    def __init__(self):
+        self.f = dionysus.Filtration()
+        self.diag = None
+        print("Use the Dionysus backend")
+
+    def add(self, verts, val):
+        self.f.append(dionysus.Simplex(verts, val))
+
+    def compute_pers(self):
+        self.f.sort()
+        m = dionysus.homology_persistence(self.f)
+        self.diag = dionysus.init_diagrams(m, self.f)
+
+    def write_diag(self, output):
+        with open(output, "w") as dst:
+            for i, pair in enumerate(self.diag):
+                for pt in pair:
+                    dst.write(f"{i} {pt.birth} {pt.death}\n")
+
+
+class Gudhi_SimplexTree:
+    def __init__(self):
+        self.st = gudhi.SimplexTree()
+        print("Use the Gudhi backend")
+
+    def add(self, verts, val):
+        self.st.insert(verts, filtration=val)
+
+    def compute_pers(self):
+        self.st.compute_persistence()
+
+    def write_diag(self, output):
+        self.st.write_persistence_diagram(output)
+
+
+def compute_persistence(wrapper, dims, values, cpx, output):
     start = time.time()
 
     edges, triangles, tetras = cpx
 
-    f = dionysus.Filtration()
     for i in range(dims[0]):
-        f.append(dionysus.Simplex([i], values[i]))
+        wrapper.add([i], values[i])
     for i in range(dims[1]):
         o = 2 * i
         a = dims[0] + i
-        f.append(dionysus.Simplex(edges[o : o + 2], values[a]))
+        wrapper.add(edges[o : o + 2], values[a])
     for i in range(dims[2]):
         o = 3 * i
         a = dims[0] + dims[1] + i
-        f.append(dionysus.Simplex(triangles[o : o + 3], values[a]))
+        wrapper.add(triangles[o : o + 3], values[a])
     for i in range(dims[3]):
         o = 4 * i
         a = dims[0] + dims[1] + dims[2] + i
-        f.append(dionysus.Simplex(tetras[o : o + 4], values[a]))
+        wrapper.add(tetras[o : o + 4], values[a])
 
-    print(f"Filled filtration with Dionysus: {time.time() - start:.3f}s")
+    print(f"Filled filtration/simplex tree: {time.time() - start:.3f}s")
     start = time.time()
 
-    f.sort()
-    m = dionysus.homology_persistence(f)
-    d = dionysus.init_diagrams(m, f)
+    wrapper.compute_pers()
 
-    print(f"Computed persistence with Dionysus: {time.time() - start:.3f}s")
+    print(f"Computed persistence: {time.time() - start:.3f}s")
 
-    return d
+    wrapper.write_diag(output)
 
 
-def write_diagram_dionysus(diag, output):
-    with open(output, "w") as dst:
-        for i, pair in enumerate(diag):
-            for pt in pair:
-                dst.write(f"{i} {pt.birth} {pt.death}\n")
-
-
-def compute_persistence_gudhi(dims, values, cpx, output):
-    start = time.time()
-
-    edges, triangles, tetras = cpx
-
-    st = gudhi.SimplexTree()
-    for i in range(dims[0]):
-        st.insert([i], filtration=values[i])
-    for i in range(dims[1]):
-        o = 2 * i
-        a = dims[0] + i
-        st.insert(edges[o : o + 2], filtration=values[a])
-    for i in range(dims[2]):
-        o = 3 * i
-        a = dims[0] + dims[1] + i
-        st.insert(triangles[o : o + 3], filtration=values[a])
-    for i in range(dims[3]):
-        o = 4 * i
-        a = dims[0] + dims[1] + dims[2] + i
-        st.insert(tetras[o : o + 4], filtration=values[a])
-
-    print(f"Filled simplex tree with Gudhi: {time.time() - start:.3f}s")
-    start = time.time()
-
-    st.compute_persistence()
-
-    print(f"Computed persistence with Gudhi: {time.time() - start:.3f}s")
-
-    st.write_persistence_diagram(output)
-
-
-class Backend(enum.Enum):
-    DIONYSUS = 1
-    GUDHI = 2
-
-
-def main(dataset, output, backend=Backend.GUDHI):
+def main(dataset, output, backend="Gudhi"):
     dims, vals, cpx = read_simplicial_complex(dataset)
-    if backend == Backend.DIONYSUS:
-        diag = compute_persistence_dionysus(dims, vals, cpx)
-        write_diagram_dionysus(diag, output)
-    elif backend == Backend.GUDHI:
-        compute_persistence_gudhi(dims, vals, cpx, output)
+    dispatch = {
+        "Dionysus": Dionysus_Filtration,
+        "Gudhi": Gudhi_SimplexTree(),
+    }
+    compute_persistence(dispatch[backend], dims, vals, cpx, output)
 
 
 if __name__ == "__main__":
