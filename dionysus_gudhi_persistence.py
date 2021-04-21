@@ -109,9 +109,9 @@ def main(dataset, output, backend="Gudhi"):
     dims, vals, cpx = read_simplicial_complex(dataset)
     dispatch = {
         "Dionysus": Dionysus_Filtration,
-        "Gudhi": Gudhi_SimplexTree(),
+        "Gudhi": Gudhi_SimplexTree,
     }
-    compute_persistence(dispatch[backend], dims, vals, cpx, output)
+    compute_persistence(dispatch[backend](), dims, vals, cpx, output)
 
 
 if __name__ == "__main__":
