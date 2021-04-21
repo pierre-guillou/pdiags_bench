@@ -31,16 +31,17 @@ def dl_build_perseus(perseus_url):
 def main():
     gh = "https://github.com"
     tb = "tarball"
-    gudhi_url = f"{gh}/GUDHI/gudhi-devel/{tb}/tags%2Fgudhi-release-3.3.0"
-    CubicalRipser_url = f"{gh}/CubicalRipser/CubicalRipser_3dim/{tb}/master"
-    dipha_url = f"{gh}/DIPHA/dipha/{tb}/master"
-    perseus_url = "https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip"
 
-    softs = ["dipha", "gudhi", "CubicalRipser"]
+    softs = {
+        "dipha": f"{gh}/DIPHA/dipha/{tb}/master",
+        "gudhi": f"{gh}/GUDHI/gudhi-devel/{tb}/tags%2Fgudhi-release-3.3.0",
+        "CubicalRipser": f"{gh}/CubicalRipser/CubicalRipser_3dim/{tb}/master",
+        "perseus": "https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip",
+    }
 
     # download and extract a tarball from GitHub
-    for soft in softs:
-        download_dataset(locals()[soft + "_url"], soft + ".tar.gz")
+    for soft, url in softs.items():
+        download_dataset(url, soft + ".tar.gz")
         with tarfile.open(soft + ".tar.gz", "r:gz") as src:
             src.extractall()
             # rename software folders
@@ -57,7 +58,7 @@ def main():
         subprocess.check_call("cmake", "--build", builddir)
 
     # download & build Perseus
-    dl_build_perseus(perseus_url)
+    dl_build_perseus(softs["perseus"])
 
 
 if __name__ == "__main__":
