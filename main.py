@@ -90,9 +90,9 @@ def compute_ttk(
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output.decode())
         time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
-        time = float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
+        cpt_time = float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
         overhead = ttk_overhead_time(ttk_output)
-        return time - overhead
+        return cpt_time - overhead
 
     def ttk_overhead_time(ttk_output):
         time_re = (
@@ -104,7 +104,7 @@ def compute_ttk(
             return 0.0
 
     try:
-        proc = subprocess.run(cmd, capture_output=True, timeout=TIMEOUT_S)
+        proc = subprocess.run(cmd, capture_output=True, timeout=TIMEOUT_S, check=True)
         times[dataset][key] = ttk_compute_time(proc.stdout)
         os.rename("output_port_0.vtu", outp)
         ttk_dipha_print_pairs(outp)
@@ -133,13 +133,13 @@ def compute_dipha(fname, exe, times, one_thread=False):
             fname,
             outp,
         ]
-    proc = subprocess.run(cmd, capture_output=True)  # no timeout here?
+    proc = subprocess.run(cmd, capture_output=True, check=True)  # no timeout here?
 
     def dipha_compute_time(dipha_output):
         dipha_output = dipha_output.decode()
         pat = r"^Computation lasted (\d+.\d+|\d+)s$"
-        time = re.search(pat, dipha_output, re.MULTILINE).group(1)
-        return round(float(time), 3)
+        cpt_time = re.search(pat, dipha_output, re.MULTILINE).group(1)
+        return round(float(cpt_time), 3)
 
     ret = ttk_dipha_print_pairs(outp)
     times[dataset] |= ret
@@ -217,7 +217,7 @@ def compute_diagrams(_, all_softs=True):
 
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
-        if ext == "vtu" or ext == "vti":
+        if ext in ("vtu", "vti"):
             # our algo
             compute_ttk(
                 fname,
@@ -276,10 +276,10 @@ def compute_distances(_, method="auction"):
         if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
             cmd = ["python", "ttk_distance.py", method, dipha_diag, ttk_diag]
             print(f"Computing distance between TTK and Dipha for {ds}")
-            proc0 = subprocess.run(cmd, capture_output=True)
+            proc0 = subprocess.run(cmd, capture_output=True, check=True)
             cmd = ["python", "ttk_distance.py", method, dipha_diag, empty_diag]
             print(f"Computing Dipha distance to empty diagram for {ds}")
-            proc1 = subprocess.run(cmd, capture_output=True)
+            proc1 = subprocess.run(cmd, capture_output=True, check=True)
 
             # match distance figures
             pattern = auct_patt if method == "auction" else btnk_patt
