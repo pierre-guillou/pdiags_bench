@@ -6,11 +6,11 @@ def check_type(src):
     magic = int.from_bytes(src.read(8), "little", signed=True)
     if magic != 8067171840:
         print("Not a Dipha file")
-        return
+        return False
     dtype = int.from_bytes(src.read(8), "little", signed=True)
     if dtype != 0:
         print("Not a Dipha Explicit Complex")
-        return
+        return False
     mtype = int.from_bytes(src.read(8), "little", signed=True)
     if mtype == 0:
         print("Boundary matrix")
@@ -18,7 +18,9 @@ def check_type(src):
         print("Co-boundary matrix")
     else:
         print("Incorrect matrix type")
-        return
+        return False
+
+    return True
 
 
 def check_cells(src):
