@@ -23,7 +23,8 @@ def read_file(input_file):
     extension = input_file.split(".")[-1]
     if extension == "vti":
         return simple.XMLImageDataReader(FileName=input_file)
-    elif extension == "raw":
+
+    if extension == "raw":
         extent, dtype = input_file.split(".")[0].split("_")[-2:]
         extent = [int(dim) for dim in extent.split("x")]
 
@@ -40,8 +41,13 @@ def read_file(input_file):
         raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
         return raw
 
+    return None
 
-def main(raw_file, out_dir=""):
+
+def main(raw_file="", out_dir=""):
+    if raw_file == "":
+        return
+
     raw_stem = raw_file.split(".")[0].split("/")[-1]
     reader = read_file(raw_file)
 
