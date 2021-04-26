@@ -11,12 +11,15 @@ def write_output(outp, fname, out_dir, explicit):
     if explicit:
         # vtkUnstructuredGrid (TTK)
         simple.SaveData(fname + ".vtu", proxy=outp)
-        # TTK Simplicial Complex (Gudhi, Dionysus)
+        # TTK Simplicial Complex (Gudhi, Dionysus, Ripser)
         simple.SaveData(fname + ".tsc", proxy=outp)
-        # Perseus Uniform Triangulation (Perseus)
-        simple.SaveData(fname + ".pers", proxy=outp)
-        # Dipha Explicit Complex or Image Data (Dipha, CubicalRipser)
-        simple.SaveData(fname + ".dipha", proxy=outp)
+    else:
+        # vtkImageData (TTK)
+        simple.SaveData(fname + ".vti", proxy=outp)
+    # Perseus Uniform Triangulation (Perseus) or Cubical Grid (Perseus, Gudhi)
+    simple.SaveData(fname + ".pers", proxy=outp)
+    # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
+    simple.SaveData(fname + ".dipha", proxy=outp)
 
 
 def read_file(input_file):
