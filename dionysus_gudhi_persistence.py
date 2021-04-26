@@ -43,7 +43,7 @@ class Dionysus_Filtration:
     def __init__(self):
         self.f = dionysus.Filtration()
         self.diag = None
-        print("Use the Dionysus backend")
+        print("Use the Dionysus2 backend")
 
     def add(self, verts, val):
         self.f.append(dionysus.Simplex(verts, val))
@@ -63,7 +63,7 @@ class Dionysus_Filtration:
 class Gudhi_SimplexTree:
     def __init__(self):
         self.st = gudhi.SimplexTree()
-        print("Use the Gudhi backend")
+        print("Use the Gudhi Simplex Tree backend")
 
     def add(self, verts, val):
         self.st.insert(verts, filtration=val)
@@ -105,13 +105,35 @@ def compute_persistence(wrapper, dims, values, cpx, output):
     wrapper.write_diag(output)
 
 
-def main(dataset, output, backend="Gudhi"):
-    dims, vals, cpx = read_simplicial_complex(dataset)
-    dispatch = {
-        "Dionysus": Dionysus_Filtration,
-        "Gudhi": Gudhi_SimplexTree,
-    }
-    compute_persistence(dispatch[backend](), dims, vals, cpx, output)
+def main(dataset, output, backend="Gudhi", simplicial=True):
+    if simplicial:
+        dims, vals, cpx = read_simplicial_complex(dataset)
+        dispatch = {
+            "Dionysus": Dionysus_Filtration,
+            "Gudhi": Gudhi_SimplexTree,
+        }
+        compute_persistence(dispatch[backend](), dims, vals, cpx, output)
+
+    elif backend == "Gudhi":
+        print("Use the Gudhi Cubical Complex backend")
+
+        start = time.time()
+        cpx = gudhi.CubicalComplex(perseus_file=dataset)
+        print(f"Loaded Perseus file: {time.time() - start:.3f}s")
+
+        print(f"Number of simplices: {cpx.num_simplices()}")
+        print(f"Global dimension: {cpx.dimension()}")
+
+        start = time.time()
+        diag = cpx.persistence()
+        print(f"Computed persistence: {time.time() - start:.3f}s")
+
+        with open(output, "w") as dst:
+            for dim, (birth, death) in diag:
+                dst.write(f"{dim} {birth} {death}\n")
+
+    else:
+        print("Cannot use Dionysus with cubical complexes")
 
 
 if __name__ == "__main__":
