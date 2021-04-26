@@ -73,29 +73,21 @@ def main(dataset, output):
 
     start = time.time()
 
-    I = np.zeros(2 * dims[1] + dims[0], dtype=np.int32)
-    J = np.zeros(2 * dims[1] + dims[0], dtype=np.int32)
-    V = np.zeros(2 * dims[1] + dims[0], dtype=np.double)
+    I = np.zeros(dims[1], dtype=np.int32)
+    J = np.zeros(dims[1], dtype=np.int32)
+    V = np.zeros(dims[1], dtype=np.double)
 
     for i, e in enumerate(edges):
-        I[2 * i + 0] = e[0]
-        I[2 * i + 1] = e[1]
-        J[2 * i + 0] = e[1]
-        J[2 * i + 1] = e[0]
-        V[2 * i + 0] = vals[dims[0] + i]
-        V[2 * i + 1] = vals[dims[0] + i]
-
-    for i in range(dims[0]):
-        I[2 * dims[1] + i] = i
-        J[2 * dims[1] + i] = i
-        V[2 * dims[1] + i] = vals[i]
+        I[i] = e[0]
+        J[i] = e[1]
+        V[i] = vals[dims[0] + i]
 
     sparseDM = sparse.coo_matrix((V, (I, J)), shape=(dims[0], dims[0]))
 
     print(f"Filled sparse distance matrix: {time.time() - start:.3f}s")
     start = time.time()
 
-    diag = ripser.ripser(sparseDM, distance_matrix=True, maxdim=1)["dgms"]
+    diag = ripser.ripser(sparseDM, distance_matrix=True, maxdim=2)["dgms"]
 
     print(f"Computed persistence diagram: {time.time() - start:.3f}s")
 
