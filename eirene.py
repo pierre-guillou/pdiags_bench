@@ -1,4 +1,5 @@
 import numpy as np
+
 import dipha_explicit
 
 
@@ -34,18 +35,26 @@ def main(dataset, output):
     tetras = tetras.reshape(-1, 4)
     psum_dims = np.cumsum(dims)
 
-    def write_csv(dst, dim, val, facets):
-        dst.write(f"{dim}, {val}, {', '.join([str(f + 1) for f in facets])}\n")
-
     with open(output, "w") as dst:
-        for i in range(dims[0]):
-            dst.write(f"0, {vals[i]}\n")
-        for i, e in enumerate(edges):
-            write_csv(dst, 1, vals[psum_dims[0] + i], e)
-        for i, t in enumerate(triangles):
-            write_csv(dst, 2, vals[psum_dims[1] + i], t)
-        for i, T in enumerate(tetras):
-            write_csv(dst, 3, vals[psum_dims[2] + i], T)
+        print(", ".join([str(dim) for dim in dims]), file=dst)  # ev
+        print(", ".join([str(val) for val in vals]), file=dst)  # fv
+        rowval = list()  # rv
+        for e in edges:
+            rowval.extend([v + 1 for v in e])
+        for t in triangles:
+            rowval.extend([e + 1 for e in t])
+        for T in tetras:
+            rowval.extend([t + 1 for t in T])
+        print(", ".join([str(row) for row in rowval]), file=dst)
+        colptr = np.concatenate(  # cp
+            [
+                np.arange(dims[0] + 1, psum_dims[1] + 1, 2),
+                np.arange(psum_dims[1] + 1, psum_dims[2] + 1, 3),
+                np.arange(psum_dims[2] + 1, psum_dims[3] + 1, 4),
+            ]
+        )
+        colptr = np.append(colptr, 2 * dims[1] + 3 * dims[2] + 4 * dims[3])
+        print(", ".join([str(col) for col in colptr]), file=dst)
 
 
 if __name__ == "__main__":
