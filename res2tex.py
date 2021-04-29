@@ -4,7 +4,9 @@ import os
 import subprocess
 
 
-def add_standalone(fname, res=list()):
+def add_standalone(fname, res):
+    if not res:
+        res = list()
     res.append(r"\documentclass{standalone}")
     res.append("")
     res.append(r"\usepackage{booktabs}")
@@ -32,7 +34,9 @@ def sort_times(vals, cols):
     return sorted(times, key=lambda x: x[1])
 
 
-def gen_table(fname, res=list()):
+def gen_table(fname, res):
+    if not res:
+        res = list()
     with open(fname, "r") as src:
         data = json.load(src)
     # use dicts to get an ordered sets
@@ -91,9 +95,9 @@ def main(fname, standalone=False, generate=False):
         with open("tmp.tex", "w") as dst:
             dst.write("\n".join(res))
         cmd = ["latexmk", "-pdf", "tmp.tex"]
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=False)
         cmd = ["latexmk", "-c"]
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=False)
         os.remove("tmp.tex")
         os.rename("tmp.pdf", fname + ".pdf")
     else:
