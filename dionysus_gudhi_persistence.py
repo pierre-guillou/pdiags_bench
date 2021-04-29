@@ -95,14 +95,18 @@ def compute_persistence(wrapper, dims, values, cpx, output):
         a = dims[0] + dims[1] + dims[2] + i
         wrapper.add(tetras[o : o + 4], values[a])
 
-    print(f"Filled filtration/simplex tree: {time.time() - start:.3f}s")
+    prec = round(time.time() - start, 3)
+    print(f"Filled filtration/simplex tree: {prec}s")
     start = time.time()
 
     wrapper.compute_pers()
 
-    print(f"Computed persistence: {time.time() - start:.3f}s")
+    pers = round(time.time() - start, 3)
+    print(f"Computed persistence: {pers}s")
 
     wrapper.write_diag(output)
+
+    return (prec, pers)
 
 
 def main(dataset, output, backend="Gudhi", simplicial=True):
@@ -112,9 +116,9 @@ def main(dataset, output, backend="Gudhi", simplicial=True):
             "Dionysus": Dionysus_Filtration,
             "Gudhi": Gudhi_SimplexTree,
         }
-        compute_persistence(dispatch[backend](), dims, vals, cpx, output)
+        return compute_persistence(dispatch[backend](), dims, vals, cpx, output)
 
-    elif backend == "Gudhi":
+    if backend == "Gudhi":
         print("Use the Gudhi Cubical Complex backend")
 
         start = time.time()
@@ -126,14 +130,17 @@ def main(dataset, output, backend="Gudhi", simplicial=True):
 
         start = time.time()
         diag = cpx.persistence()
-        print(f"Computed persistence: {time.time() - start:.3f}s")
+        pers = round(time.time() - start, 3)
+        print(f"Computed persistence: {pers}s")
 
         with open(output, "w") as dst:
             for dim, (birth, death) in diag:
                 dst.write(f"{dim} {birth} {death}\n")
 
-    else:
-        print("Cannot use Dionysus with cubical complexes")
+        return (0.0, pers)
+
+    print("Cannot use Dionysus with cubical complexes")
+    return (0.0, 0.0)
 
 
 if __name__ == "__main__":
