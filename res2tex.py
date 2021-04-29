@@ -34,7 +34,7 @@ def sort_times(vals, cols):
     return sorted(times, key=lambda x: x[1])
 
 
-def gen_table(fname, res):
+def gen_table(fname, res, simplicial=True):
     if not res:
         res = list()
     with open(fname, "r") as src:
@@ -42,8 +42,14 @@ def gen_table(fname, res):
     # use dicts to get an ordered sets
     lines = {}
     cols = {}
+    # only keep simplicial vs cubical results
+    data = {
+        ds: vals
+        for ds, vals in data.items()
+        if (simplicial and "expl" in ds) or (not simplicial and "impl" in ds)
+    }
     for ds, vals in data.items():
-        lines["_".join(ds.split("_")[:-2])] = None
+        lines[ds] = None
         for item in vals:
             cols[item] = None
     cols = ["Dataset"] + list(cols)
@@ -62,13 +68,10 @@ def gen_table(fname, res):
     res.append(r"  \midrule")
     res.append("")
     for ds in lines:
-        ds_name = r"\_".join(ds.split("_")[:-2])
+        ds_name = r"\_".join(ds.split("_")[:-4])
         curr = [ds_name] * len(cols)
-        for it, val in data[ds + "_order_expl"].items():
+        for it, val in data[ds].items():
             curr[cols_dict[it]] = str(val)
-        for it, val in data[ds + "_order_impl"].items():
-            if "#" not in it:
-                curr[cols_dict[it]] = str(val)
         # consistency check
         for i, val in enumerate(curr):
             if i != 0 and val == curr[0]:
