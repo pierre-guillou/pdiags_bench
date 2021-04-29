@@ -11,6 +11,7 @@ import time
 
 import compare_diags
 import convert_datasets
+import dionysus_gudhi_persistence
 
 
 def create_dir(dirname):
@@ -163,29 +164,21 @@ def compute_cubrips(fname, exe, times):
         print("Timeout reached, computation aborted")
 
 
-def compute_gudhi(fname, exe, times):
+def compute_gudhi_dionysus(fname, times, backend):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with Gudhi...")
-    outp = f"diagrams/{dataset}.gudhi"
-    cmd = [exe, fname]
-    try:
-        start_time = time.time()
-        subprocess.check_call(cmd, timeout=TIMEOUT_S)
-        times[dataset]["gudhi"] = round(time.time() - start_time, 3)
-        os.rename(fname.split("/")[-1] + "_persistence", outp)
-        ttk_dipha_print_pairs(outp)
-    except subprocess.TimeoutExpired:
-        print("Timeout reached, computation aborted")
+    print(f"Processing {dataset} with {backend}...")
+    outp = f"diagrams/{dataset}_{backend}.gudhi"
+    simplicial = not ("pers" in fname and "impl" in fname)
+    start_time = time.time()
+    dionysus_gudhi_persistence.main(fname, outp, backend, simplicial)
+    times[dataset][backend] = round(time.time() - start_time, 3)
+    ttk_dipha_print_pairs(outp)
 
 
 def compute_diagrams(_, all_softs=True):
     exes = {
         "ttk": "ttkPersistenceDiagramCmd",
         "dipha": "build_dipha/dipha",
-        "gudhi": (
-            "build_gudhi/src/Bitmap_cubical_complex"
-            "/utilities/cubical_complex_persistence"
-        ),
         "CubicalRipser": "CubicalRipser/CR3",
     }
 
@@ -249,8 +242,11 @@ def compute_diagrams(_, all_softs=True):
             compute_dipha(fname, exes["dipha"], times, one_thread)
         elif all_softs and ext == "dipha" and "impl" in fname:
             compute_cubrips(fname, exes["CubicalRipser"], times)
-        elif all_softs and ext == "pers":
-            compute_gudhi(fname, exes["gudhi"], times)
+        elif ext == "pers" and "impl" in fname:
+            compute_gudhi_dionysus(fname, times, "Gudhi")
+        elif ext == "tsc":
+            compute_gudhi_dionysus(fname, times, "Gudhi")
+            compute_gudhi_dionysus(fname, times, "Dionysus")
 
     with open("results", "w") as dst:
         dst.write(json.dumps(times))
