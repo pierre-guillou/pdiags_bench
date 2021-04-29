@@ -40,7 +40,7 @@ def gen_table(fname, res, simplicial=True):
     with open(fname, "r") as src:
         data = json.load(src)
     # use dicts to get an ordered sets
-    lines = {}
+    lines = list()
     cols = {}
     # only keep simplicial vs cubical results
     data = {
@@ -49,19 +49,13 @@ def gen_table(fname, res, simplicial=True):
         if (simplicial and "expl" in ds) or (not simplicial and "impl" in ds)
     }
     for ds, vals in data.items():
-        lines[ds] = None
+        lines.append(ds)
         for item in vals:
             cols[item] = None
     cols = ["Dataset"] + list(cols)
-    # escape "#" chars
-    cols_escape = []
-    for name in cols:
-        if "#" in name:
-            name = "\\" + name
-        cols_escape.append(name)
     cols_dict = {name: i for i, name in enumerate(cols)}
-    cols = cols_escape
-    lines = list(lines)
+    # escape "#" chars
+    cols = [name.replace("#", "\\#") for name in cols]
     res.append(r"\begin{tabular}[ht]{l" + "c" * (len(cols) - 1) + "}")
     res.append(r"  \toprule")
     res.append("  " + " & ".join(cols) + r" \\")
@@ -71,6 +65,8 @@ def gen_table(fname, res, simplicial=True):
         ds_name = r"\_".join(ds.split("_")[:-4])
         curr = [ds_name] * len(cols)
         for it, val in data[ds].items():
+            if isinstance(val, dict):
+                val = val["pers"]
             curr[cols_dict[it]] = str(val)
         # consistency check
         for i, val in enumerate(curr):
