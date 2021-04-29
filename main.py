@@ -95,6 +95,14 @@ def compute_ttk(
         overhead = ttk_overhead_time(ttk_output)
         return cpt_time - overhead
 
+    def ttk_prec_time(ttk_output):
+        ttk_output = escape_ansi_chars(ttk_output.decode())
+        prec_re = (
+            r"\[PersistenceDiagram\] Precondition triangulation.*\[(\d+\.\d+|\d+)s"
+        )
+        prec_time = float(re.search(prec_re, ttk_output, re.MULTILINE).group(1))
+        return prec_time
+
     def ttk_overhead_time(ttk_output):
         time_re = (
             r"\[DiscreteGradient\] Wrote Dipha explicit complex.*\[(\d+\.\d+|\d+)s"
@@ -106,7 +114,10 @@ def compute_ttk(
 
     try:
         proc = subprocess.run(cmd, capture_output=True, timeout=TIMEOUT_S, check=True)
-        times[dataset][key] = ttk_compute_time(proc.stdout)
+        times[dataset][key] = {
+            "prec": ttk_prec_time(proc.stdout),
+            "pers": ttk_compute_time(proc.stdout),
+        }
         os.rename("output_port_0.vtu", outp)
         ttk_dipha_print_pairs(outp)
         store_log(proc.stdout, dataset, key)
@@ -144,7 +155,10 @@ def compute_dipha(fname, exe, times, one_thread=False):
 
     ret = ttk_dipha_print_pairs(outp)
     times[dataset] |= ret
-    times[dataset]["dipha"] = dipha_compute_time(proc.stdout)
+    times[dataset]["dipha"] = {
+        "prec": 0.0,
+        "pers": dipha_compute_time(proc.stdout),
+    }
     store_log(proc.stdout, dataset, "dipha")
 
 
@@ -156,7 +170,10 @@ def compute_cubrips(fname, exe, times):
     try:
         start_time = time.time()
         subprocess.check_call(cmd, timeout=TIMEOUT_S)
-        times[dataset]["CubicalRipser"] = round(time.time() - start_time, 3)
+        times[dataset]["CubicalRipser"] = {
+            "prec": 0.0,
+            "pers": round(time.time() - start_time, 3),
+        }
         ttk_dipha_print_pairs(outp)
     except subprocess.CalledProcessError:
         print(dataset + " is too large for CubicalRipser")
@@ -169,9 +186,11 @@ def compute_gudhi_dionysus(fname, times, backend):
     print(f"Processing {dataset} with {backend}...")
     outp = f"diagrams/{dataset}_{backend}.gudhi"
     simplicial = not ("pers" in fname and "impl" in fname)
-    start_time = time.time()
-    dionysus_gudhi_persistence.main(fname, outp, backend, simplicial)
-    times[dataset][backend] = round(time.time() - start_time, 3)
+    prec, pers = dionysus_gudhi_persistence.main(fname, outp, backend, simplicial)
+    times[dataset][backend] = {
+        "prec": prec,
+        "pers": pers,
+    }
     ttk_dipha_print_pairs(outp)
 
 
