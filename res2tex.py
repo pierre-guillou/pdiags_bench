@@ -4,7 +4,7 @@ import os
 import subprocess
 
 
-def add_standalone(fname, res):
+def add_standalone(fname, res, simpl_cpx):
     if not res:
         res = list()
     res.append(r"\documentclass{standalone}")
@@ -15,7 +15,7 @@ def add_standalone(fname, res):
     res.append(r"\begin{document}")
     res.append("")
 
-    gen_table(fname, res)
+    gen_table(fname, res, simpl_cpx)
 
     res.append("")
     res.append(r"\end{document}")
@@ -85,22 +85,23 @@ def gen_table(fname, res, simplicial=True):
 
 
 def main(fname, standalone=False, generate=False):
-    res = list()
-    if standalone or generate:
-        res = add_standalone(fname, res)
-    else:
-        res = gen_table(fname, res)
-    if generate:
-        with open("tmp.tex", "w") as dst:
-            dst.write("\n".join(res))
-        cmd = ["latexmk", "-pdf", "tmp.tex"]
-        subprocess.run(cmd, check=False)
-        cmd = ["latexmk", "-c"]
-        subprocess.run(cmd, check=False)
-        os.remove("tmp.tex")
-        os.rename("tmp.pdf", fname + ".pdf")
-    else:
-        print("\n".join(res))
+    for cpx in ["simplicial", "cubical"]:
+        res = list()
+        if standalone or generate:
+            res = add_standalone(fname, res, cpx == "simplicial")
+        else:
+            res = gen_table(fname, res, cpx == "simplicial")
+        if generate:
+            with open("tmp.tex", "w") as dst:
+                dst.write("\n".join(res))
+            cmd = ["latexmk", "-pdf", "tmp.tex"]
+            subprocess.run(cmd, check=False)
+            cmd = ["latexmk", "-c"]
+            subprocess.run(cmd, check=False)
+            os.remove("tmp.tex")
+            os.rename("tmp.pdf", f"{fname}_{cpx}.pdf")
+        else:
+            print("\n".join(res))
 
 
 if __name__ == "__main__":
