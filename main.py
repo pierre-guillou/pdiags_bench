@@ -238,7 +238,7 @@ def compute_diagrams(_, all_softs=True):
                 hybrid_pp=True,
                 one_thread=one_thread,
             )
-        elif ext == "dipha" and "expl" in fname:
+        elif ext == "dipha":
             compute_dipha(fname, exes["dipha"], times, one_thread)
         elif all_softs and ext == "dipha" and "impl" in fname:
             compute_cubrips(fname, exes["CubicalRipser"], times)
