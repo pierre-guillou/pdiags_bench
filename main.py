@@ -77,7 +77,7 @@ def compute_ttk(
     else:
         print("Processing " + dataset + " with TTK...")
     outp = f"diagrams/{dataset}.vtu"
-    cmd = [exe, "-i", fname, "-d", "4"]
+    cmd = [exe, "-i", fname, "-d", "4", "-a", "ImageFile_Order"]
     if one_thread:
         cmd.extend(["-t", "1"])
     key = "ttk"
@@ -200,9 +200,7 @@ def compute_diagrams(_, all_softs=True):
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
         times[dataset_name(fname)] = {
-            "#Threads": 1
-            if one_thread or "impl" in fname
-            else multiprocessing.cpu_count()
+            "#Threads": 1 if one_thread else multiprocessing.cpu_count()
         }
         times[dataset_name(fname)]["#Vertices"] = "x".join(
             [str(convert_datasets.RESAMPL)] * 3
