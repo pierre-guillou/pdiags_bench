@@ -16,8 +16,8 @@ def write_output(outp, fname, out_dir, explicit):
     else:
         # vtkImageData (TTK)
         simple.SaveData(fname + ".vti", proxy=outp)
-    # Perseus Uniform Triangulation (Perseus) or Cubical Grid (Perseus, Gudhi)
-    simple.SaveData(fname + ".pers", proxy=outp)
+        # Perseus Cubical Grid (Perseus, Gudhi)
+        simple.SaveData(fname + ".pers", proxy=outp)
     # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
     simple.SaveData(fname + ".dipha", proxy=outp)
 
