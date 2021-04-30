@@ -11,7 +11,6 @@ import time
 
 import compare_diags
 import convert_datasets
-import dionysus_gudhi_persistence
 
 
 def create_dir(dirname):
@@ -186,7 +185,19 @@ def compute_gudhi_dionysus(fname, times, backend):
     print(f"Processing {dataset} with {backend}...")
     outp = f"diagrams/{dataset}_{backend}.gudhi"
     simplicial = not ("pers" in fname and "impl" in fname)
-    prec, pers = dionysus_gudhi_persistence.main(fname, outp, backend, simplicial)
+
+    def worker(args, retqueue):
+        import dionysus_gudhi_persistence
+        retqueue.put(dionysus_gudhi_persistence.main(*args))
+
+    queue = multiprocessing.Queue()
+    # wrap calls to Python script in Process to clean memory
+    p = multiprocessing.Process(
+        target=worker, args=((fname, outp, backend, simplicial), queue)
+    )
+    p.start()
+    p.join(TIMEOUT_S)
+    prec, pers = queue.get()
     times[dataset][backend] = {
         "prec": prec,
         "pers": pers,
