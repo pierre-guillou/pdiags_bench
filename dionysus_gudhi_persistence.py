@@ -1,3 +1,4 @@
+import argparse
 import math
 import time
 
@@ -147,7 +148,7 @@ def compute_persistence(wrapper, dims, values, cpx, output):
     return (prec, pers)
 
 
-def main(dataset, output, backend="Gudhi", simplicial=True):
+def run(dataset, output, backend="Gudhi", simplicial=True):
     if simplicial:
         dims, vals, cpx = read_simplicial_complex(dataset)
         dispatch = {
@@ -182,5 +183,50 @@ def main(dataset, output, backend="Gudhi", simplicial=True):
     return (0.0, 0.0)
 
 
+def main():
+    parser = argparse.ArgumentParser(
+        description="Apply Gudhi, Dionysus2 or Ripser on the given dataset"
+    )
+
+    parser.add_argument(
+        "-i",
+        type=str,
+        help="Path to input dataset",
+        default="datasets/fuel_64x64x64_uint8_order_expl.tsc",
+        dest="input_dataset",
+    )
+    parser.add_argument(
+        "-o",
+        type=str,
+        help="Output diagram file name",
+        default="out.gudhi",
+        dest="output_diagram",
+    )
+    parser.add_argument(
+        "-b", choices=["gudhi", "dionysus", "ripser"], default="gudhi", dest="backend"
+    )
+    args = parser.parse_args()
+
+    ext = args.input_dataset.split(".")[-1]
+
+    if ext not in ["tsc", "pers"]:
+        print("Input dataset not supported")
+
+    if ext == "pers" and args.backend != "gudhi":
+        print("Perseus Cubical Complex files can only be processed by Gudhi")
+        return
+
+    if ext == "pers" and "expl" in args.input_dataset:
+        print("Perseus Simplicial Complex files not supported")
+        return
+
+    run(
+        args.input_dataset,
+        args.output_diagram,
+        backend=args.backend.capitalize(),
+        simplicial="expl" in args.input_dataset,
+    )
+
+
 if __name__ == "__main__":
-    main("datasets/fuel_64x64x64_uint8_order_expl.tsc", "out.gudhi")
+    main()

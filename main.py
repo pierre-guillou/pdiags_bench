@@ -188,7 +188,7 @@ def compute_gudhi_dionysus(fname, times, backend):
 
     def worker(args, retqueue):
         import dionysus_gudhi_persistence
-        retqueue.put(dionysus_gudhi_persistence.main(*args))
+        retqueue.put(dionysus_gudhi_persistence.run(*args))
 
     queue = multiprocessing.Queue()
     # wrap calls to Python script in Process to clean memory
