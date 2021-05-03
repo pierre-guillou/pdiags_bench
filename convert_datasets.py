@@ -55,11 +55,12 @@ def main(raw_file="", out_dir=""):
     reader = read_file(raw_file)
 
     # convert input scalar field to float
-    pdc = simple.TTKPointDataConverter(Input=reader)
-    pdc.PointDataScalarField = ["POINTS", "ImageFile"]
-    pdc.OutputType = "Float"
+    calc = simple.Calculator(Input=reader)
+    calc.Function = "ImageFile"
+    calc.ResultArrayType = "Float"
+    calc.ResultArrayName = "ImageFile"
     # resample to 192^3
-    rsi = simple.ResampleToImage(Input=pdc)
+    rsi = simple.ResampleToImage(Input=calc)
     rsi.SamplingDimensions = [RESAMPL, RESAMPL, RESAMPL]
     # compute order field
     arrprec = simple.TTKArrayPreconditioning(Input=rsi)
