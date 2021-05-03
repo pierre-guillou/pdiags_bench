@@ -197,12 +197,17 @@ def compute_gudhi_dionysus(fname, times, backend):
     )
     p.start()
     p.join(TIMEOUT_S)
-    prec, pers = queue.get()
-    times[dataset][backend] = {
-        "prec": prec,
-        "pers": pers,
-    }
-    ttk_dipha_print_pairs(outp)
+
+    if p.exitcode is not None:
+        prec, pers = queue.get()
+        times[dataset][backend] = {
+            "prec": prec,
+            "pers": pers,
+        }
+        ttk_dipha_print_pairs(outp)
+    else:
+        p.terminate()
+        print("Timeout reached, computation aborted")
 
 
 def compute_diagrams(_, all_softs=True):
