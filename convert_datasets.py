@@ -1,4 +1,4 @@
-import sys
+import argparse
 
 from paraview import simple
 
@@ -47,9 +47,11 @@ def read_file(input_file):
     return None
 
 
-def main(raw_file="", out_dir=""):
+def main(raw_file, out_dir="", resampl_size=RESAMPL):
     if raw_file == "":
         return
+
+    print(f"Converting {raw_file} to input formats (resampled to {resampl_size}^3)")
 
     raw_stem = raw_file.split(".")[0].split("/")[-1]
     reader = read_file(raw_file)
@@ -61,7 +63,7 @@ def main(raw_file="", out_dir=""):
     calc.ResultArrayName = "ImageFile"
     # resample to 192^3
     rsi = simple.ResampleToImage(Input=calc)
-    rsi.SamplingDimensions = [RESAMPL, RESAMPL, RESAMPL]
+    rsi.SamplingDimensions = [resampl_size] * 3
     # compute order field
     arrprec = simple.TTKArrayPreconditioning(Input=rsi)
     arrprec.PointDataArrays = ["ImageFile"]
@@ -82,5 +84,22 @@ def main(raw_file="", out_dir=""):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) >= 1:
-        main(*sys.argv[1:3])
+    parser = argparse.ArgumentParser(
+        description="Generate input files from Open-Scivis Raw format"
+    )
+
+    parser.add_argument("raw_file", type=str, help="Path to input Raw file")
+    parser.add_argument(
+        "-d", "--dest_dir", type=str, help="Destination directory", default="datasets"
+    )
+    parser.add_argument(
+        "-s",
+        "--resampling_size",
+        type=int,
+        help="Resampling to a cube of given vertices edge",
+        default=RESAMPL,
+    )
+
+    args = parser.parse_args()
+
+    main(args.raw_file, args.dest_dir, args.resampling_size)
