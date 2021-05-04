@@ -1,9 +1,9 @@
 import os
+import shutil
 import subprocess
-import tarfile
 import zipfile
 
-from download_datasets import download_dataset
+from download_datasets import download_file
 
 
 def create_dir(dirname):
@@ -16,7 +16,7 @@ def create_dir(dirname):
 def dl_build_perseus(perseus_url):
     # download Perseus from project server
     perseus_zip = perseus_url.split("/")[-1]
-    download_dataset(perseus_url)
+    download_file(perseus_url, perseus_zip)
     create_dir("perseus")
     with zipfile.ZipFile(perseus_zip, "r") as src:
         src.extractall("perseus")
@@ -30,35 +30,39 @@ def dl_build_perseus(perseus_url):
 
 def main():
     gh = "https://github.com"
-    tb = "tarball"
 
     softs = {
-        "dipha": f"{gh}/DIPHA/dipha/{tb}/master",
-        "gudhi": f"{gh}/GUDHI/gudhi-devel/{tb}/tags%2Fgudhi-release-3.3.0",
-        "CubicalRipser": f"{gh}/CubicalRipser/CubicalRipser_3dim/{tb}/master",
+        "dipha": f"{gh}/DIPHA/dipha",
+        "CubicalRipser": f"{gh}/CubicalRipser/CubicalRipser_3dim",
         "perseus": "https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip",
+        "oineus": f"{gh}/grey-narn/oineus",
     }
 
     # download and extract a tarball from GitHub
     for soft, url in softs.items():
-        download_dataset(url, soft + ".tar.gz")
-        with tarfile.open(soft + ".tar.gz", "r:gz") as src:
-            src.extractall()
-            # rename software folders
-            os.rename(src.getmembers()[0].name, soft)
-        print("Extracted " + soft + " archive")
+        if soft == "perseus":
+            continue
+        try:
+            subprocess.check_call(["git", "clone", url, "--depth", "1", soft])
+            subprocess.check_call(["git", "submodule", "update", "--init"], cwd=soft)
+            print(f"Cloned {soft} repository")
+        except subprocess.CalledProcessError:
+            print(f"Repository {soft} already cloned")
 
-    # build the 3 applications
-    subprocess.check_call(["make", "-C", "CubicalRipser"])
-
-    for cmake_soft in ["dipha", "gudhi"]:
-        builddir = "build_" + cmake_soft
-        create_dir(builddir)
-        subprocess.check_call("cmake", "-S", cmake_soft, "-B", builddir)
-        subprocess.check_call("cmake", "--build", builddir)
-
-    # download & build Perseus
-    dl_build_perseus(softs["perseus"])
+    # build the applications
+    for soft, _ in softs.items():
+        if soft == "CubicalRipser":
+            subprocess.check_call(["make", "-C", "CubicalRipser"])
+        elif soft == "perseus":
+            # download & build Perseus
+            dl_build_perseus(softs["perseus"])
+        else:
+            builddir = "build_" + soft
+            create_dir(builddir)
+            subprocess.check_call(["cmake", "-S", soft, "-B", builddir])
+            subprocess.check_call(["cmake", "--build", builddir])
+            # remove source directory/git repository?
+            shutil.rmtree(soft)
 
 
 if __name__ == "__main__":
