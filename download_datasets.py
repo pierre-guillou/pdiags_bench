@@ -29,17 +29,21 @@ def get_datasets_urls(size_limit_mb):
     ]
 
 
+def download_file(url, dest):
+    # https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
+    with requests.get(url, stream=True) as req:
+        with open(dest, "wb") as dst:
+            for chunk in req.iter_content(chunk_size=8192):
+                dst.write(chunk)
+    print(f"Downloaded {dest} from {url}")
+
+
 def download_dataset(dataset_url, dest_dir=""):
     dataset_name = dataset_url.split("/")[-1]
     if dest_dir + dataset_name in glob.glob(dest_dir + "*.raw"):
         print(f"{dataset_name} already downloaded, skipping...")
         return
-    # https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
-    with requests.get(dataset_url, stream=True) as req:
-        with open(dest_dir + dataset_name, "wb") as dest:
-            for chunk in req.iter_content(chunk_size=8192):
-                dest.write(chunk)
-    print(f"Downloaded {dataset_name}")
+    download_file(dataset_url, dest_dir + dataset_name)
 
 
 def main():
