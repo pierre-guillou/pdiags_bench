@@ -1,3 +1,4 @@
+import argparse
 import pathlib
 
 
@@ -40,4 +41,19 @@ def main(pers_input, gudhi_output):
 
 
 if __name__ == "__main__":
-    main("out", "out.gudhi")
+    parser = argparse.ArgumentParser(
+        description="Convert a Perseus diagram into a Gudhi diagram"
+    )
+
+    parser.add_argument(
+        "input_diagram", type=str, help="Persistence Diagram in Perseus format"
+    )
+    parser.add_argument(
+        "output_diagram",
+        type=str,
+        help="Output Gudhi format file name",
+        default="out.gudhi",
+    )
+    args = parser.parse_args()
+
+    main(args.input_diagram.split("_")[0], args.output_diagram)
