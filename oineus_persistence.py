@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 
-def compute_diagram(input_dataset):
+def compute_diagram(input_dataset, nthreads):
     # read Perseus Cubical Grid
     with open(input_dataset) as src:
         dim = int(src.readline())
@@ -22,12 +22,12 @@ def compute_diagram(input_dataset):
             negate=False,
             wrap=False,
             top_d=3,
-            n_threads=4,
+            n_threads=nthreads,
         )
 
 
-def main(input_dataset, output_diagram):
-    diag = compute_diagram(input_dataset)
+def main(input_dataset, output_diagram, nthreads):
+    diag = compute_diagram(input_dataset, nthreads)
     with open(output_diagram, "w") as dst:
         for i, pairs in enumerate(diag):
             for pair in pairs:
@@ -57,7 +57,14 @@ if __name__ == "__main__":
         help="Path to Oineus Python module",
         default="build_oineus/bindings/python",
     )
+    parser.add_argument(
+        "-t",
+        "--threads",
+        type=int,
+        help="Number of threads",
+        default=1,
+    )
 
     args = parser.parse_args()
     sys.path.append(args.oineus_path)
-    main(args.input_dataset, args.output_diagram)
+    main(args.input_dataset, args.output_diagram, args.threads)
