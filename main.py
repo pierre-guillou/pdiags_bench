@@ -216,6 +216,36 @@ def compute_gudhi_dionysus(fname, times, backend):
         print("Timeout reached, computation aborted")
 
 
+def compute_oineus(fname, times, one_thread=False):
+    dataset = dataset_name(fname)
+    print(f"Processing {dataset} with Oineus...")
+    outp = f"diagrams/{dataset}_Oineus.gudhi"
+
+    def oineus_compute_time(oineus_output):
+        oineus_output = oineus_output.decode()
+        pat = r"matrix reduced in (\d+.\d+|\d+)"
+        pers_time = re.search(pat, oineus_output).group(1)
+        return round(float(pers_time), 3)
+
+    # launch with subprocess to capture stdout from the C++ library
+    cmd = ["python3", "oineus_persistence.py", fname, "-o", outp]
+    if not one_thread:
+        cmd.extend(["-t", str(multiprocessing.cpu_count())])
+
+    try:
+        start_time = time.time()
+        proc = subprocess.run(cmd, capture_output=True, check=True, timeout=TIMEOUT_S)
+        run_time = round(time.time() - start_time, 3)
+        pers = oineus_compute_time(proc.stderr)
+        times[dataset]["Oineus"] = {
+            "prec": round(run_time - pers, 3),
+            "pers": pers,
+        }
+        ttk_dipha_print_pairs(outp)
+    except subprocess.TimeoutExpired:
+        print("Timeout reached, computation aborted")
+
+
 def compute_diagrams(_, all_softs=True):
     exes = {
         "ttk": "ttkPersistenceDiagramCmd",
@@ -283,6 +313,7 @@ def compute_diagrams(_, all_softs=True):
             compute_cubrips(fname, exes["CubicalRipser"], times)
         elif ext == "pers" and "impl" in fname:
             compute_gudhi_dionysus(fname, times, "Gudhi")
+            compute_oineus(fname, times, one_thread)
         elif ext == "tsc":
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_gudhi_dionysus(fname, times, "Dionysus")
