@@ -286,7 +286,7 @@ def compute_diagrams(_, all_softs=True):
         elif ext == "tsc":
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_gudhi_dionysus(fname, times, "Dionysus")
-            compute_gudhi_dionysus(fname, times, "Ripser")
+            # compute_gudhi_dionysus(fname, times, "Ripser")
 
     with open("results", "w") as dst:
         dst.write(json.dumps(times))
