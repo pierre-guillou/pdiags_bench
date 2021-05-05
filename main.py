@@ -148,15 +148,20 @@ def compute_dipha(fname, exe, times, one_thread=False):
 
     def dipha_compute_time(dipha_output):
         dipha_output = dipha_output.decode()
-        pat = r"^Computation lasted (\d+.\d+|\d+)s$"
-        cpt_time = re.search(pat, dipha_output, re.MULTILINE).group(1)
-        return round(float(cpt_time), 3)
+        run_pat = r"^Overall running time.*\n(\d+.\d+|\d+)$"
+        run_time = re.search(run_pat, dipha_output, re.MULTILINE).group(1)
+        run_time = float(run_time)
+        pers_pat = r"^Reduction kernel running time.*\n(\d+.\d+|\d+)$"
+        pers_time = re.search(pers_pat, dipha_output, re.MULTILINE).group(1)
+        pers_time = float(pers_time)
+        return round(run_time - pers_time, 3), round(pers_time, 3)
 
     ret = ttk_dipha_print_pairs(outp)
     times[dataset] |= ret
+    prec, pers = dipha_compute_time(proc.stdout)
     times[dataset]["dipha"] = {
-        "prec": 0.0,
-        "pers": dipha_compute_time(proc.stdout),
+        "prec": prec,
+        "pers": pers,
     }
     store_log(proc.stdout, dataset, "dipha")
 
@@ -188,6 +193,7 @@ def compute_gudhi_dionysus(fname, times, backend):
 
     def worker(args, retqueue):
         import dionysus_gudhi_persistence
+
         retqueue.put(dionysus_gudhi_persistence.run(*args))
 
     queue = multiprocessing.Queue()
