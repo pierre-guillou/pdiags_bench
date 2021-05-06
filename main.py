@@ -65,9 +65,7 @@ def store_log(log, ds_name, app):
         dst.write(log.decode())
 
 
-def compute_ttk(
-    fname, exe, times, dipha_offload=False, hybrid_pp=False, one_thread=False
-):
+def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=False):
     dataset = dataset_name(fname)
     if dipha_offload:
         if hybrid_pp:
@@ -77,7 +75,7 @@ def compute_ttk(
     else:
         print("Processing " + dataset + " with TTK...")
     outp = f"diagrams/{dataset}.vtu"
-    cmd = [exe, "-i", fname, "-d", "4", "-a", "ImageFile_Order"]
+    cmd = ["ttkPersistenceDiagramCmd", "-i", fname, "-d", "4", "-a", "ImageFile_Order"]
     if one_thread:
         cmd.extend(["-t", "1"])
     key = "ttk"
@@ -125,26 +123,13 @@ def compute_ttk(
         print("Timeout reached, computation aborted")
 
 
-def compute_dipha(fname, exe, times, one_thread=False):
+def compute_dipha(fname, times, one_thread=False):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with dipha...")
     outp = f"diagrams/{dataset}.dipha"
-    if one_thread:
-        cmd = [
-            exe,
-            "--benchmark",
-            fname,
-            outp,
-        ]
-    else:
-        cmd = [
-            "mpirun",
-            "--use-hwthread-cpus",
-            exe,
-            "--benchmark",
-            fname,
-            outp,
-        ]
+    cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
+    if not one_thread:
+        cmd = ["mpirun", "--use-hwthread-cpus"] + cmd
     proc = subprocess.run(cmd, capture_output=True, check=True)  # no timeout here?
 
     def dipha_compute_time(dipha_output):
@@ -167,11 +152,11 @@ def compute_dipha(fname, exe, times, one_thread=False):
     store_log(proc.stdout, dataset, "dipha")
 
 
-def compute_cubrips(fname, exe, times):
+def compute_cubrips(fname, times):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with CubicalRipser...")
     outp = f"diagrams/{dataset}.cr"
-    cmd = [exe, fname, "--output", outp]
+    cmd = ["CubicalRipser/CR3", fname, "--output", outp]
     try:
         start_time = time.time()
         subprocess.check_call(cmd, timeout=TIMEOUT_S)
@@ -278,17 +263,7 @@ def compute_diamorse(fname, times):
         print("Timeout reached, computation aborted")
 
 
-def compute_diagrams(_, all_softs=True):
-    exes = {
-        "ttk": "ttkPersistenceDiagramCmd",
-        "dipha": "build_dipha/dipha",
-        "CubicalRipser": "CubicalRipser/CR3",
-    }
-
-    for exe in list(exes.values())[1:]:
-        if not os.path.isfile(exe):
-            print(exe + " not found")
-            all_softs = False
+def compute_diagrams(_):
 
     # output diagrams directory
     create_dir("diagrams")
@@ -313,36 +288,17 @@ def compute_diagrams(_, all_softs=True):
         ext = fname.split(".")[-1]
         if ext in ("vtu", "vti"):
             # our algo
-            compute_ttk(
-                fname,
-                exes["ttk"],
-                times,
-                dipha_offload=False,
-                hybrid_pp=False,
-                one_thread=one_thread,
-            )
+            compute_ttk(fname, times, one_thread=one_thread)
             # ttk-hybrid: offload Morse-Smale complex to Dipha
-            compute_ttk(
-                fname,
-                exes["ttk"],
-                times,
-                dipha_offload=True,
-                hybrid_pp=False,
-                one_thread=one_thread,
-            )
+            compute_ttk(fname, times, dipha_offload=True, one_thread=one_thread)
             # ttk-hybrid++: offload saddle connectors to Dipha
             compute_ttk(
-                fname,
-                exes["ttk"],
-                times,
-                dipha_offload=True,
-                hybrid_pp=True,
-                one_thread=one_thread,
+                fname, times, dipha_offload=True, hybrid_pp=True, one_thread=one_thread
             )
         elif ext == "dipha":
-            compute_dipha(fname, exes["dipha"], times, one_thread)
-        elif all_softs and ext == "dipha" and "impl" in fname:
-            compute_cubrips(fname, exes["CubicalRipser"], times)
+            compute_dipha(fname, times, one_thread)
+        elif ext == "dipha" and "impl" in fname:
+            compute_cubrips(fname, times)
         elif ext == "pers" and "impl" in fname:
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_oineus(fname, times, one_thread)
