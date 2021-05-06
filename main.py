@@ -6,6 +6,7 @@ import json
 import multiprocessing
 import os
 import re
+import resource
 import subprocess
 import time
 
@@ -194,7 +195,9 @@ def compute_gudhi_dionysus(fname, times, backend):
     def worker(args, retqueue):
         import dionysus_gudhi_persistence
 
-        retqueue.put(dionysus_gudhi_persistence.run(*args))
+        prec, pers = dionysus_gudhi_persistence.run(*args)
+        mem = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1000)
+        retqueue.put((prec, pers, mem))
 
     queue = multiprocessing.Queue()
     # wrap calls to Python script in Process to clean memory
@@ -205,10 +208,11 @@ def compute_gudhi_dionysus(fname, times, backend):
     p.join(TIMEOUT_S)
 
     if p.exitcode is not None:
-        prec, pers = queue.get()
+        prec, pers, mem = queue.get()
         times[dataset][backend] = {
             "prec": prec,
             "pers": pers,
+            "mem": mem,
         }
         ttk_dipha_print_pairs(outp)
     else:
