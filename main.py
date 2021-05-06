@@ -317,8 +317,8 @@ def compute_diagrams(_):
             )
         elif ext == "dipha":
             compute_dipha(fname, times, one_thread)
-        elif ext == "dipha" and "impl" in fname:
-            compute_cubrips(fname, times)
+            if "impl" in fname:
+                compute_cubrips(fname, times)
         elif ext == "pers" and "impl" in fname:
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_oineus(fname, times, one_thread)
