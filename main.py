@@ -6,7 +6,6 @@ import json
 import multiprocessing
 import os
 import re
-import resource
 import subprocess
 
 import compare_diags
@@ -191,33 +190,39 @@ def compute_gudhi_dionysus(fname, times, backend):
     dataset = dataset_name(fname)
     print(f"Processing {dataset} with {backend}...")
     outp = f"diagrams/{dataset}_{backend}.gudhi"
-    simplicial = not ("pers" in fname and "impl" in fname)
 
-    def worker(args, retqueue):
-        import dionysus_gudhi_persistence
+    def compute_time(output):
+        output = output.decode()
+        prec_pat = r"^Filled filtration.*: (\d+.\d+|\d+)s$"
+        pers_pat = r"^Computed persistence.*: (\d+.\d+|\d+)s$"
+        try:
+            prec = re.search(prec_pat, output, re.MULTILINE).group(1)
+            prec = round(float(prec), 3)
+        except AttributeError:
+            # Gudhi for cubical complexes has no precondition time
+            prec = 0.0
+        pers = re.search(pers_pat, output, re.MULTILINE).group(1)
+        pers = round(float(pers), 3)
+        return (prec, pers)
 
-        prec, pers = dionysus_gudhi_persistence.run(*args)
-        mem = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1000)
-        retqueue.put((prec, pers, mem))
-
-    queue = multiprocessing.Queue()
-    # wrap calls to Python script in Process to clean memory
-    p = multiprocessing.Process(
-        target=worker, args=((fname, outp, backend, simplicial), queue)
+    cmd = (
+        ["python3", "dionysus_gudhi_persistence.py"]
+        + ["-i", fname]
+        + ["-o", outp]
+        + ["-b", backend.lower()]
     )
-    p.start()
-    p.join(TIMEOUT_S)
+    cmd = RES_MEAS + cmd
 
-    if p.exitcode is not None:
-        prec, pers, mem = queue.get()
+    try:
+        proc = subprocess.run(cmd, capture_output=True, check=True, timeout=TIMEOUT_S)
+        prec, pers = compute_time(proc.stdout)
         times[dataset][backend] = {
             "prec": prec,
             "pers": pers,
-            "mem": mem,
+            "mem": get_time_mem(proc.stderr.decode())[1],
         }
         ttk_dipha_print_pairs(outp)
-    else:
-        p.terminate()
+    except subprocess.TimeoutExpired:
         print("Timeout reached, computation aborted")
 
 
