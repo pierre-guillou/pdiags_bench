@@ -8,7 +8,6 @@ import os
 import re
 import resource
 import subprocess
-import time
 
 import compare_diags
 import convert_datasets
@@ -95,6 +94,8 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
             cmd.append("-dpp")
             key = "ttk-hybrid++"
 
+    cmd = RES_MEAS + cmd
+
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output.decode())
         time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
@@ -124,6 +125,7 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
         times[dataset][key] = {
             "prec": ttk_prec_time(proc.stdout),
             "pers": ttk_compute_time(proc.stdout),
+            "mem": get_time_mem(proc.stderr.decode())[1],
         }
         os.rename("output_port_0.vtu", outp)
         ttk_dipha_print_pairs(outp)
@@ -139,6 +141,7 @@ def compute_dipha(fname, times, one_thread=False):
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
     if not one_thread:
         cmd = ["mpirun", "--use-hwthread-cpus"] + cmd
+    cmd = RES_MEAS + cmd
     proc = subprocess.run(cmd, capture_output=True, check=True)  # no timeout here?
 
     def dipha_compute_time(dipha_output):
@@ -157,6 +160,7 @@ def compute_dipha(fname, times, one_thread=False):
     times[dataset]["dipha"] = {
         "prec": prec,
         "pers": pers,
+        "mem": get_time_mem(proc.stderr.decode())[1],
     }
     store_log(proc.stdout, dataset, "dipha")
 
@@ -166,12 +170,15 @@ def compute_cubrips(fname, times):
     print("Processing " + dataset + " with CubicalRipser...")
     outp = f"diagrams/{dataset}.cr"
     cmd = ["CubicalRipser/CR3", fname, "--output", outp]
+    cmd = RES_MEAS + cmd
+
     try:
-        start_time = time.time()
-        subprocess.check_call(cmd, timeout=TIMEOUT_S)
+        proc = subprocess.run(cmd, timeout=TIMEOUT_S, capture_output=True, check=True)
+        pers, mem = get_time_mem(proc.stderr.decode())
         times[dataset]["CubicalRipser"] = {
             "prec": 0.0,
-            "pers": round(time.time() - start_time, 3),
+            "pers": pers,
+            "mem": mem,
         }
         ttk_dipha_print_pairs(outp)
     except subprocess.CalledProcessError:
@@ -229,15 +236,16 @@ def compute_oineus(fname, times, one_thread=False):
     cmd = ["python3", "oineus_persistence.py", fname, "-o", outp]
     if not one_thread:
         cmd.extend(["-t", str(multiprocessing.cpu_count())])
+    cmd = RES_MEAS + cmd
 
     try:
-        start_time = time.time()
         proc = subprocess.run(cmd, capture_output=True, check=True, timeout=TIMEOUT_S)
-        run_time = round(time.time() - start_time, 3)
         pers = oineus_compute_time(proc.stderr)
+        elapsed, mem = get_time_mem(proc.stderr.decode())
         times[dataset]["Oineus"] = {
-            "prec": round(run_time - pers, 3),
+            "prec": round(elapsed - pers, 3),
             "pers": pers,
+            "mem": mem,
         }
         ttk_dipha_print_pairs(outp)
     except subprocess.TimeoutExpired:
@@ -249,12 +257,15 @@ def compute_diamorse(fname, times):
     print("Processing " + dataset + " with Diamorse...")
     outp = f"diagrams/{dataset}.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r"]
+    cmd = RES_MEAS + cmd
+
     try:
-        start_time = time.time()
         proc = subprocess.run(cmd, timeout=TIMEOUT_S, capture_output=True, check=True)
+        elapsed, mem = get_time_mem(proc.stderr.decode())
         times[dataset]["Diamorse"] = {
             "prec": 0.0,
-            "pers": round(time.time() - start_time, 3),
+            "pers": elapsed,
+            "mem": mem,
         }
 
         # convert output to Gudhi format on-the-fly
