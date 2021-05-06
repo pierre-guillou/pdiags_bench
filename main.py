@@ -57,6 +57,15 @@ def dataset_name(dsfile):
 
 
 TIMEOUT_S = 1800  # 30 min
+RES_MEAS = ["/usr/bin/time", "-f", "Elapsed Time (s): %e\nPeak Memory (kB): %M"]
+
+
+def get_time_mem(txt):
+    time_pat = r"^Elapsed Time \(s\): (\d+\.\d+|\d+)$"
+    mem_pat = r"^Peak Memory \(kB\): (\d+\.\d+|\d+)$"
+    elapsed = re.search(time_pat, txt, re.MULTILINE).group(1)
+    mem = re.search(mem_pat, txt, re.MULTILINE).group(1)
+    return round(float(elapsed), 3), round(float(mem) / 1000)
 
 
 def store_log(log, ds_name, app):
