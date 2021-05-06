@@ -246,6 +246,34 @@ def compute_oineus(fname, times, one_thread=False):
         print("Timeout reached, computation aborted")
 
 
+def compute_diamorse(fname, times):
+    dataset = dataset_name(fname)
+    print("Processing " + dataset + " with Diamorse...")
+    outp = f"diagrams/{dataset}.gudhi"
+    cmd = ["python2", "diamorse/python/persistence.py", fname, "-r"]
+    try:
+        start_time = time.time()
+        proc = subprocess.run(cmd, timeout=TIMEOUT_S, capture_output=True, check=True)
+        times[dataset]["Diamorse"] = {
+            "prec": 0.0,
+            "pers": round(time.time() - start_time, 3),
+        }
+
+        # convert output to Gudhi format on-the-fly
+        pairs = list()
+        for line in proc.stdout.decode().splitlines():
+            if line.startswith("#"):
+                continue
+            pairs.append(line.split()[:3])
+        with open(outp, "w") as dst:
+            for birth, death, dim in pairs:
+                dst.write(f"{dim} {birth} {death}\n")
+
+        ttk_dipha_print_pairs(outp)
+    except subprocess.TimeoutExpired:
+        print("Timeout reached, computation aborted")
+
+
 def compute_diagrams(_, all_softs=True):
     exes = {
         "ttk": "ttkPersistenceDiagramCmd",
@@ -318,6 +346,8 @@ def compute_diagrams(_, all_softs=True):
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_gudhi_dionysus(fname, times, "Dionysus")
             # compute_gudhi_dionysus(fname, times, "Ripser")
+        elif ext == "nc":
+            compute_diamorse(fname, times)
 
     with open("results", "w") as dst:
         dst.write(json.dumps(times))
