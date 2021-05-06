@@ -2,6 +2,8 @@ import argparse
 
 from paraview import simple
 
+import vti2nc3
+
 RESAMPL = 192
 
 
@@ -18,6 +20,9 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".vti", proxy=outp)
         # Perseus Cubical Grid (Perseus, Gudhi)
         simple.SaveData(fname + ".pers", proxy=outp)
+        # NetCDF3 (Diamorse)
+        vti2nc3.main(fname + ".vti")
+
     # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
     simple.SaveData(fname + ".dipha", proxy=outp)
 
@@ -80,7 +85,7 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL):
     # save explicit mesh
     write_output(rgi, raw_stem + "_order_expl", out_dir, True)
 
-    print("Converted " + raw_file + " to VTU and Dipha")
+    print("Converted " + raw_file)
 
 
 if __name__ == "__main__":
