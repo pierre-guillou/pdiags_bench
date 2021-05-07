@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import zipfile
 
@@ -13,56 +12,77 @@ def create_dir(dirname):
         pass
 
 
-def dl_build_perseus(perseus_url):
+PERSEUS_URL = "https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip"
+
+
+def download_perseus(perseus_url=PERSEUS_URL):
     # download Perseus from project server
     perseus_zip = perseus_url.split("/")[-1]
     download_file(perseus_url, perseus_zip)
     create_dir("perseus")
     with zipfile.ZipFile(perseus_zip, "r") as src:
         src.extractall("perseus")
-    # build perseus
-    subprocess.check_call(
-        ["g++", "Pers.cpp", "-O3", "-fpermissive", "-o", "perseus"], cwd="perseus"
-    )
     # remove zip
     os.remove(perseus_zip)
 
 
 def main():
-    gh = "https://github.com"
 
-    softs = {
-        "dipha": f"{gh}/DIPHA/dipha",
-        "CubicalRipser": f"{gh}/CubicalRipser/CubicalRipser_3dim",
-        "perseus": "https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip",
-        "oineus": f"{gh}/grey-narn/oineus",
-    }
+    softs = [
+        "CubicalRipser",
+        "diamorse",
+        "dipha",
+        "oineus",
+        "perseus",
+    ]
 
-    # download and extract a tarball from GitHub
-    for soft, url in softs.items():
-        if soft == "perseus":
-            continue
-        try:
-            subprocess.check_call(["git", "clone", url, "--depth", "1", soft])
-            subprocess.check_call(["git", "submodule", "update", "--init"], cwd=soft)
-            print(f"Cloned {soft} repository")
-        except subprocess.CalledProcessError:
-            print(f"Repository {soft} already cloned")
+    # 1. Fetch submodules
+    subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
 
-    # build the applications
-    for soft, _ in softs.items():
+    # 2. Build each library
+    for soft in softs:
         if soft == "CubicalRipser":
-            subprocess.check_call(["make", "-C", "CubicalRipser"])
+            # build CubicalRipser
+            subprocess.run(["make"], cwd=soft, check=True)
         elif soft == "perseus":
-            # download & build Perseus
-            dl_build_perseus(softs["perseus"])
+            # download Perseus
+            download_perseus()
+            # build perseus
+            subprocess.run(
+                ["g++", "Pers.cpp", "-O3", "-fpermissive", "-o", "perseus"],
+                cwd=soft,
+                check=True,
+            )
+        elif soft == "diamorse":
+            # build diamorse
+            try:
+                subprocess.run(
+                    [
+                        "sed",
+                        "s/shell python/shell python2/",
+                        "-i",
+                        "src/python/Makefile",
+                    ],
+                    cwd=soft,
+                    check=True,
+                )
+                subprocess.run(["make", "all"], cwd=soft, check=True)
+            except subprocess.CalledProcessError:
+                print("Missing cython, python2-numpy to build diamorse")
         else:
             builddir = "build_" + soft
             create_dir(builddir)
             subprocess.check_call(["cmake", "-S", soft, "-B", builddir])
             subprocess.check_call(["cmake", "--build", builddir])
-            # remove source directory/git repository?
-            shutil.rmtree(soft)
+
+    # 3. Try poetry install
+    try:
+        subprocess.run(["poetry", "install"], check=True)
+    except FileNotFoundError:
+        print(
+            "This software needs Poetry (https://python-poetry.org/)"
+            " to manage the Python dependencies"
+        )
 
 
 if __name__ == "__main__":
