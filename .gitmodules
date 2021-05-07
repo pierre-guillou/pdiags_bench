@@ -1,0 +1,12 @@
+[submodule "dipha"]
+	path = dipha
+	url = https://github.com/DIPHA/dipha
+[submodule "CubicalRipser"]
+	path = CubicalRipser
+	url = https://github.com/CubicalRipser/CubicalRipser_3dim
+[submodule "oineus"]
+	path = oineus
+	url = https://github.com/grey-narn/oineus
+[submodule "diamorse"]
+	path = diamorse
+	url = https://github.com/AppliedMathematicsANU/diamorse
