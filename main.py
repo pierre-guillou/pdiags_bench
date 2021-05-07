@@ -150,10 +150,15 @@ def compute_dipha(fname, times, one_thread=False):
         run_pat = r"^Overall running time.*\n(\d+.\d+|\d+)$"
         run_time = re.search(run_pat, dipha_output, re.MULTILINE).group(1)
         run_time = float(run_time)
-        pers_pat = r"^Reduction kernel running time.*\n(\d+.\d+|\d+)$"
-        pers_time = re.search(pers_pat, dipha_output, re.MULTILINE).group(1)
-        pers_time = float(pers_time)
-        return round(run_time - pers_time, 3), round(pers_time, 3)
+        read_pat = r"^ *(\d+.\d+|\d+)s.*complex.load_binary.*$"
+        read_time = re.search(read_pat, dipha_output, re.MULTILINE).group(1)
+        read_time = float(read_time)
+        write_pat = r"^ *(\d+.\d+|\d+)s.*save_persistence_diagram.*$"
+        write_time = re.search(write_pat, dipha_output, re.MULTILINE).group(1)
+        write_time = float(write_time)
+        prec = round(read_time + write_time, 3)
+        pers = round(run_time - prec, 3)
+        return prec, pers
 
     ret = ttk_dipha_print_pairs(outp)
     times[dataset] |= ret
