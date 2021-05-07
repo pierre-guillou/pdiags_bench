@@ -59,11 +59,13 @@ RES_MEAS = ["/usr/bin/time", "-f", "Elapsed Time (s): %e\nPeak Memory (kB): %M"]
 
 
 def get_time_mem(txt):
-    time_pat = r"^Elapsed Time \(s\): (\d+\.\d+|\d+)$"
-    mem_pat = r"^Peak Memory \(kB\): (\d+\.\d+|\d+)$"
-    elapsed = re.search(time_pat, txt, re.MULTILINE).group(1)
-    mem = re.search(mem_pat, txt, re.MULTILINE).group(1)
-    return round(float(elapsed), 3), round(float(mem) / 1000)
+    if len(RES_MEAS) > 0:
+        time_pat = r"^Elapsed Time \(s\): (\d+\.\d+|\d+)$"
+        mem_pat = r"^Peak Memory \(kB\): (\d+\.\d+|\d+)$"
+        elapsed = re.search(time_pat, txt, re.MULTILINE).group(1)
+        mem = re.search(mem_pat, txt, re.MULTILINE).group(1)
+        return round(float(elapsed), 3), round(float(mem) / 1000)
+    return 0.0, 0.0
 
 
 def store_log(log, ds_name, app):
@@ -299,6 +301,13 @@ def compute_diagrams(_):
     times = dict()
 
     one_thread = False
+
+    try:
+        subprocess.run(["/usr/bin/time", "-V"], check=True, capture_output=True)
+    except FileNotFoundError:
+        print("Please install the GNU time utility to compute peak memory consumption")
+        global RES_MEAS
+        RES_MEAS = []
 
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
