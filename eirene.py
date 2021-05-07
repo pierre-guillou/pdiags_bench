@@ -14,7 +14,7 @@ def read_dipha_complex(fname):
         print(f"Global dataset dimension: {dim}")
 
         cell_dims = np.fromfile(src, dtype=np.int64, count=ncells)
-        dims = [np.sum(cell_dims == i) for i in range(dim + 1)]
+        dims = np.array([np.sum(cell_dims == i) for i in range(dim + 1)])
         for i, v in enumerate(dims):
             print(f"  {v} cells of dimension {i}")
         values = np.fromfile(src, dtype=np.double, count=ncells)
@@ -36,16 +36,28 @@ def main(dataset, output):
     psum_dims = np.cumsum(dims)
 
     with open(output, "w") as dst:
-        print(", ".join([str(dim) for dim in dims]), file=dst)  # ev
-        print(", ".join([str(val) for val in vals]), file=dst)  # fv
-        rowval = list()  # rv
-        for e in edges:
-            rowval.extend([v + 1 for v in e])
-        for t in triangles:
-            rowval.extend([e + 1 for e in t])
-        for T in tetras:
-            rowval.extend([t + 1 for t in T])
-        print(", ".join([str(row) for row in rowval]), file=dst)
+        dims.tofile(dst, sep=",")  # ev
+        dst.write("\n")
+        vals.tofile(dst, sep=",")  # fv
+        dst.write("\n")
+
+        rowval = np.zeros(np.dot(dims[1:], np.arange(2, 5)), dtype=np.int32)  # rv
+        for i, e in enumerate(edges):
+            rowval[2 * i + 0] = e[0] + 1
+            rowval[2 * i + 1] = e[1] + 1
+        for i, t in enumerate(triangles):
+            j = 3 * i + 2 * dims[1]
+            rowval[j + 0] = t[0] + 1
+            rowval[j + 1] = t[1] + 1
+            rowval[j + 2] = t[2] + 1
+        for i, T in enumerate(tetras):
+            j = 4 * i + 3 * dims[2] + 2 * dims[1]
+            rowval[j + 0] = T[0] + 1
+            rowval[j + 1] = T[1] + 1
+            rowval[j + 2] = T[2] + 1
+            rowval[j + 3] = T[3] + 1
+        rowval.tofile(dst, sep=",")
+        dst.write("\n")
         colptr = np.concatenate(  # cp
             [
                 np.arange(dims[0] + 1, psum_dims[1] + 1, 2),
@@ -54,7 +66,8 @@ def main(dataset, output):
             ]
         )
         colptr = np.append(colptr, 2 * dims[1] + 3 * dims[2] + 4 * dims[3])
-        print(", ".join([str(col) for col in colptr]), file=dst)
+        colptr.tofile(dst, sep=",")
+        dst.write("\n")
 
 
 if __name__ == "__main__":
