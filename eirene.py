@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import sparse
 
 import dipha_explicit
 
@@ -33,40 +34,47 @@ def main(dataset, output):
     edges = edges.reshape(-1, 2)
     triangles = triangles.reshape(-1, 3)
     tetras = tetras.reshape(-1, 4)
-    psum_dims = np.cumsum(dims)
+
+    n_entries = np.dot(dims[1:], np.arange(2, 5))
+
+    I = np.zeros(n_entries, dtype=np.int32)
+    J = np.zeros(n_entries, dtype=np.int32)
+    V = np.ones(n_entries, dtype=np.int8)
+
+    for i, e in enumerate(edges):
+        o = 2 * i
+        for k, v in enumerate(e):
+            I[o + k] = v
+            J[o + k] = i + dims[0]
+
+    for i, t in enumerate(triangles):
+        o = 3 * i + 2 * dims[1]
+        for k, e in enumerate(t):
+            I[o + k] = e
+            J[o + k] = i + dims[0] + dims[1]
+
+    for i, T in enumerate(tetras):
+        o = 4 * i + 3 * dims[2] + 2 * dims[1]
+        for k, t in enumerate(T):
+            I[o + k] = t
+            J[o + k] = i + dims[0] + dims[1] + dims[2]
+
+    sparse_mat = sparse.csc_matrix((V, (I, J)))
+    print(sparse_mat.shape)
 
     with open(output, "w") as dst:
         dims.tofile(dst, sep=",")  # ev
         dst.write("\n")
+
         vals.tofile(dst, sep=",")  # fv
         dst.write("\n")
 
-        rowval = np.zeros(np.dot(dims[1:], np.arange(2, 5)), dtype=np.int32)  # rv
-        for i, e in enumerate(edges):
-            rowval[2 * i + 0] = e[0] + 1
-            rowval[2 * i + 1] = e[1] + 1
-        for i, t in enumerate(triangles):
-            j = 3 * i + 2 * dims[1]
-            rowval[j + 0] = t[0] + 1
-            rowval[j + 1] = t[1] + 1
-            rowval[j + 2] = t[2] + 1
-        for i, T in enumerate(tetras):
-            j = 4 * i + 3 * dims[2] + 2 * dims[1]
-            rowval[j + 0] = T[0] + 1
-            rowval[j + 1] = T[1] + 1
-            rowval[j + 2] = T[2] + 1
-            rowval[j + 3] = T[3] + 1
-        rowval.tofile(dst, sep=",")
+        rv = sparse_mat.indices + 1  # Julia is 1 indexed
+        rv.tofile(dst, sep=",")
         dst.write("\n")
-        colptr = np.concatenate(  # cp
-            [
-                np.arange(dims[0] + 1, psum_dims[1] + 1, 2),
-                np.arange(psum_dims[1] + 1, psum_dims[2] + 1, 3),
-                np.arange(psum_dims[2] + 1, psum_dims[3] + 1, 4),
-            ]
-        )
-        colptr = np.append(colptr, 2 * dims[1] + 3 * dims[2] + 4 * dims[3])
-        colptr.tofile(dst, sep=",")
+
+        cp = sparse_mat.indptr + 1  # Julia is 1 indexed
+        cp.tofile(dst, sep=",")
         dst.write("\n")
 
 
