@@ -1,12 +1,12 @@
 import argparse
 import math
+import re
+import subprocess
 import time
 
 import dionysus
 import gudhi
 import numpy as np
-import ripser
-import scipy.sparse
 
 
 def read_simplicial_complex(dataset):
@@ -60,19 +60,39 @@ class Ripser_SparseDM:
             J[i] = e[1]
             V[i] = vals[dims[0] + i]
 
-        self.dist_mat = scipy.sparse.coo_matrix((V, (I, J)), shape=(dims[0], dims[0]))
+        self.dist_mat = "\n".join([f"{i} {j} {v}" for i, j, v in zip(I, J, V)])
 
     def compute_pers(self):
-        self.diag = ripser.ripser(self.dist_mat, distance_matrix=True, maxdim=2)["dgms"]
+        proc = subprocess.run(
+            ["ripser/ripser", "--format", "sparse", "--dim", "2"],
+            check=True,
+            input=self.dist_mat.encode(),
+            capture_output=True,
+        )
+        self.diag = proc.stdout.decode()
 
     def write_diag(self, output):
+        dim = 0
+        pairs = list()
+        for line in self.diag.split("\n"):
+            dim_pat = r"persistence intervals in dim (\d+):"
+            try:
+                dim = re.search(dim_pat, line).group(1)
+            except AttributeError:
+                pass
+            pair_pat = r"\[(\d+),(\d+)\)"
+            try:
+                birth, death = re.search(pair_pat, line).groups()
+                pairs.append([dim, birth, death])
+            except AttributeError:
+                pass
+
         with open(output, "w") as dst:
-            for i, pairs in enumerate(self.diag):
-                for pair in pairs:
-                    if i == 0 and pair[0] == 0 and pair[1] != math.inf:
-                        # filter out min-sad pairs beginning from 0
-                        continue
-                    dst.write(f"{i} {pair[0]} {pair[1]}\n")
+            for dim, birth, death in pairs:
+                if int(dim) == 0 and float(birth) == 0 and float(death) != math.inf:
+                    # filter out min-sad pairs beginning from 0
+                    continue
+                dst.write(f"{dim} {birth} {death}\n")
 
 
 class Dionysus_Filtration:
