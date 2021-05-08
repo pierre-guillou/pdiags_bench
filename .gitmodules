@@ -10,3 +10,6 @@
 [submodule "diamorse"]
 	path = diamorse
 	url = https://github.com/AppliedMathematicsANU/diamorse
+[submodule "ripser"]
+	path = ripser
+	url = https://github.com/Ripser/ripser
