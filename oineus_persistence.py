@@ -11,7 +11,7 @@ def compute_diagram(input_dataset, nthreads):
         extent = [0] * dim
         for i in range(dim):
             extent[i] = int(src.readline())
-        data = np.fromfile(src, dtype=np.int32, count=-1, sep="\n")
+        data = np.fromfile(src, dtype=np.float32, count=-1, sep="\n")
         grid = data.reshape(extent)
 
         import oineus
