@@ -66,5 +66,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    sys.path.append(args.oineus_path)
+    # prepend path to Oineus Python package to PYTHONPATH
+    sys.path = [args.oineus_path] + sys.path
     main(args.input_dataset, args.output_diagram, args.threads)
