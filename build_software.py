@@ -58,6 +58,11 @@ def main():
             # build diamorse
             try:
                 subprocess.run(
+                    ["git", "checkout", "."],
+                    cwd=soft,
+                    check=True,
+                )
+                subprocess.run(
                     [
                         "sed",
                         "s/shell python/shell python2/",
