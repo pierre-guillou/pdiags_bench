@@ -272,7 +272,9 @@ def compute_diamorse(fname, times):
     cmd = RES_MEAS + cmd
 
     try:
-        proc = subprocess.run(cmd, timeout=TIMEOUT_S, capture_output=True, check=True)
+        proc = subprocess.run(
+            cmd, timeout=TIMEOUT_S, capture_output=True, check=True, env=dict()
+        )
         elapsed, mem = get_time_mem(proc.stderr.decode())
         times[dataset]["Diamorse"] = {
             "prec": 0.0,
