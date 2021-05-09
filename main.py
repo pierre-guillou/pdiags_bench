@@ -348,8 +348,10 @@ def compute_diagrams(_):
         elif ext == "nc":
             compute_diamorse(fname, times)
 
-    with open("results", "w") as dst:
-        dst.write(json.dumps(times))
+        # write partial results after every dataset computation
+        with open("results", "w") as dst:
+            dst.write(json.dumps(times))
+
     return times
 
 
