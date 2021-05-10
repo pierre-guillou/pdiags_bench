@@ -15,6 +15,8 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".vtu", proxy=outp)
         # TTK Simplicial Complex (Gudhi, Dionysus, Ripser)
         simple.SaveData(fname + ".tsc", proxy=outp)
+        # Perseus Uniform Triangulation (Perseus)
+        simple.SaveData(fname + ".pers", proxy=outp)
     else:
         # vtkImageData (TTK)
         simple.SaveData(fname + ".vti", proxy=outp)
