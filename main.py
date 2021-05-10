@@ -57,9 +57,9 @@ def dataset_name(dsfile):
 
 TIMEOUT_S = 1800  # 30 min
 RES_MEAS = [
-    "/usr/bin/time",
-    "-f",
-    "Elapsed Time (s): %e\nPeak Memory (kB): %M",
+    "python",
+    "subprocess_wrapper.py",
+    "--",
     "/usr/bin/timeout",
     "--preserve-status",
     str(TIMEOUT_S),
@@ -351,13 +351,6 @@ def compute_diagrams(_):
     times = dict()
 
     one_thread = False
-
-    try:
-        subprocess.run(["/usr/bin/time", "-V"], check=True, capture_output=True)
-    except FileNotFoundError:
-        print("Please install the GNU time utility to compute peak memory consumption")
-        global RES_MEAS
-        RES_MEAS = []
 
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
