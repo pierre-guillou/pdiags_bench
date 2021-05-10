@@ -68,10 +68,32 @@ def get_time_mem(txt):
     return 0.0, 0.0
 
 
+def launch_process(cmd, *args, **kwargs):
+    cmd = RES_MEAS + cmd
+    with subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+        *args,
+        **kwargs,
+    ) as proc:
+        try:
+            proc.wait(TIMEOUT_S)
+            if proc.returncode != 0:
+                print(proc.stderr.read())
+                raise subprocess.CalledProcessError(proc.returncode, cmd)
+            return (proc.stdout.read(), proc.stderr.read())
+        except subprocess.TimeoutExpired as te:
+            print(f"Timeout reached after {TIMEOUT_S}s, computation aborted")
+            proc.terminate()
+            raise te
+
+
 def store_log(log, ds_name, app):
     file_name = f"logs/{ds_name}.{app}.log"
     with open(file_name, "w") as dst:
-        dst.write(log.decode())
+        dst.write(log)
 
 
 def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=False):
@@ -95,17 +117,15 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
             cmd.append("-dpp")
             key = "ttk-hybrid++"
 
-    cmd = RES_MEAS + cmd
-
     def ttk_compute_time(ttk_output):
-        ttk_output = escape_ansi_chars(ttk_output.decode())
+        ttk_output = escape_ansi_chars(ttk_output)
         time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
         cpt_time = float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
         overhead = ttk_overhead_time(ttk_output)
         return cpt_time - overhead
 
     def ttk_prec_time(ttk_output):
-        ttk_output = escape_ansi_chars(ttk_output.decode())
+        ttk_output = escape_ansi_chars(ttk_output)
         prec_re = (
             r"\[PersistenceDiagram\] Precondition triangulation.*\[(\d+\.\d+|\d+)s"
         )
@@ -122,17 +142,17 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
             return 0.0
 
     try:
-        proc = subprocess.run(cmd, capture_output=True, timeout=TIMEOUT_S, check=True)
+        out, err = launch_process(cmd)
         times[dataset][key] = {
-            "prec": ttk_prec_time(proc.stdout),
-            "pers": ttk_compute_time(proc.stdout),
-            "mem": get_time_mem(proc.stderr.decode())[1],
+            "prec": ttk_prec_time(out),
+            "pers": ttk_compute_time(out),
+            "mem": get_time_mem(err)[1],
         }
         os.rename("output_port_0.vtu", outp)
         ttk_dipha_print_pairs(outp)
-        store_log(proc.stdout, dataset, key)
+        store_log(out, dataset, key)
     except subprocess.TimeoutExpired:
-        print("Timeout reached, computation aborted")
+        pass
 
 
 def compute_dipha(fname, times, one_thread=False):
@@ -142,11 +162,10 @@ def compute_dipha(fname, times, one_thread=False):
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
     if not one_thread:
         cmd = ["mpirun", "--use-hwthread-cpus"] + cmd
-    cmd = RES_MEAS + cmd
-    proc = subprocess.run(cmd, capture_output=True, check=True)  # no timeout here?
+
+    out, err = launch_process(cmd)
 
     def dipha_compute_time(dipha_output):
-        dipha_output = dipha_output.decode()
         run_pat = r"^Overall running time.*\n(\d+.\d+|\d+)$"
         run_time = re.search(run_pat, dipha_output, re.MULTILINE).group(1)
         run_time = float(run_time)
@@ -162,13 +181,13 @@ def compute_dipha(fname, times, one_thread=False):
 
     ret = ttk_dipha_print_pairs(outp)
     times[dataset] |= ret
-    prec, pers = dipha_compute_time(proc.stdout)
+    prec, pers = dipha_compute_time(out)
     times[dataset]["dipha"] = {
         "prec": prec,
         "pers": pers,
-        "mem": get_time_mem(proc.stderr.decode())[1],
+        "mem": get_time_mem(err)[1],
     }
-    store_log(proc.stdout, dataset, "dipha")
+    store_log(out, dataset, "dipha")
 
 
 def compute_cubrips(fname, times):
@@ -176,11 +195,10 @@ def compute_cubrips(fname, times):
     print("Processing " + dataset + " with CubicalRipser...")
     outp = f"diagrams/{dataset}.cr"
     cmd = ["CubicalRipser/CR3", fname, "--output", outp]
-    cmd = RES_MEAS + cmd
 
     try:
-        proc = subprocess.run(cmd, timeout=TIMEOUT_S, capture_output=True, check=True)
-        pers, mem = get_time_mem(proc.stderr.decode())
+        _, err = launch_process(cmd)
+        pers, mem = get_time_mem(err)
         times[dataset]["CubicalRipser"] = {
             "prec": 0.0,
             "pers": pers,
@@ -190,7 +208,7 @@ def compute_cubrips(fname, times):
     except subprocess.CalledProcessError:
         print(dataset + " is too large for CubicalRipser")
     except subprocess.TimeoutExpired:
-        print("Timeout reached, computation aborted")
+        pass
 
 
 def compute_gudhi_dionysus(fname, times, backend):
@@ -199,7 +217,6 @@ def compute_gudhi_dionysus(fname, times, backend):
     outp = f"diagrams/{dataset}_{backend}.gudhi"
 
     def compute_time(output):
-        output = output.decode()
         prec_pat = r"^Filled filtration.*: (\d+.\d+|\d+)s$"
         pers_pat = r"^Computed persistence.*: (\d+.\d+|\d+)s$"
         try:
@@ -218,19 +235,18 @@ def compute_gudhi_dionysus(fname, times, backend):
         + ["-o", outp]
         + ["-b", backend.lower()]
     )
-    cmd = RES_MEAS + cmd
 
     try:
-        proc = subprocess.run(cmd, capture_output=True, check=True, timeout=TIMEOUT_S)
-        prec, pers = compute_time(proc.stdout)
+        out, err = launch_process(cmd)
+        prec, pers = compute_time(out)
         times[dataset][backend] = {
             "prec": prec,
             "pers": pers,
-            "mem": get_time_mem(proc.stderr.decode())[1],
+            "mem": get_time_mem(err)[1],
         }
         ttk_dipha_print_pairs(outp)
     except subprocess.TimeoutExpired:
-        print("Timeout reached, computation aborted")
+        pass
 
 
 def compute_oineus(fname, times, one_thread=False):
@@ -239,7 +255,6 @@ def compute_oineus(fname, times, one_thread=False):
     outp = f"diagrams/{dataset}_Oineus.gudhi"
 
     def oineus_compute_time(oineus_output):
-        oineus_output = oineus_output.decode()
         pat = r"matrix reduced in (\d+.\d+|\d+)"
         pers_time = re.search(pat, oineus_output).group(1)
         return round(float(pers_time), 3)
@@ -248,12 +263,11 @@ def compute_oineus(fname, times, one_thread=False):
     cmd = ["python3", "oineus_persistence.py", fname, "-o", outp]
     if not one_thread:
         cmd.extend(["-t", str(multiprocessing.cpu_count())])
-    cmd = RES_MEAS + cmd
 
     try:
-        proc = subprocess.run(cmd, capture_output=True, check=True, timeout=TIMEOUT_S)
-        pers = oineus_compute_time(proc.stderr)
-        elapsed, mem = get_time_mem(proc.stderr.decode())
+        _, err = launch_process(cmd)
+        pers = oineus_compute_time(err)
+        elapsed, mem = get_time_mem(err)
         times[dataset]["Oineus"] = {
             "prec": round(elapsed - pers, 3),
             "pers": pers,
@@ -261,7 +275,7 @@ def compute_oineus(fname, times, one_thread=False):
         }
         ttk_dipha_print_pairs(outp)
     except subprocess.TimeoutExpired:
-        print("Timeout reached, computation aborted")
+        pass
 
 
 def compute_diamorse(fname, times):
@@ -269,13 +283,10 @@ def compute_diamorse(fname, times):
     print("Processing " + dataset + " with Diamorse...")
     outp = f"diagrams/{dataset}.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r"]
-    cmd = RES_MEAS + cmd
 
     try:
-        proc = subprocess.run(
-            cmd, timeout=TIMEOUT_S, capture_output=True, check=True, env=dict()
-        )
-        elapsed, mem = get_time_mem(proc.stderr.decode())
+        out, err = launch_process(cmd, env=dict())  # reset environment for Python2
+        elapsed, mem = get_time_mem(err)
         times[dataset]["Diamorse"] = {
             "prec": 0.0,
             "pers": elapsed,
@@ -284,7 +295,7 @@ def compute_diamorse(fname, times):
 
         # convert output to Gudhi format on-the-fly
         pairs = list()
-        for line in proc.stdout.decode().splitlines():
+        for line in out.splitlines():
             if line.startswith("#"):
                 continue
             pairs.append(line.split()[:3])
@@ -294,7 +305,7 @@ def compute_diamorse(fname, times):
 
         ttk_dipha_print_pairs(outp)
     except subprocess.TimeoutExpired:
-        print("Timeout reached, computation aborted")
+        pass
 
 
 def compute_diagrams(_):
