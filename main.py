@@ -10,6 +10,7 @@ import subprocess
 
 import compare_diags
 import convert_datasets
+import pers2gudhi
 
 
 def create_dir(dirname):
@@ -164,7 +165,7 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
 
 def compute_dipha(fname, times, one_thread=False):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with dipha...")
+    print("Processing " + dataset + " with Dipha...")
     outp = f"diagrams/{dataset}.dipha"
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
     if not one_thread:
@@ -288,7 +289,7 @@ def compute_oineus(fname, times, one_thread=False):
 def compute_diamorse(fname, times):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with Diamorse...")
-    outp = f"diagrams/{dataset}.gudhi"
+    outp = f"diagrams/{dataset}_Diamorse.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r"]
 
     try:
@@ -309,6 +310,30 @@ def compute_diamorse(fname, times):
         with open(outp, "w") as dst:
             for birth, death, dim in pairs:
                 dst.write(f"{dim} {birth} {death}\n")
+
+        ttk_dipha_print_pairs(outp)
+    except subprocess.TimeoutExpired:
+        pass
+
+
+def compute_perseus(fname, times, simplicial):
+    dataset = dataset_name(fname)
+    print("Processing " + dataset + " with Perseus...")
+    outp = f"diagrams/{dataset}_Perseus.gudhi"
+    subc = "simtop" if simplicial else "cubtop"
+    cmd = ["perseus/perseus", subc, fname, "out"]
+
+    try:
+        _, err = launch_process(cmd)
+        elapsed, mem = get_time_mem(err)
+        times[dataset]["Perseus"] = {
+            "prec": 0.0,
+            "pers": elapsed,
+            "mem": mem,
+        }
+
+        # convert output to Gudhi format
+        pers2gudhi.main("out", outp)
 
         ttk_dipha_print_pairs(outp)
     except subprocess.TimeoutExpired:
@@ -361,6 +386,9 @@ def compute_diagrams(_):
         elif ext == "pers" and "impl" in fname:
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_oineus(fname, times, one_thread)
+            compute_perseus(fname, times, False)
+        elif ext == "pers" and "expl" in fname:
+            compute_perseus(fname, times, True)
         elif ext == "tsc":
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_gudhi_dionysus(fname, times, "Dionysus")
