@@ -55,7 +55,14 @@ def dataset_name(dsfile):
 
 
 TIMEOUT_S = 1800  # 30 min
-RES_MEAS = ["/usr/bin/time", "-f", "Elapsed Time (s): %e\nPeak Memory (kB): %M"]
+RES_MEAS = [
+    "/usr/bin/time",
+    "-f",
+    "Elapsed Time (s): %e\nPeak Memory (kB): %M",
+    "/usr/bin/timeout",
+    "--preserve-status",
+    str(TIMEOUT_S),
+]
 
 
 def get_time_mem(txt):
