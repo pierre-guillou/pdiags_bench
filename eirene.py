@@ -1,3 +1,7 @@
+import argparse
+import subprocess
+import os
+
 import numpy as np
 from scipy import sparse
 
@@ -29,12 +33,7 @@ def read_dipha_complex(fname):
         return dims, values, (edges, triangles, tetras)
 
 
-def main(dataset, output):
-    dims, vals, (edges, triangles, tetras) = read_dipha_complex(dataset)
-    edges = edges.reshape(-1, 2)
-    triangles = triangles.reshape(-1, 3)
-    tetras = tetras.reshape(-1, 4)
-
+def generate_sparse_mat(dims, edges, triangles, tetras):
     n_entries = np.dot(dims[1:], np.arange(2, 5))
 
     I = np.zeros(n_entries, dtype=np.int32)
@@ -59,10 +58,11 @@ def main(dataset, output):
             I[o + k] = t
             J[o + k] = i + dims[0] + dims[1] + dims[2]
 
-    sparse_mat = sparse.csc_matrix((V, (I, J)))
-    print(sparse_mat.shape)
+    return sparse.csc_matrix((V, (I, J)))
 
-    with open(output, "w") as dst:
+
+def generate_csv(sparse_mat, dims, vals, output_csv):
+    with open(output_csv, "w") as dst:
         dims.tofile(dst, sep=",")  # ev
         dst.write("\n")
 
@@ -78,5 +78,31 @@ def main(dataset, output):
         dst.write("\n")
 
 
+def call_julia(input_csv, output_diag):
+    subprocess.run(["julia", "test_eirene.jl", input_csv, output_diag], check=True)
+    os.remove(input_csv)
+
+
+def main(dataset, output_diag):
+    dims, vals, (edges, triangles, tetras) = read_dipha_complex(dataset)
+    edges = edges.reshape(-1, 2)
+    triangles = triangles.reshape(-1, 3)
+    tetras = tetras.reshape(-1, 4)
+
+    sparse_mat = generate_sparse_mat(dims, edges, triangles, tetras)
+    print(sparse_mat.shape)
+
+    temp_csv = "tmp.csv"
+    generate_csv(sparse_mat, dims, vals, temp_csv)
+    call_julia(temp_csv, output_diag)
+
+
 if __name__ == "__main__":
-    main("datasets/fuel_64x64x64_uint8_order_expl.dipha", "eirene.csv")
+    parser = argparse.ArgumentParser(
+        description="Compute persistence diagram using Eirene.jl"
+    )
+    parser.add_argument("input", help="Path to the input Dipha file")
+    parser.add_argument("output", help="Output persistence diagram in Gudhi format")
+    args = parser.parse_args()
+
+    main(args.input, args.output)
