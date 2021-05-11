@@ -30,25 +30,20 @@ poetry install
 poetry run python build_software.py
 ```
 
-3. Fetching the OpenSciVis datasets
+3. Fetching the OpenSciVis datasets (raw files) & converting them to
+   supported input formats
 
 ```
-poetry run python download_datasets.py
+poetry run python main.py prepare_datasets -d
 ```
 
-4. Converting the OpenSciVis raws to supported input formats
-
-```
-poetry run python main.py prepare_datasets
-```
-
-5. Launch the Persistence Diagram computation
+4. Launch the Persistence Diagram computation
 
 ```
 poetry run python main.py compute_diagrams
 ```
 
-6. Observe the results, generate a LaTeX table
+5. Observe the results, generate a LaTeX table
 
 ```
 python -m json.tool results
