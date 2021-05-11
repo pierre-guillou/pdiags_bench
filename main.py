@@ -10,6 +10,7 @@ import subprocess
 
 import compare_diags
 import convert_datasets
+import download_datasets
 import pers2gudhi
 
 
@@ -20,7 +21,10 @@ def create_dir(dirname):
         pass
 
 
-def prepare_datasets(_):
+def prepare_datasets(args):
+    if args.download:
+        download_datasets.main(args.max_dataset_size)
+
     create_dir("datasets")
     for dataset in sorted(glob.glob("raws/*.raw")):
         # reduce RAM usage by isolating datasets manipulation in
@@ -453,6 +457,19 @@ def main():
     subparsers = parser.add_subparsers()
 
     prep_datasets = subparsers.add_parser("prepare_datasets")
+    prep_datasets.add_argument(
+        "-d",
+        "--download",
+        help="Download raw files from OpenSciViz",
+        action="store_true",
+    )
+    prep_datasets.add_argument(
+        "-s",
+        "--max_dataset_size",
+        help="Maximum size of the raw files to download (MB)",
+        type=int,
+        default=download_datasets.SIZE_LIMIT_MB,
+    )
     prep_datasets.set_defaults(func=prepare_datasets)
 
     get_diags = subparsers.add_parser("compute_diagrams")
