@@ -46,14 +46,14 @@ def download_dataset(dataset_url, dest_dir=""):
     download_file(dataset_url, dest_dir + dataset_name)
 
 
-def main():
+def main(max_size=SIZE_LIMIT_MB):
     dest_dir = "raws"
     try:
         os.mkdir(dest_dir)
     except FileExistsError:
         pass
 
-    ds_urls = get_datasets_urls(SIZE_LIMIT_MB)
+    ds_urls = get_datasets_urls(max_size)
     for url in ds_urls:
         download_dataset(url, dest_dir + "/")
 
