@@ -1,6 +1,4 @@
 import argparse
-import math
-import re
 import subprocess
 
 import numpy as np
@@ -29,7 +27,7 @@ def load_raw(input_raw):
         return data.reshape(extent)
 
 
-def compute_persistence(sparse_triplets):
+def compute_persistence(sparse_triplets, output_diagram):
     proc = subprocess.Popen(
         ["ripser/ripser", "--format", "sparse", "--dim", "2"],
         stdin=subprocess.PIPE,
@@ -37,7 +35,9 @@ def compute_persistence(sparse_triplets):
         universal_newlines=True,
     )
     out, _ = proc.communicate(sparse_triplets)
-    return out
+
+    with open(output_diagram, "w") as dst:
+        dst.write(out)
 
 
 def build_sparse_triplets(data):
@@ -63,35 +63,10 @@ def build_sparse_triplets(data):
     return "\n".join([f"{i} {j} {v}" for i, j, v in triplets])
 
 
-def parse_write_pairs(ripser_pairs, output):
-    dim = 0
-    pairs = list()
-    for line in ripser_pairs.split("\n"):
-        dim_pat = r"persistence intervals in dim (\d+):"
-        try:
-            dim = re.search(dim_pat, line).group(1)
-        except AttributeError:
-            pass
-        pair_pat = r"\[(\d+),(\d+)\)"
-        try:
-            birth, death = re.search(pair_pat, line).groups()
-            pairs.append([dim, birth, death])
-        except AttributeError:
-            pass
-
-    with open(output, "w") as dst:
-        for dim, birth, death in pairs:
-            if int(dim) == 0 and float(birth) == 0 and float(death) != math.inf:
-                # filter out min-sad pairs beginning from 0
-                continue
-            dst.write(f"{dim} {birth} {death}\n")
-
-
 def main(input_raw, output_diagram):
     data = load_raw(input_raw)
     sparse_triplets = build_sparse_triplets(data)
-    ripser_pairs = compute_persistence(sparse_triplets)
-    parse_write_pairs(ripser_pairs, output_diagram)
+    compute_persistence(sparse_triplets, output_diagram)
 
 
 if __name__ == "__main__":
@@ -100,8 +75,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--output_diagram",
-        help="Output diagram in Gudhi format",
-        default="out.gudhi",
+        help="Output diagram in Ripser format",
+        default="out.ripser",
     )
     args = parser.parse_args()
 
