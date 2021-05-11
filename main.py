@@ -121,13 +121,13 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
     cmd = ["ttkPersistenceDiagramCmd", "-i", fname, "-d", "4", "-a", "ImageFile_Order"]
     if one_thread:
         cmd.extend(["-t", "1"])
-    key = "ttk"
+    key = "ttk-sandwich"
     if dipha_offload:
         cmd.append("-wd")
-        key = "ttk-hybrid"
+        key = "ttk/dipha"
         if hybrid_pp:
             cmd.append("-dpp")
-            key = "ttk-hybrid++"
+            key = "ttk-sandwich/dipha"
 
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
@@ -162,7 +162,7 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
         }
         os.rename("output_port_0.vtu", outp)
         ttk_dipha_print_pairs(outp)
-        store_log(out, dataset, key)
+        store_log(out, dataset, key.replace("/", "_"))
     except subprocess.TimeoutExpired:
         pass
 
