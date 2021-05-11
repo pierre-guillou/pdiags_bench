@@ -340,7 +340,7 @@ def compute_perseus(fname, times, simplicial):
         pass
 
 
-def compute_diagrams(_):
+def compute_diagrams(args):
 
     # output diagrams directory
     create_dir("diagrams")
@@ -350,7 +350,7 @@ def compute_diagrams(_):
     # store computation times
     times = dict()
 
-    one_thread = False
+    one_thread = args.sequential
 
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
@@ -456,6 +456,12 @@ def main():
     prep_datasets.set_defaults(func=prepare_datasets)
 
     get_diags = subparsers.add_parser("compute_diagrams")
+    get_diags.add_argument(
+        "-1",
+        "--sequential",
+        help="Disable the multi-threading support",
+        action="store_true",
+    )
     get_diags.set_defaults(func=compute_diagrams)
 
     get_dists = subparsers.add_parser("compute_distances")
