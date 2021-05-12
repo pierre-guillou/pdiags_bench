@@ -79,7 +79,13 @@ def generate_csv(sparse_mat, dims, vals, output_csv):
 
 
 def call_julia(input_csv, output_diag):
-    subprocess.run(["julia", "call_eirene.jl", input_csv, output_diag], check=True)
+    proc = subprocess.run(
+        ["julia", "call_eirene.jl", input_csv, output_diag],
+        capture_output=True,
+        universal_newlines=True,
+        check=True,
+    )
+    print(proc.stdout)  # Forward Julia @time info to parent process
     os.remove(input_csv)
 
 
