@@ -344,6 +344,33 @@ def compute_perseus(fname, times, simplicial):
         pass
 
 
+def compute_eirene(fname, times):
+    dataset = dataset_name(fname)
+    print("Processing " + dataset + " with Eirene.jl...")
+    outp = f"diagrams/{dataset}_Eirene.gudhi"
+    cmd = ["python3", "eirene_persistence.py", fname, outp]
+
+    def compute_pers_time(output):
+        pers_pat = r"^ (\d+.\d+|\d+) seconds.*$"
+        pers = re.search(pers_pat, output, re.MULTILINE).group(1)
+        pers = round(float(pers), 3)
+        return pers
+
+    try:
+        out, err = launch_process(cmd)
+        elapsed, mem = get_time_mem(err)
+        pers = compute_pers_time(out)
+        times[dataset]["Eirene"] = {
+            "prec": round(elapsed - pers, 3),
+            "pers": pers,
+            "mem": mem,
+        }
+
+        ttk_dipha_print_pairs(outp)
+    except subprocess.TimeoutExpired:
+        pass
+
+
 def compute_diagrams(args):
 
     # output diagrams directory
@@ -380,6 +407,8 @@ def compute_diagrams(args):
             compute_dipha(fname, times, one_thread)
             if "impl" in fname:
                 compute_cubrips(fname, times)
+            elif "expl" in fname:
+                compute_eirene(fname, times)
         elif ext == "pers" and "impl" in fname:
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_oineus(fname, times, one_thread)
