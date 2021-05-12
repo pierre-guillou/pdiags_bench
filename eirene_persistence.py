@@ -79,7 +79,7 @@ def generate_csv(sparse_mat, dims, vals, output_csv):
 
 
 def call_julia(input_csv, output_diag):
-    subprocess.run(["julia", "test_eirene.jl", input_csv, output_diag], check=True)
+    subprocess.run(["julia", "call_eirene.jl", input_csv, output_diag], check=True)
     os.remove(input_csv)
 
 
