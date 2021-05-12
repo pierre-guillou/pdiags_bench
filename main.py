@@ -166,6 +166,12 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
     except subprocess.TimeoutExpired:
         pass
 
+    try:
+        os.remove("morse.dipha")
+        os.remove("output.dipha")
+    except FileNotFoundError:
+        pass
+
 
 def compute_dipha(fname, times, one_thread=False):
     dataset = dataset_name(fname)
