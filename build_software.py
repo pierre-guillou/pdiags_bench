@@ -32,6 +32,7 @@ def main():
         "CubicalRipser",
         "diamorse",
         "dipha",
+        "Eirene.jl",
         "oineus",
         "perseus",
         "ripser",
@@ -82,6 +83,8 @@ def main():
                 cwd=soft,
                 check=True,
             )
+        elif soft == "Eirene.jl":
+            subprocess.run(["julia", "-e", 'using Pkg; Pkg.add("Eirene")'], check=True)
         else:
             builddir = "build_" + soft
             create_dir(builddir)

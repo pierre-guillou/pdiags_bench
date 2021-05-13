@@ -19,7 +19,7 @@ Python dependencies.
 1. Installing the dependencies
 
 ```
-sudo apt install python-numpy pipx
+sudo apt install python-numpy pipx julia
 pipx install poetry
 poetry install
 ```
