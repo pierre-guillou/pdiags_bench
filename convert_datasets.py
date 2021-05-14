@@ -2,6 +2,7 @@ import argparse
 
 from paraview import simple
 
+import dipha2eirene
 import vti2nc3
 
 RESAMPL = 192
@@ -10,6 +11,10 @@ RESAMPL = 192
 def write_output(outp, fname, out_dir, explicit):
     if out_dir:
         fname = out_dir + "/" + fname
+
+    # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
+    simple.SaveData(fname + ".dipha", proxy=outp)
+
     if explicit:
         # vtkUnstructuredGrid (TTK)
         simple.SaveData(fname + ".vtu", proxy=outp)
@@ -17,6 +22,8 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".tsc", proxy=outp)
         # Perseus Uniform Triangulation (Perseus)
         simple.SaveData(fname + ".pers", proxy=outp)
+        # Eirene.jl Sparse Column Format CSV
+        dipha2eirene.main(fname + ".dipha")
     else:
         # vtkImageData (TTK)
         simple.SaveData(fname + ".vti", proxy=outp)
@@ -24,9 +31,6 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".pers", proxy=outp)
         # NetCDF3 (Diamorse)
         vti2nc3.main(fname + ".vti")
-
-    # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
-    simple.SaveData(fname + ".dipha", proxy=outp)
 
 
 def read_file(input_file):
