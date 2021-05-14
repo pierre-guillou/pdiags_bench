@@ -46,6 +46,7 @@ def build_sparse_triplets(data):
 
     with np.nditer(data, flags=["multi_index"]) as it:
         for v in it:
+            i = np.ravel_multi_index(it.multi_index, data.shape)
             for d in range(data.ndim):
                 for s in [-1, 1]:
                     coords = list(it.multi_index)
@@ -53,10 +54,9 @@ def build_sparse_triplets(data):
                     if s < 0 or s >= data.shape[d]:
                         continue
                     coords[d] = s
-                    i = np.ravel_multi_index(it.multi_index, data.shape)
                     j = np.ravel_multi_index(coords, data.shape)
                     if i < j:  # upper triangle distance matrix
-                        triplets.append([i, j, max(data[tuple(coords)], v)])
+                        triplets.append([i, j, max(data.flat[j], v)])
 
     return "\n".join([f"{i} {j} {v}" for i, j, v in triplets])
 
