@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import time
 
 import numpy as np
 
@@ -62,7 +63,9 @@ def build_sparse_triplets(data):
 
 def main(input_raw, output_diagram):
     data = load_raw(input_raw)
+    start = time.time()
     sparse_triplets = build_sparse_triplets(data)
+    print(f"Build sparse triplets in {time.time() - start:.2f}s")
     compute_persistence(sparse_triplets, output_diagram)
 
 
