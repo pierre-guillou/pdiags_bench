@@ -354,7 +354,7 @@ def compute_eirene(fname, times):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with Eirene.jl...")
     outp = f"diagrams/{dataset}_Eirene.gudhi"
-    cmd = ["python3", "eirene_persistence.py", fname, outp]
+    cmd = ["julia", "call_eirene.jl", fname, outp]
 
     def compute_pers_time(output):
         pers_pat = r"^ (\d+.\d+|\d+) seconds.*$"
@@ -413,8 +413,6 @@ def compute_diagrams(args):
             compute_dipha(fname, times, one_thread)
             if "impl" in fname:
                 compute_cubrips(fname, times)
-            elif "expl" in fname:
-                compute_eirene(fname, times)
         elif ext == "pers" and "impl" in fname:
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_oineus(fname, times, one_thread)
@@ -427,6 +425,8 @@ def compute_diagrams(args):
             # compute_gudhi_dionysus(fname, times, "Ripser")
         elif ext == "nc":
             compute_diamorse(fname, times)
+        elif ext == "csv":
+            compute_eirene(fname, times)
 
         # write partial results after every dataset computation
         with open("results", "w") as dst:
