@@ -425,7 +425,7 @@ def compute_diagrams(args):
             # compute_gudhi_dionysus(fname, times, "Ripser")
         elif ext == "nc":
             compute_diamorse(fname, times)
-        elif ext == "csv":
+        elif ext == "eirene":
             compute_eirene(fname, times)
 
         # write partial results after every dataset computation

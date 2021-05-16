@@ -2,7 +2,6 @@ import argparse
 
 from paraview import simple
 
-import dipha2eirene
 import vti2nc3
 
 RESAMPL = 192
@@ -23,7 +22,7 @@ def write_output(outp, fname, out_dir, explicit):
         # Perseus Uniform Triangulation (Perseus)
         simple.SaveData(fname + ".pers", proxy=outp)
         # Eirene.jl Sparse Column Format CSV
-        dipha2eirene.main(fname + ".dipha")
+        simple.SaveData(fname + ".eirene", proxy=outp)
     else:
         # vtkImageData (TTK)
         simple.SaveData(fname + ".vti", proxy=outp)
