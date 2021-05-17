@@ -24,6 +24,10 @@ To run the benchmark, please use a computer/virtual machine with
 * at least 700GB of free disk space for storing the converted input datasets
 * at least 100h of computing time
 
+If those requirements are too heavy, you can
+* reduce the number of downloaded datasets (default max size: 1024MB)
+* reduce the resampling size (default: 192 for a grid of 192^3 vertices)
+
 1. Installing the dependencies
 
 ```
@@ -47,11 +51,18 @@ poetry run python build_software.py
 poetry run python main.py prepare_datasets -d
 ```
 
+Use the `--max_dataset_size xxx` flag to change the number of downloaded
+datasets (default 1024MB). Use the `--max_resample_size yyy` flag to
+modify the resampled size (default 192 for a 192^3 grid)
+
 4. Launch the Persistence Diagram computation
 
 ```
 poetry run python main.py compute_diagrams
 ```
+
+Use the `--sequential` key to request a sequential execution (parallel
+for TTK, Dipha and Oineus by default).
 
 5. Observe the results, generate a LaTeX table
 
