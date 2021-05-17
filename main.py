@@ -30,7 +30,8 @@ def prepare_datasets(args):
         # reduce RAM usage by isolating datasets manipulation in
         # separate processes
         p = multiprocessing.Process(
-            target=convert_datasets.main, args=(dataset, "datasets")
+            target=convert_datasets.main,
+            args=(dataset, "datasets", args.max_resample_size),
         )
         p.start()
         p.join()
@@ -504,6 +505,13 @@ def main():
         help="Maximum size of the raw files to download (MB)",
         type=int,
         default=download_datasets.SIZE_LIMIT_MB,
+    )
+    prep_datasets.add_argument(
+        "-r",
+        "--max_resample_size",
+        help="Maximum size of the resampled datasets (vertices per edge)",
+        type=int,
+        default=convert_datasets.RESAMPL,
     )
     prep_datasets.set_defaults(func=prepare_datasets)
 
