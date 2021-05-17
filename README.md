@@ -16,6 +16,14 @@ Benchmark suite for Persistence Diagrams Libraries
 This project uses [Poetry](https://python-poetry.org/) to manage the
 Python dependencies.
 
+0. Prerequisites
+
+To run the benchmark, please use a computer/virtual machine with
+* Ubuntu 20.04 (preferred)
+* at least 64GB of RAM (it might even swap)
+* at least 700GB of free disk space for storing the converted input datasets
+* at least 100h of computing time
+
 1. Installing the dependencies
 
 ```
@@ -23,6 +31,8 @@ sudo apt install python-numpy pipx julia
 pipx install poetry
 poetry install
 ```
+TODO: ParaView + TTK (via deb packages?)
+
 
 2. Building the missing software libraries
 
