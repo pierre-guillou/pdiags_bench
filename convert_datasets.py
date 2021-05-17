@@ -65,6 +65,9 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL):
 
     raw_stem = raw_file.split(".")[0].split("/")[-1]
     reader = read_file(raw_file)
+    raw_stem_parts = raw_stem.split("_")
+    raw_stem_parts[-2] = "x".join([str(resampl_size)] * 3)
+    raw_stem = "_".join(raw_stem_parts)
 
     # convert input scalar field to float
     calc = simple.Calculator(Input=reader)
