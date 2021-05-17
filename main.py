@@ -376,6 +376,8 @@ def compute_eirene(fname, times):
         ttk_dipha_print_pairs(outp)
     except subprocess.TimeoutExpired:
         pass
+    except subprocess.CalledProcessError:
+        print(">> Consider installing Julia and Eirene.jl")
 
 
 def compute_diagrams(args):
