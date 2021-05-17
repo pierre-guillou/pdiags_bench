@@ -153,14 +153,16 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
 
     try:
         out, err = launch_process(cmd)
+        elapsed, mem = get_time_mem(err)
         times[dataset][key] = {
             "prec": ttk_prec_time(out),
             "pers": ttk_compute_time(out),
-            "mem": get_time_mem(err)[1],
+            "mem": mem,
         }
         os.rename("output_port_0.vtu", outp)
         times[dataset][key] |= get_pairs_number(outp)
         store_log(out, dataset, key.replace("/", "_"))
+        print(f"  Done in {elapsed}s")
     except subprocess.TimeoutExpired:
         pass
 
@@ -196,12 +198,14 @@ def compute_dipha(fname, times, one_thread=False):
         return prec, pers
 
     prec, pers = dipha_compute_time(out)
+    elapsed, mem = get_time_mem(err)
     times[dataset]["dipha"] = {
         "prec": prec,
         "pers": pers,
-        "mem": get_time_mem(err)[1],
+        "mem": mem,
     }
     times[dataset]["dipha"] |= get_pairs_number(outp)
+    print(f"  Done in {elapsed}s")
     store_log(out, dataset, "dipha")
 
 
@@ -213,13 +217,14 @@ def compute_cubrips(fname, times):
 
     try:
         _, err = launch_process(cmd)
-        pers, mem = get_time_mem(err)
+        elapsed, mem = get_time_mem(err)
         times[dataset]["CubicalRipser"] = {
             "prec": 0.0,
-            "pers": pers,
+            "pers": elapsed,
             "mem": mem,
         }
         times[dataset]["CubicalRipser"] |= get_pairs_number(outp)
+        print(f"  Done in {elapsed}s")
     except subprocess.CalledProcessError:
         print(dataset + " is too large for CubicalRipser")
     except subprocess.TimeoutExpired:
@@ -254,12 +259,14 @@ def compute_gudhi_dionysus(fname, times, backend):
     try:
         out, err = launch_process(cmd)
         prec, pers = compute_time(out)
+        elapsed, mem = get_time_mem(err)
         times[dataset][backend] = {
             "prec": prec,
             "pers": pers,
-            "mem": get_time_mem(err)[1],
+            "mem": mem,
         }
         times[dataset][backend] |= get_pairs_number(outp)
+        print(f"  Done in {elapsed}s")
     except subprocess.TimeoutExpired:
         pass
 
@@ -289,6 +296,7 @@ def compute_oineus(fname, times, one_thread=False):
             "mem": mem,
         }
         times[dataset]["Oineus"] |= get_pairs_number(outp)
+        print(f"  Done in {elapsed}s")
     except subprocess.TimeoutExpired:
         pass
 
@@ -319,6 +327,7 @@ def compute_diamorse(fname, times):
                 dst.write(f"{dim} {birth} {death}\n")
 
         times[dataset]["Diamorse"] |= get_pairs_number(outp)
+        print(f"  Done in {elapsed}s")
     except subprocess.TimeoutExpired:
         pass
 
@@ -343,6 +352,7 @@ def compute_perseus(fname, times, simplicial):
         pers2gudhi.main("out", outp)
 
         times[dataset]["Perseus"] |= get_pairs_number(outp)
+        print(f"  Done in {elapsed}s")
     except subprocess.TimeoutExpired:
         pass
 
@@ -370,6 +380,7 @@ def compute_eirene(fname, times):
         }
 
         times[dataset]["Eirene"] |= get_pairs_number(outp)
+        print(f"  Done in {elapsed}s")
     except subprocess.TimeoutExpired:
         pass
     except subprocess.CalledProcessError:
