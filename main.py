@@ -155,8 +155,8 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
         out, err = launch_process(cmd)
         elapsed, mem = get_time_mem(err)
         times[dataset][key] = {
-            "prec": ttk_prec_time(out),
-            "pers": ttk_compute_time(out),
+            "prec": round(ttk_prec_time(out), 3),
+            "pers": round(ttk_compute_time(out), 3),
             "mem": mem,
         }
         os.rename("output_port_0.vtu", outp)
