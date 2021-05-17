@@ -113,11 +113,11 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
     dataset = dataset_name(fname)
     if dipha_offload:
         if hybrid_pp:
-            print("Processing " + dataset + " with TTK (hybrid++ mode)...")
+            print("Processing " + dataset + " with TTK-sandwich/Dipha...")
         else:
-            print("Processing " + dataset + " with TTK (hybrid mode)...")
+            print("Processing " + dataset + " with TTK/Dipha...")
     else:
-        print("Processing " + dataset + " with TTK...")
+        print("Processing " + dataset + " with TTK-sandwich...")
     outp = f"diagrams/{dataset}.vtu"
     cmd = ["ttkPersistenceDiagramCmd", "-i", fname, "-d", "4", "-a", "ImageFile_Order"]
     if one_thread:
