@@ -392,6 +392,9 @@ def compute_diagrams(args):
 
     one_thread = args.sequential
 
+    global TIMEOUT_S
+    TIMEOUT_S = args.timeout
+
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
         dsname = dataset_name(fname)
@@ -520,6 +523,12 @@ def main():
         "--sequential",
         help="Disable the multi-threading support",
         action="store_true",
+    )
+    get_diags.add_argument(
+        "-t",
+        "--timeout",
+        help="Timeout in seconds of every persistence diagram computation",
+        type=int,
     )
     get_diags.set_defaults(func=compute_diagrams)
 
