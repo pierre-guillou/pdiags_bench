@@ -37,16 +37,13 @@ def prepare_datasets(args):
         p.join()
 
 
-def ttk_dipha_print_pairs(diag):
+def get_pairs_number(diag):
     pairs = compare_diags.read_diag(diag)
-    print(f" #Min-saddle pairs: {len(pairs[0])}")
-    print(f" #Saddle-saddle pairs: {len(pairs[1])}")
-    print(f" #Saddle-max pairs: {len(pairs[2])}")
-    print(f" Total: {sum(map(len, pairs))}")
     return {
         "#Min-saddle": len(pairs[0]),
         "#Saddle-saddle": len(pairs[1]),
         "#Saddle-max": len(pairs[2]),
+        "#Total pairs": sum([len(p) for p in pairs]),
     }
 
 
@@ -162,7 +159,7 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
             "mem": get_time_mem(err)[1],
         }
         os.rename("output_port_0.vtu", outp)
-        ttk_dipha_print_pairs(outp)
+        times[dataset][key] |= get_pairs_number(outp)
         store_log(out, dataset, key.replace("/", "_"))
     except subprocess.TimeoutExpired:
         pass
@@ -198,14 +195,13 @@ def compute_dipha(fname, times, one_thread=False):
         pers = round(run_time - prec, 3)
         return prec, pers
 
-    ret = ttk_dipha_print_pairs(outp)
-    times[dataset] |= ret
     prec, pers = dipha_compute_time(out)
     times[dataset]["dipha"] = {
         "prec": prec,
         "pers": pers,
         "mem": get_time_mem(err)[1],
     }
+    times[dataset]["dipha"] |= get_pairs_number(outp)
     store_log(out, dataset, "dipha")
 
 
@@ -223,7 +219,7 @@ def compute_cubrips(fname, times):
             "pers": pers,
             "mem": mem,
         }
-        ttk_dipha_print_pairs(outp)
+        times[dataset]["CubicalRipser"] |= get_pairs_number(outp)
     except subprocess.CalledProcessError:
         print(dataset + " is too large for CubicalRipser")
     except subprocess.TimeoutExpired:
@@ -263,7 +259,7 @@ def compute_gudhi_dionysus(fname, times, backend):
             "pers": pers,
             "mem": get_time_mem(err)[1],
         }
-        ttk_dipha_print_pairs(outp)
+        times[dataset][backend] |= get_pairs_number(outp)
     except subprocess.TimeoutExpired:
         pass
 
@@ -292,7 +288,7 @@ def compute_oineus(fname, times, one_thread=False):
             "pers": pers,
             "mem": mem,
         }
-        ttk_dipha_print_pairs(outp)
+        times[dataset]["Oineus"] |= get_pairs_number(outp)
     except subprocess.TimeoutExpired:
         pass
 
@@ -322,7 +318,7 @@ def compute_diamorse(fname, times):
             for birth, death, dim in pairs:
                 dst.write(f"{dim} {birth} {death}\n")
 
-        ttk_dipha_print_pairs(outp)
+        times[dataset]["Diamorse"] |= get_pairs_number(outp)
     except subprocess.TimeoutExpired:
         pass
 
@@ -346,7 +342,7 @@ def compute_perseus(fname, times, simplicial):
         # convert output to Gudhi format
         pers2gudhi.main("out", outp)
 
-        ttk_dipha_print_pairs(outp)
+        times[dataset]["Perseus"] |= get_pairs_number(outp)
     except subprocess.TimeoutExpired:
         pass
 
@@ -373,7 +369,7 @@ def compute_eirene(fname, times):
             "mem": mem,
         }
 
-        ttk_dipha_print_pairs(outp)
+        times[dataset]["Eirene"] |= get_pairs_number(outp)
     except subprocess.TimeoutExpired:
         pass
     except subprocess.CalledProcessError:
