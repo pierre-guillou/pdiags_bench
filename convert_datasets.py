@@ -65,9 +65,14 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL):
 
     raw_stem = raw_file.split(".")[0].split("/")[-1]
     reader = read_file(raw_file)
-    raw_stem_parts = raw_stem.split("_")
-    raw_stem_parts[-2] = "x".join([str(resampl_size)] * 3)
-    raw_stem = "_".join(raw_stem_parts)
+    extent_s = "x".join([str(resampl_size)] * 3)
+    try:
+        raw_stem_parts = raw_stem.split("_")
+        raw_stem_parts[-2] = extent_s
+        raw_stem = "_".join(raw_stem_parts)
+    except IndexError:
+        # not an Open-Scivis-Datasets raw file (elevation or random)
+        raw_stem = f"{raw_stem}_{extent_s}"
 
     # convert input scalar field to float
     calc = simple.Calculator(Input=reader)
