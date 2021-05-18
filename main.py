@@ -11,6 +11,7 @@ import subprocess
 import compare_diags
 import convert_datasets
 import download_datasets
+import gen_random
 import pers2gudhi
 
 
@@ -22,11 +23,16 @@ def create_dir(dirname):
 
 
 def prepare_datasets(args):
+    create_dir("raws")
     if args.download:
         download_datasets.main(args.max_dataset_size)
 
+    # also generate a random and an elevation datasets
+    for field in ["elevation", "random"]:
+        gen_random.main(min(args.max_resample_size, 64), field, "raws")
+
     create_dir("datasets")
-    for dataset in sorted(glob.glob("raws/*.raw")):
+    for dataset in sorted(glob.glob("raws/*.raw") + glob.glob("raws/*.vti")):
         # reduce RAM usage by isolating datasets manipulation in
         # separate processes
         p = multiprocessing.Process(
