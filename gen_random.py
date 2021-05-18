@@ -1,43 +1,57 @@
-import sys
+import argparse
 
 from paraview import simple
 
 
-def main(ext, mode):
+def main(edge_size, field, dest_dir):
     fug = simple.FastUniformGrid()
-    fug.WholeExtent = [0, ext - 1, 0, ext - 1, 0, ext - 1]
+    fug.WholeExtent = [0, edge_size - 1, 0, edge_size - 1, 0, edge_size - 1]
 
-    if mode == "elev":
-        elev = simple.Elevation(Input=fug)
-        elev.LowPoint = [0, 0, 0]
-        elev.HighPoint = [ext - 1, ext - 1, ext - 1]
+    sfname = {"elevation": "Elevation", "random": "RandomPointScalars"}
 
-        pa = simple.PassArrays(Input=elev)
-        pa.PointDataArrays = ["Elevation"]
+    if field == "elevation":
+        sf = simple.Elevation(Input=fug)
+        sf.LowPoint = [0, 0, 0]
+        sf.HighPoint = [edge_size - 1, edge_size - 1, edge_size - 1]
 
-        simple.SaveData("elevation.vti", Input=pa)
+    elif field == "random":
+        sf = simple.RandomAttributes(Input=fug)
+        sf.DataType = "Float"
+        sf.ComponentRange = [0.0, 1.0]
+        sf.GeneratePointScalars = 1
+        sf.GenerateCellVectors = 0
 
-    elif mode == "rand":
-        rattr = simple.RandomAttributes(Input=fug)
-        rattr.DataType = "Float"
-        rattr.ComponentRange = [0.0, 1.0]
-        rattr.GeneratePointScalars = 1
-        rattr.GenerateCellVectors = 0
+    # rename scalar field to "ImageFile" (and convert it to float)
+    calc = simple.Calculator(Input=sf)
+    calc.Function = sfname[field]
+    calc.ResultArrayType = "Float"
+    calc.ResultArrayName = "ImageFile"
 
-        pa = simple.PassArrays(Input=rattr)
-        pa.PointDataArrays = ["RandomPointScalars"]
+    # only keep "ImageFile" field
+    pa = simple.PassArrays(Input=calc)
+    pa.PointDataArrays = ["ImageFile"]
 
-        simple.SaveData("random.vti", Input=pa)
+    simple.SaveData(f"{dest_dir}/{field}.vti", Input=pa)
 
 
 if __name__ == "__main__":
-    try:
-        ext = int(sys.argv[1])
-    except IndexError:
-        ext = 8
-    try:
-        mode = sys.argv[2]
-    except IndexError:
-        mode = "rand"
+    parser = argparse.ArgumentParser(
+        description="Generate a cubical grid with the given edge size "
+        "with a random or an elevation scalar field"
+    )
 
-    main(ext, mode)
+    parser.add_argument(
+        "edge_size", help="Number of vertices per grid edge", type=int, default=8
+    )
+    parser.add_argument(
+        "-f",
+        "--field",
+        choices=["elevation", "random"],
+        help="Generated scalar field",
+        default="random",
+    )
+    parser.add_argument("-d", "--dest_dir", help="Destination directory", default=".")
+
+    args = parser.parse_args()
+
+    main(args.edge_size, args.field, args.dest_dir)
