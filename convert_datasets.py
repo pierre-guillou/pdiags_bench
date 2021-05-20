@@ -68,7 +68,10 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL):
     extent_s = "x".join([str(resampl_size)] * 3)
     try:
         raw_stem_parts = raw_stem.split("_")
+        # update extent
         raw_stem_parts[-2] = extent_s
+        # remove data type in file name
+        raw_stem_parts.pop()
         raw_stem = "_".join(raw_stem_parts)
     except IndexError:
         # not an Open-Scivis-Datasets raw file (elevation or random)

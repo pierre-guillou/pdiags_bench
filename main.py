@@ -412,7 +412,7 @@ def compute_diagrams(args):
         # initialize compute times table
         dsname = dataset_name(fname)
         times[dsname] = {"#Threads": 1 if one_thread else multiprocessing.cpu_count()}
-        times[dsname]["#Vertices"] = dsname.split("_")[-4]
+        times[dsname]["#Vertices"] = dsname.split("_")[-3]
 
     for fname in sorted(glob.glob("datasets/*")):
         ext = fname.split(".")[-1]
