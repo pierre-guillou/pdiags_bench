@@ -1,4 +1,5 @@
 import argparse
+import time
 
 from paraview import simple
 
@@ -62,6 +63,7 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL):
         return
 
     print(f"Converting {raw_file} to input formats (resampled to {resampl_size}^3)")
+    beg = time.time()
 
     raw_stem = raw_file.split(".")[0].split("/")[-1]
     reader = read_file(raw_file)
@@ -100,8 +102,9 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL):
     rgi = simple.RemoveGhostInformation(Input=tetrah)
     # save explicit mesh
     write_output(rgi, raw_stem + "_order_expl", out_dir, True)
+    end = time.time()
 
-    print("Converted " + raw_file)
+    print(f"Converted {raw_file} (took {round(end - beg, 3)}s)")
 
 
 if __name__ == "__main__":
