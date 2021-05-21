@@ -411,10 +411,13 @@ def compute_diagrams(args):
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
         dsname = dataset_name(fname)
-        times[dsname] = {"#Threads": 1 if one_thread else multiprocessing.cpu_count()}
-        times[dsname]["#Vertices"] = dsname.split("_")[-3]
+        if times.get(dsname) is None:
+            times[dsname] = {
+                "#Threads": 1 if one_thread else multiprocessing.cpu_count(),
+                "#Vertices": dsname.split("_")[-3],
+            }
 
-    for fname in sorted(glob.glob("datasets/*")):
+        # process file according to extension
         ext = fname.split(".")[-1]
         if ext in ("vtu", "vti"):
             # our algo
