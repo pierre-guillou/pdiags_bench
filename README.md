@@ -32,7 +32,7 @@ If those requirements are too heavy, you can
 
 ```
 sudo apt install python-numpy pipx julia
-pipx install poetry
+/usr/bin/python3 -m pipx install poetry
 poetry install
 ```
 TODO: ParaView + TTK (via deb packages?)
