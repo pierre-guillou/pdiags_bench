@@ -64,27 +64,28 @@ def dataset_name(dsfile):
 
 
 TIMEOUT_S = 1800  # 30 min
-RES_MEAS = [
-    "python",
-    "subprocess_wrapper.py",
-    "--",
-    "/usr/bin/timeout",
-    "--preserve-status",
-    str(TIMEOUT_S),
-]
 
 
 def get_time_mem(txt):
-    if len(RES_MEAS) > 0:
+    try:
         time_pat = r"^Elapsed Time \(s\): (\d+\.\d+|\d+)$"
         mem_pat = r"^Peak Memory \(kB\): (\d+\.\d+|\d+)$"
         elapsed = re.search(time_pat, txt, re.MULTILINE).group(1)
         mem = re.search(mem_pat, txt, re.MULTILINE).group(1)
         return round(float(elapsed), 3), round(float(mem) / 1000)
-    return 0.0, 0.0
+    except AttributeError:
+        return 0.0, 0.0
 
 
 def launch_process(cmd, *args, **kwargs):
+    RES_MEAS = [
+        "python",
+        "subprocess_wrapper.py",
+        "--",
+        "/usr/bin/timeout",
+        "--preserve-status",
+        str(TIMEOUT_S),
+    ]
     cmd = RES_MEAS + cmd
     with subprocess.Popen(
         cmd,
@@ -545,6 +546,7 @@ def main():
         "--timeout",
         help="Timeout in seconds of every persistence diagram computation",
         type=int,
+        default=TIMEOUT_S,
     )
     get_diags.set_defaults(func=compute_diagrams)
 
