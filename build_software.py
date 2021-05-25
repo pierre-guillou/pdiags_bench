@@ -13,6 +13,10 @@ def create_dir(dirname):
 
 
 PERSEUS_URL = "https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip"
+JAVAPLEX_URL = (
+    "https://github.com/appliedtopology/javaplex"
+    "/files/2196392/javaplex-processing-lib-4.3.4.zip"
+)
 
 
 def download_perseus(perseus_url=PERSEUS_URL):
@@ -26,6 +30,20 @@ def download_perseus(perseus_url=PERSEUS_URL):
     os.remove(perseus_zip)
 
 
+def download_javaplex(jplex_url=JAVAPLEX_URL):
+    # download JAR from GitHub repository latest release
+    jplex_zip = jplex_url.split("/")[-1]
+    download_file(jplex_url, jplex_zip)
+    create_dir("javaplex")
+    with zipfile.ZipFile(jplex_zip, "r") as src:
+        src.extract("javaplex/library/javaplex.jar")
+    # move JAR to cwd
+    os.replace("javaplex/library/javaplex.jar", "javaplex.jar")
+    os.removedirs("javaplex/library")
+    # remove zip
+    os.remove(jplex_zip)
+
+
 def main():
 
     softs = [
@@ -36,6 +54,7 @@ def main():
         "oineus",
         "perseus",
         "ripser",
+        "JavaPlex",
     ]
 
     # 1. Fetch submodules
@@ -85,6 +104,8 @@ def main():
             )
         elif soft == "Eirene.jl":
             subprocess.run(["julia", "-e", 'using Pkg; Pkg.add("Eirene")'], check=True)
+        elif soft == "JavaPlex":
+            download_javaplex()
         else:
             builddir = "build_" + soft
             create_dir(builddir)
