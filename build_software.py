@@ -106,6 +106,10 @@ def main():
             subprocess.run(["julia", "-e", 'using Pkg; Pkg.add("Eirene")'], check=True)
         elif soft == "JavaPlex":
             download_javaplex()
+            subprocess.run(
+                ["javac", "-classpath", "javaplex.jar", "jplex_persistence.java"],
+                check=True,
+            )
         else:
             builddir = "build_" + soft
             create_dir(builddir)

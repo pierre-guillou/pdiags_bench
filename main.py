@@ -394,6 +394,34 @@ def compute_eirene(fname, times):
         print(">> Consider installing Julia and Eirene.jl")
 
 
+def compute_javaplex(fname, times):
+    dataset = dataset_name(fname)
+    print("Processing " + dataset + " with JavaPlex...")
+    outp = f"diagrams/{dataset}_JavaPlex.gudhi"
+    cmd = ["java", "-classpath", ".:javaplex.jar", "jplex_persistence", fname, outp]
+
+    def compute_pers_time(output):
+        pers_pat = r"^.* (\d+.\d+|\d+) seconds$"
+        pers = re.search(pers_pat, output, re.MULTILINE).group(1)
+        pers = round(float(pers), 3)
+        return pers
+
+    try:
+        out, err = launch_process(cmd)
+        elapsed, mem = get_time_mem(err)
+        pers = compute_pers_time(out)
+        times[dataset]["JavaPlex"] = {
+            "prec": round(elapsed - pers, 3),
+            "pers": pers,
+            "mem": mem,
+        }
+
+        times[dataset]["JavaPlex"].update(get_pairs_number(outp))
+        print(f"  Done in {elapsed}s")
+    except subprocess.TimeoutExpired:
+        pass
+
+
 def compute_diagrams(args):
 
     # output diagrams directory
@@ -443,6 +471,7 @@ def compute_diagrams(args):
             compute_gudhi_dionysus(fname, times, "Gudhi")
             compute_gudhi_dionysus(fname, times, "Dionysus")
             # compute_gudhi_dionysus(fname, times, "Ripser")
+            compute_javaplex(fname, times)
         elif ext == "nc":
             compute_diamorse(fname, times)
         elif ext == "eirene":

@@ -31,7 +31,7 @@ If those requirements are too heavy, you can
 1. Installing the dependencies
 
 ```
-sudo apt install python-numpy pipx julia
+sudo apt install python-numpy pipx julia default-jdk
 /usr/bin/python3 -m pipx install poetry
 poetry install
 ```
