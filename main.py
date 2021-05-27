@@ -123,7 +123,14 @@ def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=F
     else:
         print("Processing " + dataset + " with TTK-sandwich...")
     outp = f"diagrams/{dataset}.vtu"
-    cmd = ["ttkPersistenceDiagramCmd", "-i", fname, "-d", "4", "-a", "ImageFile_Order"]
+    cmd = (
+        ["ttkPersistenceDiagramCmd"]
+        + ["-i", fname]
+        + ["-B", "2"]
+        + ["-d", "4"]
+        + ["-a", "ImageFile_Order"]
+    )
+
     if one_thread:
         cmd.extend(["-t", "1"])
     key = "ttk-sandwich"
