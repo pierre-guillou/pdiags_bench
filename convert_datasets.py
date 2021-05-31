@@ -58,7 +58,24 @@ def read_file(input_file):
     return None
 
 
-def main(raw_file, out_dir="", resampl_size=RESAMPL):
+def slice_vti(input_vti, resampl_size=RESAMPL, for_implicit=True):
+    # force generation of input_vti (otherwise, slice is empty)
+    simple.Show(input_vti)
+    sl = simple.Slice(Input=input_vti)
+    # slice along depth/z axis
+    sl.SliceType.Normal = [0.0, 0.0, 1.0]
+    if for_implicit:
+        # slice are Polygonal Meshes
+        rsi = simple.ResampleToImage(Input=sl)
+        rsi.SamplingDimensions = [resampl_size, resampl_size, 1]
+        # trash input scalar field, save order field
+        pa = simple.PassArrays(Input=rsi)
+        pa.PointDataArrays = ["ImageFile_Order"]
+        return pa
+    return sl
+
+
+def main(raw_file, out_dir="", resampl_size=RESAMPL, slice2d=False):
     if raw_file == "":
         return
 
@@ -90,12 +107,19 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL):
     # compute order field
     arrprec = simple.TTKArrayPreconditioning(Input=rsi)
     arrprec.PointDataArrays = ["ImageFile"]
+
     # trash input scalar field, save order field
     pa = simple.PassArrays(Input=arrprec)
     pa.PointDataArrays = ["ImageFile_Order"]
-    # save implicit mesh
-    write_output(pa, raw_stem + "_order_impl", out_dir, False)
 
+    # save implicit mesh
+    out_vti = pa
+    if slice2d:
+        out_vti = slice_vti(pa, resampl_size, True)
+    write_output(out_vti, raw_stem + "_order_impl", out_dir, False)
+
+    if slice2d:
+        pa = slice_vti(pa, resampl_size, False)
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
     # remove vtkGhostType arrays (only applies on vtu & vtp)
@@ -123,7 +147,13 @@ if __name__ == "__main__":
         help="Resampling to a cube of given vertices edge",
         default=RESAMPL,
     )
+    parser.add_argument(
+        "-2",
+        "--slice",
+        action="store_true",
+        help="Generate a 2D slice",
+    )
 
     args = parser.parse_args()
 
-    main(args.raw_file, args.dest_dir, args.resampling_size)
+    main(args.raw_file, args.dest_dir, args.resampling_size, args.slice)
