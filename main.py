@@ -227,7 +227,11 @@ def compute_cubrips(fname, times):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with CubicalRipser...")
     outp = f"diagrams/{dataset}.cr"
-    cmd = ["CubicalRipser/CR3", fname, "--output", outp]
+    if "x1" in dataset:
+        binary = "CubicalRipser_2dim/CR2"
+    else:
+        binary = "CubicalRipser_3dim/CR3"
+    cmd = [binary, fname, "--output", outp]
 
     try:
         _, err = launch_process(cmd)
