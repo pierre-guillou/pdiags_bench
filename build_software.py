@@ -47,7 +47,8 @@ def download_javaplex(jplex_url=JAVAPLEX_URL):
 def main():
 
     softs = [
-        "CubicalRipser",
+        "CubicalRipser_2dim",
+        "CubicalRipser_3dim",
         "diamorse",
         "dipha",
         "Eirene.jl",
@@ -62,7 +63,7 @@ def main():
 
     # 2. Build each library
     for soft in softs:
-        if soft == "CubicalRipser":
+        if "CubicalRipser" in soft:
             # build CubicalRipser
             subprocess.run(["make"], cwd=soft, check=True)
         elif soft == "perseus":
