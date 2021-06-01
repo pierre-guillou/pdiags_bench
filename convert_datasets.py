@@ -58,23 +58,6 @@ def read_file(input_file):
     return None
 
 
-def slice_vti(input_vti, resampl_size=RESAMPL, for_implicit=True):
-    # force generation of input_vti (otherwise, slice is empty)
-    simple.Show(input_vti)
-    sl = simple.Slice(Input=input_vti)
-    # slice along depth/z axis
-    sl.SliceType.Normal = [0.0, 0.0, 1.0]
-    if for_implicit:
-        # slice are Polygonal Meshes
-        rsi = simple.ResampleToImage(Input=sl)
-        rsi.SamplingDimensions = [resampl_size, resampl_size, 1]
-        # trash input scalar field, save order field
-        pa = simple.PassArrays(Input=rsi)
-        pa.PointDataArrays = ["ImageFile_Order"]
-        return pa
-    return sl
-
-
 def main(raw_file, out_dir="", resampl_size=RESAMPL, slice2d=False):
     if raw_file == "":
         return
@@ -103,9 +86,21 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL, slice2d=False):
     calc.Function = "ImageFile"
     calc.ResultArrayType = "Float"
     calc.ResultArrayName = "ImageFile"
+
+    # get a 2D slice
+    dims = [resampl_size] * 3
+    if slice2d:
+        # force generation of input_vti (otherwise, slice is empty)
+        simple.Show(calc)
+        # slice along depth/z axis
+        sl = simple.Slice(Input=calc)
+        sl.SliceType.Normal = [0.0, 0.0, 1.0]
+        dims = [resampl_size] * 2 + [1]
+
     # resample to 192^3
-    rsi = simple.ResampleToImage(Input=calc)
-    rsi.SamplingDimensions = [resampl_size] * 3
+    rsi = simple.ResampleToImage(Input=sl if slice2d else calc)
+    rsi.SamplingDimensions = dims
+
     # compute order field
     arrprec = simple.TTKArrayPreconditioning(Input=rsi)
     arrprec.PointDataArrays = ["ImageFile"]
@@ -115,13 +110,8 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL, slice2d=False):
     pa.PointDataArrays = ["ImageFile_Order"]
 
     # save implicit mesh
-    out_vti = pa
-    if slice2d:
-        out_vti = slice_vti(pa, resampl_size, True)
-    write_output(out_vti, raw_stem + "_order_impl", out_dir, False)
+    write_output(pa, raw_stem + "_order_impl", out_dir, False)
 
-    if slice2d:
-        pa = slice_vti(pa, resampl_size, False)
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
     # remove vtkGhostType arrays (only applies on vtu & vtp)
