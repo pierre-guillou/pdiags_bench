@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import enum
 import glob
 import json
 import multiprocessing
@@ -113,33 +114,41 @@ def store_log(log, ds_name, app):
         dst.write(log)
 
 
-def compute_ttk(fname, times, dipha_offload=False, hybrid_pp=False, one_thread=False):
+class TTKBackend(enum.Enum):
+    FTM = 0
+    SANDWICH = 1
+    DIPHA = 2
+    DIPHAPP = 3
+
+
+def compute_ttk(fname, times, backend, one_thread=False):
     dataset = dataset_name(fname)
-    if dipha_offload:
-        if hybrid_pp:
-            print("Processing " + dataset + " with TTK-sandwich/Dipha...")
-        else:
-            print("Processing " + dataset + " with TTK/Dipha...")
-    else:
-        print("Processing " + dataset + " with TTK-sandwich...")
     outp = f"diagrams/{dataset}.vtu"
     cmd = (
         ["ttkPersistenceDiagramCmd"]
         + ["-i", fname]
-        + ["-B", "2"]
         + ["-d", "4"]
         + ["-a", "ImageFile_Order"]
     )
 
+    if backend == TTKBackend.FTM:
+        cmd += ["-B", "0"]
+        key = "TTK-FTM"
+    elif backend == TTKBackend.SANDWICH:
+        cmd += ["-B", "2"]
+        key = "TTK-Sandwich"
+    elif backend == TTKBackend.DIPHA:
+        cmd += ["-B", "2", "-wd"]
+        key = "TTK/Dipha"
+    elif backend == TTKBackend.DIPHAPP:
+        cmd += ["-B", "2", "-wd", "-dpp"]
+        key = "TTK-Sandwich/Dipha"
+
+    print(f"Processing {dataset} with {key}...")
+    key = key.lower()
+
     if one_thread:
         cmd.extend(["-t", "1"])
-    key = "ttk-sandwich"
-    if dipha_offload:
-        cmd.append("-wd")
-        key = "ttk/dipha"
-        if hybrid_pp:
-            cmd.append("-dpp")
-            key = "ttk-sandwich/dipha"
 
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
@@ -460,14 +469,18 @@ def compute_diagrams(args):
         # process file according to extension
         ext = fname.split(".")[-1]
         if ext in ("vtu", "vti"):
-            # our algo
-            compute_ttk(fname, times, one_thread=one_thread)
-            # ttk-hybrid: offload Morse-Smale complex to Dipha
-            compute_ttk(fname, times, dipha_offload=True, one_thread=one_thread)
-            # ttk-hybrid++: offload saddle connectors to Dipha
-            compute_ttk(
-                fname, times, dipha_offload=True, hybrid_pp=True, one_thread=one_thread
-            )
+            if "x1" in fname:
+                # FTM in 2D
+                compute_ttk(fname, times, TTKBackend.FTM, one_thread=one_thread)
+                # and our algo
+                compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=one_thread)
+            else:
+                # our algo
+                compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=one_thread)
+                # ttk-hybrid: offload Morse-Smale complex to Dipha
+                compute_ttk(fname, times, TTKBackend.DIPHA, one_thread=one_thread)
+                # ttk-hybrid++: offload saddle connectors to Dipha
+                compute_ttk(fname, times, TTKBackend.DIPHAPP, one_thread=one_thread)
         elif ext == "dipha":
             compute_dipha(fname, times, one_thread)
             if "impl" in fname:
