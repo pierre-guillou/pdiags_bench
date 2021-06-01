@@ -85,6 +85,8 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL, slice2d=False):
     raw_stem = raw_file.split(".")[0].split("/")[-1]
     reader = read_file(raw_file)
     extent_s = "x".join([str(resampl_size)] * 3)
+    if slice2d:
+        extent_s = "x".join([str(resampl_size)] * 2 + ["1"])
     try:
         raw_stem_parts = raw_stem.split("_")
         # update extent
