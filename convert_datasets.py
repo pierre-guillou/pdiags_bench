@@ -1,4 +1,5 @@
 import argparse
+import enum
 import time
 
 from paraview import simple
@@ -58,18 +59,28 @@ def read_file(input_file):
     return None
 
 
-def main(raw_file, out_dir="", resampl_size=RESAMPL, slice2d=False):
+class SliceType(enum.Enum):
+    VOL = 0
+    SURF = 1
+    LINE = 2
+
+
+def main(raw_file, out_dir="", resampl_size=RESAMPL, slice_type=SliceType.VOL):
     if raw_file == "":
         return
 
-    print(f"Converting {raw_file} to input formats (resampled to {resampl_size}^3)")
-    beg = time.time()
-
     raw_stem = raw_file.split(".")[0].split("/")[-1]
     reader = read_file(raw_file)
-    extent_s = "x".join([str(resampl_size)] * 3)
-    if slice2d:
+    if slice_type == SliceType.VOL:
+        extent_s = "x".join([str(resampl_size)] * 3)
+    elif slice_type == SliceType.SURF:
         extent_s = "x".join([str(resampl_size)] * 2 + ["1"])
+    elif slice_type == SliceType.LINE:
+        extent_s = "x".join([str(resampl_size)] + ["1"] * 2)
+
+    print(f"Converting {raw_file} to input formats (resampled to {extent_s})")
+    beg = time.time()
+
     try:
         raw_stem_parts = raw_stem.split("_")
         # update extent
@@ -88,17 +99,26 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL, slice2d=False):
     calc.ResultArrayName = "ImageFile"
 
     # get a 2D slice
-    dims = [resampl_size] * 3
-    if slice2d:
+    if slice_type == SliceType.VOL:
+        dims = [resampl_size] * 3
+        cut = calc
+    elif slice_type in (SliceType.SURF, SliceType.LINE):
         # force generation of input_vti (otherwise, slice is empty)
         simple.Show(calc)
         # slice along depth/z axis
-        sl = simple.Slice(Input=calc)
-        sl.SliceType.Normal = [0.0, 0.0, 1.0]
+        sl0 = simple.Slice(Input=calc)
+        sl0.SliceType.Normal = [0.0, 0.0, 1.0]
         dims = [resampl_size] * 2 + [1]
+        cut = sl0
+        if slice_type == SliceType.LINE:
+            # slice along vertical/y axis
+            sl1 = simple.Slice(Input=sl0)
+            sl1.SliceType.Normal = [0.0, 1.0, 0.0]
+            dims = [resampl_size] + [1] * 2
+            cut = sl1
 
     # resample to 192^3
-    rsi = simple.ResampleToImage(Input=sl if slice2d else calc)
+    rsi = simple.ResampleToImage(Input=cut)
     rsi.SamplingDimensions = dims
 
     # compute order field
@@ -145,7 +165,22 @@ if __name__ == "__main__":
         action="store_true",
         help="Generate a 2D slice",
     )
-
+    parser.add_argument(
+        "-1",
+        "--line",
+        action="store_true",
+        help="Generate a 1D line",
+    )
     args = parser.parse_args()
 
-    main(args.raw_file, args.dest_dir, args.resampling_size, args.slice)
+    if args.line and args.slice:
+        raise argparse.ArgumentError
+
+    if args.slice:
+        stype = SliceType.SURF
+    elif args.line:
+        stype = SliceType.LINE
+    else:
+        stype = SliceType.VOL
+
+    main(args.raw_file, args.dest_dir, args.resampling_size, stype)
