@@ -21,7 +21,7 @@ def compute_diagram(input_dataset, nthreads):
             grid,
             negate=False,
             wrap=False,
-            top_d=3,
+            top_d=dim,
             n_threads=nthreads,
         )
 
