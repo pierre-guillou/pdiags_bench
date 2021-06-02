@@ -243,7 +243,7 @@ def compute_dipha(fname, times, one_thread=False):
 def compute_cubrips(fname, times):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with CubicalRipser...")
-    outp = f"diagrams/{dataset}.cr"
+    outp = f"diagrams/{dataset}_CubicalRipser.dipha"
     if "x1" in dataset:
         binary = "CubicalRipser_2dim/CR2"
     else:
