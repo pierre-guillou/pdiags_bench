@@ -74,6 +74,7 @@ def dataset_name(dsfile):
 
 
 TIMEOUT_S = 1800  # 30 min
+SEQUENTIAL = False  # parallel
 
 
 def get_time_mem(txt):
@@ -130,7 +131,7 @@ class TTKBackend(enum.Enum):
     DIPHAPP = 3
 
 
-def compute_ttk(fname, times, backend, one_thread=False):
+def compute_ttk(fname, times, backend):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}.vtu"
     cmd = (
@@ -156,7 +157,7 @@ def compute_ttk(fname, times, backend, one_thread=False):
     print(f"Processing {dataset} with {key}...")
     key = key.lower()
 
-    if one_thread:
+    if SEQUENTIAL:
         cmd.extend(["-t", "1"])
 
     def ttk_compute_time(ttk_output):
@@ -202,12 +203,12 @@ def compute_ttk(fname, times, backend, one_thread=False):
         pass
 
 
-def compute_dipha(fname, times, one_thread=False):
+def compute_dipha(fname, times):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with Dipha...")
     outp = f"diagrams/{dataset}.dipha"
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
-    if not one_thread:
+    if not SEQUENTIAL:
         cmd = ["mpirun", "--use-hwthread-cpus"] + cmd
 
     out, err = launch_process(cmd)
@@ -296,7 +297,7 @@ def compute_gudhi_dionysus(fname, times, backend):
     print(f"  Done in {elapsed}s")
 
 
-def compute_oineus(fname, times, one_thread=False):
+def compute_oineus(fname, times):
     dataset = dataset_name(fname)
     print(f"Processing {dataset} with Oineus...")
     outp = f"diagrams/{dataset}_Oineus.gudhi"
@@ -308,7 +309,7 @@ def compute_oineus(fname, times, one_thread=False):
 
     # launch with subprocess to capture stdout from the C++ library
     cmd = ["python3", "oineus_persistence.py", fname, "-o", outp]
-    if not one_thread:
+    if not SEQUENTIAL:
         cmd.extend(["-t", str(multiprocessing.cpu_count())])
 
     _, err = launch_process(cmd)
@@ -423,30 +424,30 @@ def compute_javaplex(fname, times):
     print(f"  Done in {elapsed}s")
 
 
-def dispatch(fname, times, seq=False):
+def dispatch(fname, times):
     # process file according to extension
     ext = fname.split(".")[-1]
 
     if ext in ("vtu", "vti"):
         if "x1" in fname:
             # FTM in 2D
-            compute_ttk(fname, times, TTKBackend.FTM, one_thread=seq)
+            compute_ttk(fname, times, TTKBackend.FTM)
             # and our algo
-            compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=seq)
+            compute_ttk(fname, times, TTKBackend.SANDWICH)
         else:
             # our algo
-            compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=seq)
+            compute_ttk(fname, times, TTKBackend.SANDWICH)
             # ttk-hybrid: offload Morse-Smale complex to Dipha
-            compute_ttk(fname, times, TTKBackend.DIPHA, one_thread=seq)
+            compute_ttk(fname, times, TTKBackend.DIPHA)
             # ttk-hybrid++: offload saddle connectors to Dipha
-            compute_ttk(fname, times, TTKBackend.DIPHAPP, one_thread=seq)
+            compute_ttk(fname, times, TTKBackend.DIPHAPP)
     elif ext == "dipha":
-        compute_dipha(fname, times, seq)
+        compute_dipha(fname, times)
         if "impl" in fname:
             compute_cubrips(fname, times)
     elif ext == "pers" and "impl" in fname:
         compute_gudhi_dionysus(fname, times, "Gudhi")
-        compute_oineus(fname, times, seq)
+        compute_oineus(fname, times)
         compute_perseus(fname, times, False)
     elif ext == "pers" and "expl" in fname:
         compute_perseus(fname, times, True)
@@ -471,8 +472,11 @@ def compute_diagrams(args):
     # store computation times
     times = dict()
 
+    # pylint: disable=W0603
     global TIMEOUT_S
     TIMEOUT_S = args.timeout
+    global SEQUENTIAL
+    SEQUENTIAL = args.sequential
 
     result_fname = f"results_{datetime.datetime.now().isoformat()}.json"
 
@@ -486,7 +490,7 @@ def compute_diagrams(args):
             }
 
         try:
-            dispatch(fname, times, args.sequential)
+            dispatch(fname, times)
         except subprocess.TimeoutExpired:
             pass
         except subprocess.CalledProcessError:
