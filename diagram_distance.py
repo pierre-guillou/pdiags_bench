@@ -25,26 +25,28 @@ class DistMethod(enum.Enum):
         return super().name.lower()
 
 
-def compare_diags(fdiag0, fdiag1, method=DistMethod.AUCTION):
+def compare_diags(fdiag0, fdiag1, thr_bound, method=DistMethod.AUCTION):
     diag0 = load_diagram(fdiag0)
     diag1 = load_diagram(fdiag1)
-    thr_bound = 0.01
 
     if method == DistMethod.AUCTION:
         gd = simple.GroupDatasets(Input=[diag0, diag1])
+        thrange = gd.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr = simple.Threshold(Input=gd)
         thr.Scalars = ["CELLS", "Persistence"]
-        thr.ThresholdRange = [thr_bound, 1.0]
+        thr.ThresholdRange = [thr_bound * thrange[1], thrange[1]]
         dist = simple.TTKPersistenceDiagramClustering(Input=thr)
         dist.Maximalcomputationtimes = 10.0
 
     elif method == DistMethod.BOTTLENECK:
+        thr0range = diag0.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr0 = simple.Threshold(Input=diag0)
         thr0.Scalars = ["CELLS", "Persistence"]
-        thr0.ThresholdRange = [thr_bound, 1.0]
+        thr0.ThresholdRange = [thr_bound * thr0range[1], thr0range[1]]
+        thr1range = diag1.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr1 = simple.Threshold(Input=diag1)
         thr1.Scalars = ["CELLS", "Persistence"]
-        thr1.ThresholdRange = [thr_bound, 1.0]
+        thr1.ThresholdRange = [thr_bound * thr1range[1], thr1range[1]]
         dist = simple.TTKBottleneckDistance(
             Persistencediagram1=thr0,
             Persistencediagram2=thr1,
@@ -54,7 +56,7 @@ def compare_diags(fdiag0, fdiag1, method=DistMethod.AUCTION):
     os.remove("dist.vtu")
 
 
-def main(fdiag0, fdiag1, method):
+def main(fdiag0, fdiag1, threshold_bound, method):
     float_re = r"(\d+\.\d+|\d+)"
     if method == DistMethod.AUCTION:
         pattern = re.compile(
@@ -64,7 +66,13 @@ def main(fdiag0, fdiag1, method):
         pattern = re.compile(rf"diag(?:Max|Min|Sad)\({float_re}\)")
 
     # launch compare_diags through subprocess to capture stdout
-    cmd = ["python", __file__, "-p", fdiag0, fdiag1, "-m", str(method)]
+    cmd = (
+        ["python", __file__]
+        + ["-p", fdiag0, fdiag1]
+        + ["-m", str(method)]
+        + ["-t", str(threshold_bound)]
+    )
+
     proc = subprocess.run(cmd, capture_output=True, check=True)
     matches = re.findall(pattern, str(proc.stdout))
     matches = [float(m) for m in matches]
@@ -92,6 +100,13 @@ if __name__ == "__main__":
         default="auction",
     )
     parser.add_argument(
+        "-t",
+        "--threshold_value",
+        type=float,
+        help="Threshold persistence below value before computing distance",
+        default=0.01,
+    )
+    parser.add_argument(
         "-p",
         "--pipeline",
         action="store_true",
@@ -107,6 +122,6 @@ if __name__ == "__main__":
         raise argparse.ArgumentError
 
     if args.pipeline:
-        compare_diags(args.diag0, args.diag1, distmeth)
+        compare_diags(args.diag0, args.diag1, args.threshold_value, distmeth)
     else:
-        main(args.diag0, args.diag1, distmeth)
+        main(args.diag0, args.diag1, args.threshold_value, distmeth)
