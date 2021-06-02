@@ -497,15 +497,15 @@ def compute_diagrams(args):
     return times
 
 
-def compute_distances(_, method="auction"):
+def compute_distances(args):
     # list of datasets that have at least one persistence diagram
     datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
 
     dists = dict()
 
-    if method == "auction":
+    if args.method == "auction":
         distmeth = diagram_distance.DistMethod.AUCTION
-    elif method == "bottleneck":
+    elif args.method == "bottleneck":
         distmeth = diagram_distance.DistMethod.BOTTLENECK
 
     for ds in datasets:
@@ -515,8 +515,12 @@ def compute_distances(_, method="auction"):
 
         if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
             dists[ds] = {
-                "ttk-dipha": diagram_distance.main(dipha_diag, ttk_diag, distmeth),
-                "empty-dipha": diagram_distance.main(dipha_diag, empty_diag, distmeth),
+                "ttk-dipha": diagram_distance.main(
+                    dipha_diag, ttk_diag, args.threshold_value, distmeth
+                ),
+                "empty-dipha": diagram_distance.main(
+                    dipha_diag, empty_diag, args.threshold_value, distmeth
+                ),
             }
 
     with open("distances", "w") as dst:
@@ -574,6 +578,20 @@ def main():
 
     get_dists = subparsers.add_parser("compute_distances")
     get_dists.set_defaults(func=compute_distances)
+    get_dists.add_argument(
+        "-m",
+        "--method",
+        help="Comparison method",
+        choices=["auction", "bottleneck"],
+        default="auction",
+    )
+    get_dists.add_argument(
+        "-t",
+        "--threshold_value",
+        type=float,
+        help="Threshold persistence below value before computing distance",
+        default=0.01,
+    )
 
     cli_args = parser.parse_args()
 
