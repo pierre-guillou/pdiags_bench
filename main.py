@@ -183,20 +183,17 @@ def compute_ttk(fname, times, backend, one_thread=False):
         except AttributeError:
             return 0.0
 
-    try:
-        out, err = launch_process(cmd)
-        elapsed, mem = get_time_mem(err)
-        times[dataset][key] = {
-            "prec": round(ttk_prec_time(out), 3),
-            "pers": round(ttk_compute_time(out), 3),
-            "mem": mem,
-        }
-        os.rename("output_port_0.vtu", outp)
-        times[dataset][key].update(get_pairs_number(outp))
-        store_log(out, dataset, key.replace("/", "_"))
-        print(f"  Done in {elapsed}s")
-    except subprocess.TimeoutExpired:
-        pass
+    out, err = launch_process(cmd)
+    elapsed, mem = get_time_mem(err)
+    times[dataset][key] = {
+        "prec": round(ttk_prec_time(out), 3),
+        "pers": round(ttk_compute_time(out), 3),
+        "mem": mem,
+    }
+    os.rename("output_port_0.vtu", outp)
+    times[dataset][key].update(get_pairs_number(outp))
+    store_log(out, dataset, key.replace("/", "_"))
+    print(f"  Done in {elapsed}s")
 
     try:
         os.remove("morse.dipha")
@@ -251,20 +248,15 @@ def compute_cubrips(fname, times):
         binary = "CubicalRipser_3dim/CR3"
     cmd = [binary, fname, "--output", outp]
 
-    try:
-        _, err = launch_process(cmd)
-        elapsed, mem = get_time_mem(err)
-        times[dataset]["CubicalRipser"] = {
-            "prec": 0.0,
-            "pers": elapsed,
-            "mem": mem,
-        }
-        times[dataset]["CubicalRipser"].update(get_pairs_number(outp))
-        print(f"  Done in {elapsed}s")
-    except subprocess.CalledProcessError:
-        print(dataset + " is too large for CubicalRipser")
-    except subprocess.TimeoutExpired:
-        pass
+    _, err = launch_process(cmd)
+    elapsed, mem = get_time_mem(err)
+    times[dataset]["CubicalRipser"] = {
+        "prec": 0.0,
+        "pers": elapsed,
+        "mem": mem,
+    }
+    times[dataset]["CubicalRipser"].update(get_pairs_number(outp))
+    print(f"  Done in {elapsed}s")
 
 
 def compute_gudhi_dionysus(fname, times, backend):
@@ -292,19 +284,16 @@ def compute_gudhi_dionysus(fname, times, backend):
         + ["-b", backend.lower()]
     )
 
-    try:
-        out, err = launch_process(cmd)
-        prec, pers = compute_time(out)
-        elapsed, mem = get_time_mem(err)
-        times[dataset][backend] = {
-            "prec": prec,
-            "pers": pers,
-            "mem": mem,
-        }
-        times[dataset][backend].update(get_pairs_number(outp))
-        print(f"  Done in {elapsed}s")
-    except subprocess.TimeoutExpired:
-        pass
+    out, err = launch_process(cmd)
+    prec, pers = compute_time(out)
+    elapsed, mem = get_time_mem(err)
+    times[dataset][backend] = {
+        "prec": prec,
+        "pers": pers,
+        "mem": mem,
+    }
+    times[dataset][backend].update(get_pairs_number(outp))
+    print(f"  Done in {elapsed}s")
 
 
 def compute_oineus(fname, times, one_thread=False):
@@ -322,19 +311,16 @@ def compute_oineus(fname, times, one_thread=False):
     if not one_thread:
         cmd.extend(["-t", str(multiprocessing.cpu_count())])
 
-    try:
-        _, err = launch_process(cmd)
-        pers = oineus_compute_time(err)
-        elapsed, mem = get_time_mem(err)
-        times[dataset]["Oineus"] = {
-            "prec": round(elapsed - pers, 3),
-            "pers": pers,
-            "mem": mem,
-        }
-        times[dataset]["Oineus"].update(get_pairs_number(outp))
-        print(f"  Done in {elapsed}s")
-    except subprocess.TimeoutExpired:
-        pass
+    _, err = launch_process(cmd)
+    pers = oineus_compute_time(err)
+    elapsed, mem = get_time_mem(err)
+    times[dataset]["Oineus"] = {
+        "prec": round(elapsed - pers, 3),
+        "pers": pers,
+        "mem": mem,
+    }
+    times[dataset]["Oineus"].update(get_pairs_number(outp))
+    print(f"  Done in {elapsed}s")
 
 
 def compute_diamorse(fname, times):
@@ -343,29 +329,26 @@ def compute_diamorse(fname, times):
     outp = f"diagrams/{dataset}_Diamorse.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r"]
 
-    try:
-        out, err = launch_process(cmd, env=dict())  # reset environment for Python2
-        elapsed, mem = get_time_mem(err)
-        times[dataset]["Diamorse"] = {
-            "prec": 0.0,
-            "pers": elapsed,
-            "mem": mem,
-        }
+    out, err = launch_process(cmd, env=dict())  # reset environment for Python2
+    elapsed, mem = get_time_mem(err)
+    times[dataset]["Diamorse"] = {
+        "prec": 0.0,
+        "pers": elapsed,
+        "mem": mem,
+    }
 
-        # convert output to Gudhi format on-the-fly
-        pairs = list()
-        for line in out.splitlines():
-            if line.startswith("#"):
-                continue
-            pairs.append(line.split()[:3])
-        with open(outp, "w") as dst:
-            for birth, death, dim in pairs:
-                dst.write(f"{dim} {birth} {death}\n")
+    # convert output to Gudhi format on-the-fly
+    pairs = list()
+    for line in out.splitlines():
+        if line.startswith("#"):
+            continue
+        pairs.append(line.split()[:3])
+    with open(outp, "w") as dst:
+        for birth, death, dim in pairs:
+            dst.write(f"{dim} {birth} {death}\n")
 
-        times[dataset]["Diamorse"].update(get_pairs_number(outp))
-        print(f"  Done in {elapsed}s")
-    except subprocess.TimeoutExpired:
-        pass
+    times[dataset]["Diamorse"].update(get_pairs_number(outp))
+    print(f"  Done in {elapsed}s")
 
 
 def compute_perseus(fname, times, simplicial):
@@ -375,22 +358,19 @@ def compute_perseus(fname, times, simplicial):
     subc = "simtop" if simplicial else "cubtop"
     cmd = ["perseus/perseus", subc, fname, "out"]
 
-    try:
-        _, err = launch_process(cmd)
-        elapsed, mem = get_time_mem(err)
-        times[dataset]["Perseus"] = {
-            "prec": 0.0,
-            "pers": elapsed,
-            "mem": mem,
-        }
+    _, err = launch_process(cmd)
+    elapsed, mem = get_time_mem(err)
+    times[dataset]["Perseus"] = {
+        "prec": 0.0,
+        "pers": elapsed,
+        "mem": mem,
+    }
 
-        # convert output to Gudhi format
-        pers2gudhi.main("out", outp)
+    # convert output to Gudhi format
+    pers2gudhi.main("out", outp)
 
-        times[dataset]["Perseus"].update(get_pairs_number(outp))
-        print(f"  Done in {elapsed}s")
-    except subprocess.TimeoutExpired:
-        pass
+    times[dataset]["Perseus"].update(get_pairs_number(outp))
+    print(f"  Done in {elapsed}s")
 
 
 def compute_eirene(fname, times):
@@ -405,22 +385,17 @@ def compute_eirene(fname, times):
         pers = round(float(pers), 3)
         return pers
 
-    try:
-        out, err = launch_process(cmd)
-        elapsed, mem = get_time_mem(err)
-        pers = compute_pers_time(out)
-        times[dataset]["Eirene"] = {
-            "prec": round(elapsed - pers, 3),
-            "pers": pers,
-            "mem": mem,
-        }
+    out, err = launch_process(cmd)
+    elapsed, mem = get_time_mem(err)
+    pers = compute_pers_time(out)
+    times[dataset]["Eirene"] = {
+        "prec": round(elapsed - pers, 3),
+        "pers": pers,
+        "mem": mem,
+    }
 
-        times[dataset]["Eirene"].update(get_pairs_number(outp))
-        print(f"  Done in {elapsed}s")
-    except subprocess.TimeoutExpired:
-        pass
-    except subprocess.CalledProcessError:
-        print(">> Consider installing Julia and Eirene.jl")
+    times[dataset]["Eirene"].update(get_pairs_number(outp))
+    print(f"  Done in {elapsed}s")
 
 
 def compute_javaplex(fname, times):
@@ -435,20 +410,17 @@ def compute_javaplex(fname, times):
         pers = round(float(pers), 3)
         return pers
 
-    try:
-        out, err = launch_process(cmd)
-        elapsed, mem = get_time_mem(err)
-        pers = compute_pers_time(out)
-        times[dataset]["JavaPlex"] = {
-            "prec": round(elapsed - pers, 3),
-            "pers": pers,
-            "mem": mem,
-        }
+    out, err = launch_process(cmd)
+    elapsed, mem = get_time_mem(err)
+    pers = compute_pers_time(out)
+    times[dataset]["JavaPlex"] = {
+        "prec": round(elapsed - pers, 3),
+        "pers": pers,
+        "mem": mem,
+    }
 
-        times[dataset]["JavaPlex"].update(get_pairs_number(outp))
-        print(f"  Done in {elapsed}s")
-    except subprocess.TimeoutExpired:
-        pass
+    times[dataset]["JavaPlex"].update(get_pairs_number(outp))
+    print(f"  Done in {elapsed}s")
 
 
 def compute_diagrams(args):
@@ -461,7 +433,7 @@ def compute_diagrams(args):
     # store computation times
     times = dict()
 
-    one_thread = args.sequential
+    ot = args.sequential  # one thread
 
     global TIMEOUT_S
     TIMEOUT_S = args.timeout
@@ -473,44 +445,50 @@ def compute_diagrams(args):
         dsname = dataset_name(fname)
         if times.get(dsname) is None:
             times[dsname] = {
-                "#Threads": 1 if one_thread else multiprocessing.cpu_count(),
+                "#Threads": 1 if ot else multiprocessing.cpu_count(),
                 "#Vertices": dsname.split("_")[-3],
             }
 
         # process file according to extension
         ext = fname.split(".")[-1]
-        if ext in ("vtu", "vti"):
-            if "x1" in fname:
-                # FTM in 2D
-                compute_ttk(fname, times, TTKBackend.FTM, one_thread=one_thread)
-                # and our algo
-                compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=one_thread)
-            else:
-                # our algo
-                compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=one_thread)
-                # ttk-hybrid: offload Morse-Smale complex to Dipha
-                compute_ttk(fname, times, TTKBackend.DIPHA, one_thread=one_thread)
-                # ttk-hybrid++: offload saddle connectors to Dipha
-                compute_ttk(fname, times, TTKBackend.DIPHAPP, one_thread=one_thread)
-        elif ext == "dipha":
-            compute_dipha(fname, times, one_thread)
-            if "impl" in fname:
-                compute_cubrips(fname, times)
-        elif ext == "pers" and "impl" in fname:
-            compute_gudhi_dionysus(fname, times, "Gudhi")
-            compute_oineus(fname, times, one_thread)
-            compute_perseus(fname, times, False)
-        elif ext == "pers" and "expl" in fname:
-            compute_perseus(fname, times, True)
-        elif ext == "tsc":
-            compute_gudhi_dionysus(fname, times, "Gudhi")
-            compute_gudhi_dionysus(fname, times, "Dionysus")
-            # compute_gudhi_dionysus(fname, times, "Ripser")
-            compute_javaplex(fname, times)
-        elif ext == "nc":
-            compute_diamorse(fname, times)
-        elif ext == "eirene":
-            compute_eirene(fname, times)
+        try:
+            if ext in ("vtu", "vti"):
+                if "x1" in fname:
+                    # FTM in 2D
+                    compute_ttk(fname, times, TTKBackend.FTM, one_thread=ot)
+                    # and our algo
+                    compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=ot)
+                else:
+                    # our algo
+                    compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=ot)
+                    # ttk-hybrid: offload Morse-Smale complex to Dipha
+                    compute_ttk(fname, times, TTKBackend.DIPHA, one_thread=ot)
+                    # ttk-hybrid++: offload saddle connectors to Dipha
+                    compute_ttk(fname, times, TTKBackend.DIPHAPP, one_thread=ot)
+            elif ext == "dipha":
+                compute_dipha(fname, times, ot)
+                if "impl" in fname:
+                    compute_cubrips(fname, times)
+            elif ext == "pers" and "impl" in fname:
+                compute_gudhi_dionysus(fname, times, "Gudhi")
+                compute_oineus(fname, times, ot)
+                compute_perseus(fname, times, False)
+            elif ext == "pers" and "expl" in fname:
+                compute_perseus(fname, times, True)
+            elif ext == "tsc":
+                compute_gudhi_dionysus(fname, times, "Gudhi")
+                compute_gudhi_dionysus(fname, times, "Dionysus")
+                # compute_gudhi_dionysus(fname, times, "Ripser")
+                compute_javaplex(fname, times)
+            elif ext == "nc":
+                compute_diamorse(fname, times)
+            elif ext == "eirene":
+                compute_eirene(fname, times)
+
+        except subprocess.TimeoutExpired:
+            pass
+        except subprocess.CalledProcessError:
+            pass
 
         # write partial results after every dataset computation
         with open(result_fname, "w") as dst:
