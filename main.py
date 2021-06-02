@@ -423,6 +423,44 @@ def compute_javaplex(fname, times):
     print(f"  Done in {elapsed}s")
 
 
+def dispatch(fname, times, seq=False):
+    # process file according to extension
+    ext = fname.split(".")[-1]
+
+    if ext in ("vtu", "vti"):
+        if "x1" in fname:
+            # FTM in 2D
+            compute_ttk(fname, times, TTKBackend.FTM, one_thread=seq)
+            # and our algo
+            compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=seq)
+        else:
+            # our algo
+            compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=seq)
+            # ttk-hybrid: offload Morse-Smale complex to Dipha
+            compute_ttk(fname, times, TTKBackend.DIPHA, one_thread=seq)
+            # ttk-hybrid++: offload saddle connectors to Dipha
+            compute_ttk(fname, times, TTKBackend.DIPHAPP, one_thread=seq)
+    elif ext == "dipha":
+        compute_dipha(fname, times, seq)
+        if "impl" in fname:
+            compute_cubrips(fname, times)
+    elif ext == "pers" and "impl" in fname:
+        compute_gudhi_dionysus(fname, times, "Gudhi")
+        compute_oineus(fname, times, seq)
+        compute_perseus(fname, times, False)
+    elif ext == "pers" and "expl" in fname:
+        compute_perseus(fname, times, True)
+    elif ext == "tsc":
+        compute_gudhi_dionysus(fname, times, "Gudhi")
+        compute_gudhi_dionysus(fname, times, "Dionysus")
+        # compute_gudhi_dionysus(fname, times, "Ripser")
+        compute_javaplex(fname, times)
+    elif ext == "nc":
+        compute_diamorse(fname, times)
+    elif ext == "eirene":
+        compute_eirene(fname, times)
+
+
 def compute_diagrams(args):
 
     # output diagrams directory
@@ -432,8 +470,6 @@ def compute_diagrams(args):
 
     # store computation times
     times = dict()
-
-    ot = args.sequential  # one thread
 
     global TIMEOUT_S
     TIMEOUT_S = args.timeout
@@ -445,46 +481,12 @@ def compute_diagrams(args):
         dsname = dataset_name(fname)
         if times.get(dsname) is None:
             times[dsname] = {
-                "#Threads": 1 if ot else multiprocessing.cpu_count(),
+                "#Threads": 1 if args.sequential else multiprocessing.cpu_count(),
                 "#Vertices": dsname.split("_")[-3],
             }
 
-        # process file according to extension
-        ext = fname.split(".")[-1]
         try:
-            if ext in ("vtu", "vti"):
-                if "x1" in fname:
-                    # FTM in 2D
-                    compute_ttk(fname, times, TTKBackend.FTM, one_thread=ot)
-                    # and our algo
-                    compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=ot)
-                else:
-                    # our algo
-                    compute_ttk(fname, times, TTKBackend.SANDWICH, one_thread=ot)
-                    # ttk-hybrid: offload Morse-Smale complex to Dipha
-                    compute_ttk(fname, times, TTKBackend.DIPHA, one_thread=ot)
-                    # ttk-hybrid++: offload saddle connectors to Dipha
-                    compute_ttk(fname, times, TTKBackend.DIPHAPP, one_thread=ot)
-            elif ext == "dipha":
-                compute_dipha(fname, times, ot)
-                if "impl" in fname:
-                    compute_cubrips(fname, times)
-            elif ext == "pers" and "impl" in fname:
-                compute_gudhi_dionysus(fname, times, "Gudhi")
-                compute_oineus(fname, times, ot)
-                compute_perseus(fname, times, False)
-            elif ext == "pers" and "expl" in fname:
-                compute_perseus(fname, times, True)
-            elif ext == "tsc":
-                compute_gudhi_dionysus(fname, times, "Gudhi")
-                compute_gudhi_dionysus(fname, times, "Dionysus")
-                # compute_gudhi_dionysus(fname, times, "Ripser")
-                compute_javaplex(fname, times)
-            elif ext == "nc":
-                compute_diamorse(fname, times)
-            elif ext == "eirene":
-                compute_eirene(fname, times)
-
+            dispatch(fname, times, args.sequential)
         except subprocess.TimeoutExpired:
             pass
         except subprocess.CalledProcessError:
