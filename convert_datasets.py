@@ -65,57 +65,34 @@ class SliceType(enum.Enum):
     LINE = 2
 
 
-def main(raw_file, out_dir="", resampl_size=RESAMPL, slice_type=SliceType.VOL):
-    if raw_file == "":
-        return
+def slice_data(input_dataset, slice_type):
+    if slice_type in (SliceType.SURF, SliceType.LINE):
+        # force generation of input_vti (otherwise, slice is empty)
+        simple.Show(input_dataset)
+        # slice along depth/z axis
+        sl0 = simple.Slice(Input=input_dataset)
+        sl0.SliceType.Normal = [0.0, 0.0, 1.0]
 
-    raw_stem = raw_file.split(".")[0].split("/")[-1]
+        if slice_type == SliceType.LINE:
+            # slice along vertical/y axis
+            sl1 = simple.Slice(Input=sl0)
+            sl1.SliceType.Normal = [0.0, 1.0, 0.0]
+            return sl1
+
+        return sl0
+    return input_dataset
+
+
+def pipeline(raw_file, raw_stem, dims, slice_type, out_dir):
     reader = read_file(raw_file)
-    if slice_type == SliceType.VOL:
-        extent_s = "x".join([str(resampl_size)] * 3)
-    elif slice_type == SliceType.SURF:
-        extent_s = "x".join([str(resampl_size)] * 2 + ["1"])
-    elif slice_type == SliceType.LINE:
-        extent_s = "x".join([str(resampl_size)] + ["1"] * 2)
-
-    print(f"Converting {raw_file} to input formats (resampled to {extent_s})")
-    beg = time.time()
-
-    try:
-        raw_stem_parts = raw_stem.split("_")
-        # update extent
-        raw_stem_parts[-2] = extent_s
-        # remove data type in file name
-        raw_stem_parts.pop()
-        raw_stem = "_".join(raw_stem_parts)
-    except IndexError:
-        # not an Open-Scivis-Datasets raw file (elevation or random)
-        raw_stem = f"{raw_stem}_{extent_s}"
-
     # convert input scalar field to float
     calc = simple.Calculator(Input=reader)
     calc.Function = "ImageFile"
     calc.ResultArrayType = "Float"
     calc.ResultArrayName = "ImageFile"
 
-    # get a 2D slice
-    if slice_type == SliceType.VOL:
-        dims = [resampl_size] * 3
-        cut = calc
-    elif slice_type in (SliceType.SURF, SliceType.LINE):
-        # force generation of input_vti (otherwise, slice is empty)
-        simple.Show(calc)
-        # slice along depth/z axis
-        sl0 = simple.Slice(Input=calc)
-        sl0.SliceType.Normal = [0.0, 0.0, 1.0]
-        dims = [resampl_size] * 2 + [1]
-        cut = sl0
-        if slice_type == SliceType.LINE:
-            # slice along vertical/y axis
-            sl1 = simple.Slice(Input=sl0)
-            sl1.SliceType.Normal = [0.0, 1.0, 0.0]
-            dims = [resampl_size] + [1] * 2
-            cut = sl1
+    # get a slice
+    cut = slice_data(calc, slice_type)
 
     # resample to 192^3
     rsi = simple.ResampleToImage(Input=cut)
@@ -138,8 +115,38 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL, slice_type=SliceType.VOL):
     rgi = simple.RemoveGhostInformation(Input=tetrah)
     # save explicit mesh
     write_output(rgi, raw_stem + "_order_expl", out_dir, True)
-    end = time.time()
 
+
+def main(raw_file, out_dir="", resampl_size=RESAMPL, slice_type=SliceType.VOL):
+    if raw_file == "":
+        return
+
+    if slice_type == SliceType.VOL:
+        dims = [resampl_size] * 3
+    elif slice_type == SliceType.SURF:
+        dims = [resampl_size] * 2 + [1]
+    elif slice_type == SliceType.LINE:
+        dims = [resampl_size] + [1] * 2
+    extent_s = "x".join([str(d) for d in dims])
+
+    raw_stem = raw_file.split(".")[0].split("/")[-1]
+    try:
+        raw_stem_parts = raw_stem.split("_")
+        # update extent
+        raw_stem_parts[-2] = extent_s
+        # remove data type in file name
+        raw_stem_parts.pop()
+        raw_stem = "_".join(raw_stem_parts)
+    except IndexError:
+        # not an Open-Scivis-Datasets raw file (elevation or random)
+        raw_stem = f"{raw_stem}_{extent_s}"
+
+    print(f"Converting {raw_file} to input formats (resampled to {extent_s})")
+    beg = time.time()
+
+    pipeline(raw_file, raw_stem, dims, slice_type, out_dir)
+
+    end = time.time()
     print(f"Converted {raw_file} (took {round(end - beg, 3)}s)")
 
 
