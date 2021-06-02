@@ -42,6 +42,13 @@ def prepare_datasets(args):
         )
         p.start()
         p.join()
+        # 2D slices
+        p = multiprocessing.Process(
+            target=convert_datasets.main,
+            args=(dataset, "datasets", 1024, convert_datasets.SliceType.SURF),
+        )
+        p.start()
+        p.join()
 
 
 def get_pairs_number(diag):
