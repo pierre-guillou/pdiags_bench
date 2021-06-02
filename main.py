@@ -243,7 +243,7 @@ def compute_cubrips(fname, times):
     dataset = dataset_name(fname)
     print("Processing " + dataset + " with CubicalRipser...")
     outp = f"diagrams/{dataset}_CubicalRipser.dipha"
-    if "x1" in dataset:
+    if "x1_" in dataset:
         binary = "CubicalRipser_2dim/CR2"
     else:
         binary = "CubicalRipser_3dim/CR3"
@@ -429,7 +429,7 @@ def dispatch(fname, times):
     ext = fname.split(".")[-1]
 
     if ext in ("vtu", "vti"):
-        if "x1" in fname:
+        if "x1_" in fname:
             # FTM in 2D
             compute_ttk(fname, times, TTKBackend.FTM)
             # and our algo
