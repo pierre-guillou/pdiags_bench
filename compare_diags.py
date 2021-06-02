@@ -13,7 +13,7 @@ def read_file(fname):
     ext = fname.split(".")[-1]
     if ext == "vtu":
         reader = vtk.vtkXMLUnstructuredGridReader()
-    elif ext == "dipha" or ext == "cr":
+    elif ext == "dipha":
         reader = ttk.ttkDiphaReader()
     elif ext == "gudhi":
         reader = ttk.ttkGudhiPersistenceDiagramReader()
@@ -40,13 +40,13 @@ def read_diag(diag):
     return pairs
 
 
-def compare_pairs(pairs0, pairs1, type, show_diff):
+def compare_pairs(pairs0, pairs1, ptype, show_diff):
     sm = difflib.SequenceMatcher(isjunk=None, a=pairs0, b=pairs1)
     diffrat = sm.ratio()
     if math.isclose(diffrat, 1.0):
-        print(f"> Identical {type} pairs")
+        print(f"> Identical {ptype} pairs")
     else:
-        print(f"> Differences in {type} pairs (similarity ratio: {diffrat})")
+        print(f"> Differences in {ptype} pairs (similarity ratio: {diffrat})")
         if show_diff:
             p0 = [str(a) + " " + str(b) for (a, b) in pairs0]
             p1 = [str(a) + " " + str(b) for (a, b) in pairs1]
@@ -77,5 +77,5 @@ if __name__ == "__main__":
         main(sys.argv[1], sys.argv[2], True)
     else:
         expl_diags = sorted(glob.glob("diagrams/*_order_sfnorm_expl*"))
-        for i in range(len(expl_diags) // 2):
-            main(expl_diags[2 * i], expl_diags[2 * i + 1])
+        for k in range(len(expl_diags) // 2):
+            main(expl_diags[2 * k], expl_diags[2 * k + 1])
