@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import datetime
 import enum
 import glob
 import json
@@ -464,6 +465,8 @@ def compute_diagrams(args):
     global TIMEOUT_S
     TIMEOUT_S = args.timeout
 
+    result_fname = f"results_{datetime.datetime.now().isoformat()}.json"
+
     for fname in sorted(glob.glob("datasets/*")):
         # initialize compute times table
         dsname = dataset_name(fname)
@@ -509,7 +512,7 @@ def compute_diagrams(args):
             compute_eirene(fname, times)
 
         # write partial results after every dataset computation
-        with open("results", "w") as dst:
+        with open(result_fname, "w") as dst:
             dst.write(json.dumps(times))
 
     return times
