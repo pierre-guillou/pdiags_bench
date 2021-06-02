@@ -12,6 +12,7 @@ import subprocess
 
 import compare_diags
 import convert_datasets
+import diagram_distance
 import download_datasets
 import gen_random
 import pers2gudhi
@@ -522,12 +523,12 @@ def compute_distances(_, method="auction"):
     # list of datasets that have at least one persistence diagram
     datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
 
-    float_re = r"(\d+\.\d+|\d+)"
-    auct_patt = re.compile(
-        rf"(?:Min-saddle|Saddle-saddle|Saddle-max) cost\s+:\s+{float_re}"
-    )
-    btnk_patt = re.compile(rf"diag(?:Max|Min|Sad)\({float_re}\)")
     dists = dict()
+
+    if method == "auction":
+        distmeth = diagram_distance.DistMethod.AUCTION
+    elif method == "bottleneck":
+        distmeth = diagram_distance.DistMethod.BOTTLENECK
 
     for ds in datasets:
         ttk_diag = ds + ".vtu"
@@ -535,30 +536,10 @@ def compute_distances(_, method="auction"):
         empty_diag = "empty.vtu"
 
         if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
-            cmd = ["python", "ttk_distance.py", method, dipha_diag, ttk_diag]
-            print(f"Computing distance between TTK and Dipha for {ds}")
-            proc0 = subprocess.run(cmd, capture_output=True, check=True)
-            cmd = ["python", "ttk_distance.py", method, dipha_diag, empty_diag]
-            print(f"Computing Dipha distance to empty diagram for {ds}")
-            proc1 = subprocess.run(cmd, capture_output=True, check=True)
-
-            # match distance figures
-            pattern = auct_patt if method == "auction" else btnk_patt
-            matches0 = re.findall(pattern, str(proc0.stdout))
-            matches1 = re.findall(pattern, str(proc1.stdout))
-
-            # parse string to float
-            matches0 = [float(m) for m in matches0]
-            matches1 = [float(m) for m in matches1]
-
-            pairTypes = ["min-sad", "sad-sad", "sad-max"]
             dists[ds] = {
-                "ttk-dipha": dict(zip(pairTypes, matches0)),
-                "empty-dipha": dict(zip(pairTypes, matches1)),
+                "ttk-dipha": diagram_distance.main(dipha_diag, ttk_diag, distmeth),
+                "empty-dipha": diagram_distance.main(dipha_diag, empty_diag, distmeth),
             }
-
-    # clean pipeline sink
-    os.remove("dist.vtu")
 
     with open("distances", "w") as dst:
         dst.write(json.dumps(dists))
