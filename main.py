@@ -5,6 +5,7 @@ import datetime
 import enum
 import glob
 import json
+import logging
 import multiprocessing
 import os
 import re
@@ -16,6 +17,8 @@ import diagram_distance
 import download_datasets
 import gen_random
 import pers2gudhi
+
+logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
 
 def create_dir(dirname):
@@ -109,11 +112,10 @@ def launch_process(cmd, *args, **kwargs):
         try:
             proc.wait(TIMEOUT_S)
             if proc.returncode != 0:
-                print(proc.stderr.read())
+                logging.debug(proc.stderr.read())
                 raise subprocess.CalledProcessError(proc.returncode, cmd)
             return (proc.stdout.read(), proc.stderr.read())
         except subprocess.TimeoutExpired as te:
-            print(f"Timeout reached after {TIMEOUT_S}s, computation aborted")
             proc.terminate()
             raise te
 
@@ -154,7 +156,7 @@ def compute_ttk(fname, times, backend):
         cmd += ["-B", "2", "-wd", "-dpp"]
         key = "TTK-Sandwich/Dipha"
 
-    print(f"Processing {dataset} with {key}...")
+    logging.info("Processing %s with %s...", dataset, key)
     key = key.lower()
 
     if SEQUENTIAL:
@@ -194,7 +196,7 @@ def compute_ttk(fname, times, backend):
     os.rename("output_port_0.vtu", outp)
     times[dataset][key].update(get_pairs_number(outp))
     store_log(out, dataset, key.replace("/", "_"))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
     try:
         os.remove("morse.dipha")
@@ -205,7 +207,7 @@ def compute_ttk(fname, times, backend):
 
 def compute_dipha(fname, times):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with Dipha...")
+    logging.info("Processing %s with Dipha...", dataset)
     outp = f"diagrams/{dataset}.dipha"
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
     if not SEQUENTIAL:
@@ -235,13 +237,13 @@ def compute_dipha(fname, times):
         "mem": mem,
     }
     times[dataset]["dipha"].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
     store_log(out, dataset, "dipha")
 
 
 def compute_cubrips(fname, times):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with CubicalRipser...")
+    logging.info("Processing %s with CubicalRipser...", dataset)
     outp = f"diagrams/{dataset}_CubicalRipser.dipha"
     if "x1_" in dataset:
         binary = "CubicalRipser_2dim/CR2"
@@ -257,12 +259,12 @@ def compute_cubrips(fname, times):
         "mem": mem,
     }
     times[dataset]["CubicalRipser"].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
 
 def compute_gudhi_dionysus(fname, times, backend):
     dataset = dataset_name(fname)
-    print(f"Processing {dataset} with {backend}...")
+    logging.info("Processing %s with %s...", dataset, backend)
     outp = f"diagrams/{dataset}_{backend}.gudhi"
 
     def compute_time(output):
@@ -294,12 +296,12 @@ def compute_gudhi_dionysus(fname, times, backend):
         "mem": mem,
     }
     times[dataset][backend].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
 
 def compute_oineus(fname, times):
     dataset = dataset_name(fname)
-    print(f"Processing {dataset} with Oineus...")
+    logging.info("Processing %s with Oineus...", dataset)
     outp = f"diagrams/{dataset}_Oineus.gudhi"
 
     def oineus_compute_time(oineus_output):
@@ -321,12 +323,12 @@ def compute_oineus(fname, times):
         "mem": mem,
     }
     times[dataset]["Oineus"].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
 
 def compute_diamorse(fname, times):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with Diamorse...")
+    logging.info("Processing %s with Diamorse...", dataset)
     outp = f"diagrams/{dataset}_Diamorse.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r"]
 
@@ -349,12 +351,12 @@ def compute_diamorse(fname, times):
             dst.write(f"{dim} {birth} {death}\n")
 
     times[dataset]["Diamorse"].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
 
 def compute_perseus(fname, times, simplicial):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with Perseus...")
+    logging.info("Processing %s with Perseus...", dataset)
     outp = f"diagrams/{dataset}_Perseus.gudhi"
     subc = "simtop" if simplicial else "cubtop"
     cmd = ["perseus/perseus", subc, fname, "out"]
@@ -371,12 +373,12 @@ def compute_perseus(fname, times, simplicial):
     pers2gudhi.main("out", outp)
 
     times[dataset]["Perseus"].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
 
 def compute_eirene(fname, times):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with Eirene.jl...")
+    logging.info("Processing %s with Eirene.jl...", dataset)
     outp = f"diagrams/{dataset}_Eirene.gudhi"
     cmd = ["julia", "call_eirene.jl", fname, outp]
 
@@ -396,12 +398,12 @@ def compute_eirene(fname, times):
     }
 
     times[dataset]["Eirene"].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
 
 def compute_javaplex(fname, times):
     dataset = dataset_name(fname)
-    print("Processing " + dataset + " with JavaPlex...")
+    logging.info("Processing %s with JavaPlex...", dataset)
     outp = f"diagrams/{dataset}_JavaPlex.gudhi"
     cmd = ["java", "-classpath", ".:javaplex.jar", "jplex_persistence", fname, outp]
 
@@ -421,7 +423,7 @@ def compute_javaplex(fname, times):
     }
 
     times[dataset]["JavaPlex"].update(get_pairs_number(outp))
-    print(f"  Done in {elapsed}s")
+    logging.info("  Done in %.3fs", elapsed)
 
 
 def dispatch(fname, times):
@@ -492,9 +494,9 @@ def compute_diagrams(args):
         try:
             dispatch(fname, times)
         except subprocess.TimeoutExpired:
-            pass
+            logging.warning("Timeout reached after %ds, computation aborted", TIMEOUT_S)
         except subprocess.CalledProcessError:
-            pass
+            logging.error("  Process aborted")
 
         # write partial results after every dataset computation
         with open(result_fname, "w") as dst:
