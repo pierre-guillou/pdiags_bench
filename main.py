@@ -53,7 +53,7 @@ def prepare_datasets(args):
             # 2D slices
             p = multiprocessing.Process(
                 target=convert_datasets.main,
-                args=(dataset, "datasets", 1024, convert_datasets.SliceType.SURF),
+                args=(dataset, "datasets", 960, convert_datasets.SliceType.SURF),
             )
             p.start()
             p.join()
