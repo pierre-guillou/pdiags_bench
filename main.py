@@ -494,6 +494,11 @@ def compute_diagrams(args):
                 "#Vertices": dsname.split("_")[-3],
             }
 
+        if "x1_" in fname and args.only_cubes and not args.only_slices:
+            continue
+        if not "x1_" in fname and args.only_slices and not args.only_cubes:
+            continue
+
         try:
             dispatch(fname, times)
         except subprocess.TimeoutExpired:
@@ -596,6 +601,18 @@ def main():
         help="Timeout in seconds of every persistence diagram computation",
         type=int,
         default=TIMEOUT_S,
+    )
+    get_diags.add_argument(
+        "-3",
+        "--only_cubes",
+        help="Only process 3D datasets",
+        action="store_true",
+    )
+    get_diags.add_argument(
+        "-2",
+        "--only_slices",
+        help="Only process 2D datasets",
+        action="store_true",
     )
     get_diags.set_defaults(func=compute_diagrams)
 
