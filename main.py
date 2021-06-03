@@ -41,19 +41,22 @@ def prepare_datasets(args):
     for dataset in sorted(glob.glob("raws/*.raw") + glob.glob("raws/*.vti")):
         # reduce RAM usage by isolating datasets manipulation in
         # separate processes
-        p = multiprocessing.Process(
-            target=convert_datasets.main,
-            args=(dataset, "datasets", args.max_resample_size),
-        )
-        p.start()
-        p.join()
-        # 2D slices
-        p = multiprocessing.Process(
-            target=convert_datasets.main,
-            args=(dataset, "datasets", 1024, convert_datasets.SliceType.SURF),
-        )
-        p.start()
-        p.join()
+        if args.only_cubes or not args.only_slices:
+            # 3D cubes
+            p = multiprocessing.Process(
+                target=convert_datasets.main,
+                args=(dataset, "datasets", args.max_resample_size),
+            )
+            p.start()
+            p.join()
+        if args.only_slices or not args.only_cubes:
+            # 2D slices
+            p = multiprocessing.Process(
+                target=convert_datasets.main,
+                args=(dataset, "datasets", 1024, convert_datasets.SliceType.SURF),
+            )
+            p.start()
+            p.join()
 
 
 def get_pairs_number(diag):
@@ -565,6 +568,18 @@ def main():
         help="Maximum size of the resampled datasets (vertices per edge)",
         type=int,
         default=convert_datasets.RESAMPL,
+    )
+    prep_datasets.add_argument(
+        "-3",
+        "--only_cubes",
+        help="Only generate 3D cubes",
+        action="store_true",
+    )
+    prep_datasets.add_argument(
+        "-2",
+        "--only_slices",
+        help="Only generate 2D slices",
+        action="store_true",
     )
     prep_datasets.set_defaults(func=prepare_datasets)
 
