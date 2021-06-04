@@ -200,14 +200,18 @@ def compute_ttk(fname, times, backend, num_threads=1):
 
     out, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
-    times[dataset][key] = {
+    res = {
         "prec": round(ttk_prec_time(out), 3),
         "pers": round(ttk_compute_time(out), 3),
         "mem": mem,
         "#threads": num_threads,
     }
     os.rename("output_port_0.vtu", outp)
-    times[dataset][key].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset].setdefault(key, dict()).update(
+        {("seq" if num_threads == 1 else "para"): res}
+    )
+
     store_log(out, dataset, key.replace("/", "_"))
     logging.info("  Done in %.3fs", elapsed)
 
@@ -245,13 +249,16 @@ def compute_dipha(fname, times, num_threads=1):
 
     prec, pers = dipha_compute_time(out)
     elapsed, mem = get_time_mem(err)
-    times[dataset]["dipha"] = {
+    res = {
         "prec": prec,
         "pers": pers,
         "mem": mem,
         "#threads": num_threads,
     }
-    times[dataset]["dipha"].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset].setdefault("dipha", dict()).update(
+        {("seq" if num_threads == 1 else "para"): res}
+    )
     logging.info("  Done in %.3fs", elapsed)
     store_log(out, dataset, "dipha")
 
@@ -268,12 +275,13 @@ def compute_cubrips(fname, times):
 
     _, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
-    times[dataset]["CubicalRipser"] = {
+    res = {
         "prec": 0.0,
         "pers": elapsed,
         "mem": mem,
     }
-    times[dataset]["CubicalRipser"].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset]["CubicalRipser"] = {"seq": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
@@ -305,12 +313,13 @@ def compute_gudhi_dionysus(fname, times, backend):
     out, err = launch_process(cmd)
     prec, pers = compute_time(out)
     elapsed, mem = get_time_mem(err)
-    times[dataset][backend] = {
+    res = {
         "prec": prec,
         "pers": pers,
         "mem": mem,
     }
-    times[dataset][backend].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset][backend] = {"seq": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
@@ -333,13 +342,17 @@ def compute_oineus(fname, times, num_threads=1):
     _, err = launch_process(cmd)
     pers = oineus_compute_time(err)
     elapsed, mem = get_time_mem(err)
-    times[dataset]["Oineus"] = {
+    res = {
         "prec": round(elapsed - pers, 3),
         "pers": pers,
         "mem": mem,
         "#threads": num_threads,
     }
-    times[dataset]["Oineus"].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset].setdefault("Oineus", dict()).update(
+        {("seq" if num_threads == 1 else "para"): res}
+    )
+
     logging.info("  Done in %.3fs", elapsed)
 
 
@@ -351,7 +364,7 @@ def compute_diamorse(fname, times):
 
     out, err = launch_process(cmd, env=dict())  # reset environment for Python2
     elapsed, mem = get_time_mem(err)
-    times[dataset]["Diamorse"] = {
+    res = {
         "prec": 0.0,
         "pers": elapsed,
         "mem": mem,
@@ -367,7 +380,8 @@ def compute_diamorse(fname, times):
         for birth, death, dim in pairs:
             dst.write(f"{dim} {birth} {death}\n")
 
-    times[dataset]["Diamorse"].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset]["Diamorse"] = {"seq": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
@@ -380,7 +394,7 @@ def compute_perseus(fname, times, simplicial):
 
     _, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
-    times[dataset]["Perseus"] = {
+    res = {
         "prec": 0.0,
         "pers": elapsed,
         "mem": mem,
@@ -389,7 +403,8 @@ def compute_perseus(fname, times, simplicial):
     # convert output to Gudhi format
     pers2gudhi.main("out", outp)
 
-    times[dataset]["Perseus"].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset]["Perseus"] = {"seq": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
@@ -408,13 +423,14 @@ def compute_eirene(fname, times):
     out, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
     pers = compute_pers_time(out)
-    times[dataset]["Eirene"] = {
+    res = {
         "prec": round(elapsed - pers, 3),
         "pers": pers,
         "mem": mem,
     }
 
-    times[dataset]["Eirene"].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset]["Eirene"] = {"seq": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
@@ -433,13 +449,14 @@ def compute_javaplex(fname, times):
     out, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
     pers = compute_pers_time(out)
-    times[dataset]["JavaPlex"] = {
+    res = {
         "prec": round(elapsed - pers, 3),
         "pers": pers,
         "mem": mem,
     }
 
-    times[dataset]["JavaPlex"].update(get_pairs_number(outp))
+    res.update(get_pairs_number(outp))
+    times[dataset]["JavaPlex"] = {"seq": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
