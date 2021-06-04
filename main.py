@@ -517,17 +517,17 @@ def compute_diagrams(args):
     result_fname = f"results_{datetime.datetime.now().isoformat()}.json"
 
     for fname in sorted(glob.glob("datasets/*")):
+        if "x1_" in fname and args.only_cubes and not args.only_slices:
+            continue
+        if not "x1_" in fname and args.only_slices and not args.only_cubes:
+            continue
+
         # initialize compute times table
         dsname = dataset_name(fname)
         if times.get(dsname) is None:
             times[dsname] = {
                 "#Vertices": dsname.split("_")[-3],
             }
-
-        if "x1_" in fname and args.only_cubes and not args.only_slices:
-            continue
-        if not "x1_" in fname and args.only_slices and not args.only_cubes:
-            continue
 
         try:
             dispatch(fname, times)
