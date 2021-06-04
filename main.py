@@ -386,7 +386,7 @@ def compute_eirene(fname, times):
     cmd = ["julia", "call_eirene.jl", fname, outp]
 
     def compute_pers_time(output):
-        pers_pat = r"^ (\d+.\d+|\d+) seconds.*$"
+        pers_pat = r"^(\d+.\d+|\d+) seconds.*$"
         pers = re.search(pers_pat, output, re.MULTILINE).group(1)
         pers = round(float(pers), 3)
         return pers
