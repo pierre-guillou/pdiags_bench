@@ -136,7 +136,17 @@ class TTKBackend(enum.Enum):
     DIPHAPP = 3
 
 
-def compute_ttk(fname, times, backend):
+def parallel_decorator(func):
+    def wrapper(*args, **kwargs):
+        if not SEQUENTIAL:
+            func(*args, **kwargs, num_threads=multiprocessing.cpu_count())
+        func(*args, **kwargs, num_threads=1)
+
+    return wrapper
+
+
+@parallel_decorator
+def compute_ttk(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}.vtu"
     cmd = (
@@ -159,11 +169,10 @@ def compute_ttk(fname, times, backend):
         cmd += ["-B", "2", "-wd", "-dpp"]
         key = "TTK-Sandwich/Dipha"
 
-    logging.info("Processing %s with %s...", dataset, key)
+    logging.info("Processing %s with %s (%d thread(s))...", dataset, key, num_threads)
     key = key.lower()
 
-    if SEQUENTIAL:
-        cmd.extend(["-t", "1"])
+    cmd.extend(["-t", str(num_threads)])
 
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
@@ -195,6 +204,7 @@ def compute_ttk(fname, times, backend):
         "prec": round(ttk_prec_time(out), 3),
         "pers": round(ttk_compute_time(out), 3),
         "mem": mem,
+        "#threads": num_threads,
     }
     os.rename("output_port_0.vtu", outp)
     times[dataset][key].update(get_pairs_number(outp))
@@ -208,13 +218,14 @@ def compute_ttk(fname, times, backend):
         pass
 
 
-def compute_dipha(fname, times):
+@parallel_decorator
+def compute_dipha(fname, times, num_threads=1):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with Dipha...", dataset)
+    logging.info("Processing %s with Dipha (%d process(es))...", dataset, num_threads)
     outp = f"diagrams/{dataset}.dipha"
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
-    if not SEQUENTIAL:
-        cmd = ["mpirun", "--use-hwthread-cpus"] + cmd
+    if num_threads > 1:
+        cmd = ["mpirun", "--use-hwthread-cpus", "-np", str(num_threads)] + cmd
 
     out, err = launch_process(cmd)
 
@@ -238,6 +249,7 @@ def compute_dipha(fname, times):
         "prec": prec,
         "pers": pers,
         "mem": mem,
+        "#threads": num_threads,
     }
     times[dataset]["dipha"].update(get_pairs_number(outp))
     logging.info("  Done in %.3fs", elapsed)
@@ -302,9 +314,10 @@ def compute_gudhi_dionysus(fname, times, backend):
     logging.info("  Done in %.3fs", elapsed)
 
 
-def compute_oineus(fname, times):
+@parallel_decorator
+def compute_oineus(fname, times, num_threads=1):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with Oineus...", dataset)
+    logging.info("Processing %s with Oineus (%d thread(s))...", dataset, num_threads)
     outp = f"diagrams/{dataset}_Oineus.gudhi"
 
     def oineus_compute_time(oineus_output):
@@ -314,8 +327,8 @@ def compute_oineus(fname, times):
 
     # launch with subprocess to capture stdout from the C++ library
     cmd = ["python3", "oineus_persistence.py", fname, "-o", outp]
-    if not SEQUENTIAL:
-        cmd.extend(["-t", str(multiprocessing.cpu_count())])
+    if num_threads > 1:
+        cmd.extend(["-t", str(num_threads)])
 
     _, err = launch_process(cmd)
     pers = oineus_compute_time(err)
@@ -324,6 +337,7 @@ def compute_oineus(fname, times):
         "prec": round(elapsed - pers, 3),
         "pers": pers,
         "mem": mem,
+        "#threads": num_threads,
     }
     times[dataset]["Oineus"].update(get_pairs_number(outp))
     logging.info("  Done in %.3fs", elapsed)
@@ -490,7 +504,6 @@ def compute_diagrams(args):
         dsname = dataset_name(fname)
         if times.get(dsname) is None:
             times[dsname] = {
-                "#Threads": 1 if args.sequential else multiprocessing.cpu_count(),
                 "#Vertices": dsname.split("_")[-3],
             }
 
