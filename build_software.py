@@ -52,6 +52,7 @@ def main():
         "diamorse",
         "dipha",
         "Eirene.jl",
+        "gudhi",
         "oineus",
         "perseus",
         "ripser",
@@ -111,6 +112,16 @@ def main():
                 ["javac", "-classpath", "javaplex.jar", "jplex_persistence.java"],
                 check=True,
             )
+        elif soft == "gudhi":
+            builddir = "build_" + soft
+            create_dir(builddir)
+            subprocess.check_call(
+                ["cmake"]
+                + ["-DWITH_GUDHI_TEST=OFF", "-DWITH_GUDHI_UTILITIES=OFF"]
+                + ["-S", soft]
+                + ["-B", builddir]
+            )
+            subprocess.check_call(["cmake", "--build", builddir])
         else:
             builddir = "build_" + soft
             create_dir(builddir)
