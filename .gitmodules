@@ -16,3 +16,6 @@
 [submodule "CubicalRipser_3dim"]
 	path = CubicalRipser_3dim
 	url = https://github.com/CubicalRipser/CubicalRipser_3dim
+[submodule "gudhi-devel"]
+	path = gudhi
+	url = https://github.com/GUDHI/gudhi-devel
