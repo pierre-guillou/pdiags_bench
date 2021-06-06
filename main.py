@@ -170,7 +170,6 @@ def compute_ttk(fname, times, backend, num_threads=1):
         key = "TTK-Sandwich/Dipha"
 
     logging.info("Processing %s with %s (%d thread(s))...", dataset, key, num_threads)
-    key = key.lower()
 
     cmd.extend(["-t", str(num_threads)])
 
@@ -256,7 +255,7 @@ def compute_dipha(fname, times, num_threads=1):
         "#threads": num_threads,
     }
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault("dipha", dict()).update(
+    times[dataset].setdefault("Dipha", dict()).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
     logging.info("  Done in %.3fs", elapsed)
