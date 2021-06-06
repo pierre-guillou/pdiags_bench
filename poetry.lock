@@ -50,17 +50,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "gudhi"
-version = "3.4.1"
-description = "The Gudhi library is an open source library for Computational Topology and Topological Data Analysis (TDA)."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-numpy = ">=1.9"
-
-[[package]]
 name = "idna"
 version = "2.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -87,6 +76,17 @@ description = "NumPy is the fundamental package for array computing with Python.
 category = "main"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "pybind11"
+version = "2.6.2"
+description = "Seamless operability between C++11 and Python"
+category = "main"
+optional = false
+python-versions = "!=3.0,!=3.1,!=3.2,!=3.3,!=3.4,>=2.7"
+
+[package.extras]
+global = ["pybind11-global (==2.6.2)"]
 
 [[package]]
 name = "requests"
@@ -133,7 +133,7 @@ brotli = ["brotlipy (>=0.6.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.7"
-content-hash = "75716f25cf813605a5ba996e3c5d5521a4df51ba8a3f28e3831d6626eca9d535"
+content-hash = "4d7e23e9ca6c8f6d8777cc87b81c8da81af6bd1d979e6cbfa48c8b2c1436b627"
 
 [metadata.files]
 certifi = [
@@ -237,23 +237,6 @@ dionysus = [
     {file = "dionysus-2.0.8-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:6f3f641326786d159895dade8b84df5de4fd6bafcb59241f3a1c26a4717f8843"},
     {file = "dionysus-2.0.8.tar.gz", hash = "sha256:7ea34f76e3d796d2ae2c66e3369037a70b0430b8869175ec34cae2649a485157"},
 ]
-gudhi = [
-    {file = "gudhi-3.4.1-cp35-cp35m-macosx_10_14_x86_64.whl", hash = "sha256:1e338075279f4e524563886bc4a659d2419bb2d4268789e30461d0d794e70922"},
-    {file = "gudhi-3.4.1-cp35-cp35m-manylinux2014_x86_64.whl", hash = "sha256:e05a996ec4b881e3d2494991aede0364581a4e49778c57b1d8aa8881007eb950"},
-    {file = "gudhi-3.4.1-cp35-cp35m-win_amd64.whl", hash = "sha256:07a98dd849bf8b988ad86bcdb398d339b8efd0dfc1343828994d44f703b6ad64"},
-    {file = "gudhi-3.4.1-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:fd9148e5292a363f2b21aa3dead8877b31d5aceba9a682ef4991de622d18d368"},
-    {file = "gudhi-3.4.1-cp36-cp36m-manylinux2014_x86_64.whl", hash = "sha256:6921f442b51da13ef78d1201204c65e69e41da667c117c3ad31a19a7283d1f0b"},
-    {file = "gudhi-3.4.1-cp36-cp36m-win_amd64.whl", hash = "sha256:8da272d9176b812664edf7d7d928039bbd877f22a03b3c818fd8bc4f796b28e4"},
-    {file = "gudhi-3.4.1-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:ee2067898836dd2e8a1ae79d55b5de229a4a931c2a648a076419b57b3c55376d"},
-    {file = "gudhi-3.4.1-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:9b9b8ab7f0d61548fc6d5bc7fdb776993cbaf33f04462cc49f84b7e7e30b54c3"},
-    {file = "gudhi-3.4.1-cp37-cp37m-win_amd64.whl", hash = "sha256:57eb8764ebe16da1562c851fbd544270354ce69cc55324afa58c9d4f852b0b3a"},
-    {file = "gudhi-3.4.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:44200e4d73ec8fb18d092d4b5093c525b1069a7915425135db3a00cdb13067d4"},
-    {file = "gudhi-3.4.1-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:15b2fcf15cb05f4375d39d891d5dc606c5c81a5381f4b0a65bc42c3fac7b7102"},
-    {file = "gudhi-3.4.1-cp38-cp38-win_amd64.whl", hash = "sha256:97e29033b28b6d792daf744e1c6c738c6580ce11c6540e00f6897503e0bc2bee"},
-    {file = "gudhi-3.4.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:2280757a3562ba5fe0c53be8873b718335db9f16ecec6abe4d511c045fef76de"},
-    {file = "gudhi-3.4.1-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:413f1394dae0486a462df22b5c26283a8ef68bbbba126ed933a6d46ea8a8efdf"},
-    {file = "gudhi-3.4.1-cp39-cp39-win_amd64.whl", hash = "sha256:490b4955cedc7879386b23d62be152ec3b260a44b757ba735a4185df116a5d81"},
-]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
@@ -323,6 +306,10 @@ numpy = [
     {file = "numpy-1.20.2-cp39-cp39-win_amd64.whl", hash = "sha256:924dc3f83de20437de95a73516f36e09918e9c9c18d5eac520062c49191025fb"},
     {file = "numpy-1.20.2-pp37-pypy37_pp73-manylinux2010_x86_64.whl", hash = "sha256:97ce8b8ace7d3b9288d88177e66ee75480fb79b9cf745e91ecfe65d91a856042"},
     {file = "numpy-1.20.2.zip", hash = "sha256:878922bf5ad7550aa044aa9301d417e2d3ae50f0f577de92051d739ac6096cee"},
+]
+pybind11 = [
+    {file = "pybind11-2.6.2-py2.py3-none-any.whl", hash = "sha256:2d8aebe1709bc367e34e3b23d8eccbf3f387ee9d5640548c6260d33b59f02405"},
+    {file = "pybind11-2.6.2.tar.gz", hash = "sha256:d0e0aed9279656f21501243b707eb6e3b951e89e10c3271dedf3ae41c365e5ed"},
 ]
 requests = [
     {file = "requests-2.25.1-py2.py3-none-any.whl", hash = "sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e"},
