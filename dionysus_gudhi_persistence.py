@@ -3,9 +3,9 @@ import math
 import re
 import subprocess
 import time
+import sys
 
 import dionysus
-import gudhi
 import numpy as np
 
 
@@ -118,6 +118,8 @@ class Dionysus_Filtration:
 
 class Gudhi_SimplexTree:
     def __init__(self):
+        import gudhi
+
         self.st = gudhi.SimplexTree()
         print("Using the Gudhi Simplex Tree backend")
 
@@ -180,6 +182,7 @@ def run(dataset, output, backend="Gudhi", simplicial=True):
 
     if backend == "Gudhi":
         print("Use the Gudhi Cubical Complex backend")
+        import gudhi
 
         start = time.time()
         cpx = gudhi.CubicalComplex(perseus_file=dataset)
@@ -223,6 +226,13 @@ def main():
         dest="output_diagram",
     )
     parser.add_argument(
+        "-p",
+        "--gudhi_path",
+        type=str,
+        help="Path to Gudhi Python module",
+        default="build_gudhi/src/python",
+    )
+    parser.add_argument(
         "-b", choices=["gudhi", "dionysus", "ripser"], default="gudhi", dest="backend"
     )
     args = parser.parse_args()
@@ -239,6 +249,9 @@ def main():
     if ext == "pers" and "expl" in args.input_dataset:
         print("Perseus Simplicial Complex files not supported")
         return
+
+    # prepend path to Gudhi Python package to PYTHONPATH
+    sys.path = [args.gudhi_path] + sys.path
 
     run(
         args.input_dataset,
