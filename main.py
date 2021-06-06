@@ -318,7 +318,11 @@ def compute_gudhi_dionysus(fname, times, backend):
         "mem": mem,
     }
     res.update(get_pairs_number(outp))
-    times[dataset][backend] = {"seq": res}
+    if backend == "Gudhi":
+        res.update({"#threads": multiprocessing.cpu_count()})
+        times[dataset][backend] = {"para": res}
+    else:
+        times[dataset][backend] = {"seq": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
