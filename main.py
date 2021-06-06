@@ -493,7 +493,8 @@ def dispatch(fname, times):
     elif ext == "tsc":
         compute_gudhi_dionysus(fname, times, "Gudhi")
         compute_gudhi_dionysus(fname, times, "Dionysus")
-        # compute_gudhi_dionysus(fname, times, "Ripser")
+        if "x1_" in fname:
+            compute_gudhi_dionysus(fname, times, "Ripser")
         compute_javaplex(fname, times)
     elif ext == "nc":
         compute_diamorse(fname, times)

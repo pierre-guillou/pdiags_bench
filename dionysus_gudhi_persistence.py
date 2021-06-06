@@ -64,7 +64,7 @@ class Ripser_SparseDM:
 
     def compute_pers(self):
         proc = subprocess.run(
-            ["ripser/ripser", "--format", "sparse", "--dim", "2"],
+            ["ripser/ripser", "--format", "sparse"],
             check=True,
             input=self.dist_mat.encode(),
             capture_output=True,
