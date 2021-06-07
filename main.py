@@ -278,7 +278,7 @@ def compute_cubrips(fname, times):
         binary = "CubicalRipser_2dim/CR2"
     else:
         binary = "CubicalRipser_3dim/CR3"
-    cmd = [binary, fname, "--output", outp]
+    cmd = [binary, "--output", outp, "--method", "compute_pairs", fname]
 
     _, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
