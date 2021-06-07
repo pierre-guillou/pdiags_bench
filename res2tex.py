@@ -62,18 +62,21 @@ def gen_table(fname, res, simplicial=True):
     res.append(r"  \midrule")
     res.append("")
     for ds in lines:
-        ds_name = r"\_".join(ds.split("_")[:-4])
+        ds_name = r"\_".join(ds.split("_")[:-3])
         curr = [ds_name] * len(cols)
         for it, val in data[ds].items():
             if isinstance(val, dict):
-                val = val["pers"]
+                try:
+                    val = val["seq"]["pers"]
+                except KeyError:
+                    val = val["para"]["pers"]
             curr[cols_dict[it]] = str(val)
         # consistency check
         for i, val in enumerate(curr):
             if i != 0 and val == curr[0]:
-                curr[i] = r"+30min"
+                curr[i] = r"\cellcolor{lightgray}{+10min}"
         # sort times in increasing order
-        colors = ["green", "lime", "yellow", "orange", "red!75", "purple"]
+        colors = ["green", "lime", "yellow", "orange", "brown", "red", "purple", "violet"]
         stimes = sort_times(curr, cols)
         for t, c in zip(stimes, colors):
             curr[t[0]] = r"\cellcolor{" + c + "}" + curr[t[0]]
