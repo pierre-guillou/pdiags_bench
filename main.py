@@ -464,10 +464,11 @@ def compute_javaplex(fname, times):
         "prec": round(elapsed - pers, 3),
         "pers": pers,
         "mem": mem,
+        "#threads": multiprocessing.cpu_count(),
     }
 
     res.update(get_pairs_number(outp))
-    times[dataset]["JavaPlex"] = {"seq": res}
+    times[dataset]["JavaPlex"] = {"para": res}
     logging.info("  Done in %.3fs", elapsed)
 
 
