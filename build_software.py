@@ -71,11 +71,14 @@ def main():
             # download Perseus
             download_perseus()
             # build perseus
-            subprocess.run(
-                ["g++", "Pers.cpp", "-O3", "-fpermissive", "-o", "perseus"],
-                cwd=soft,
-                check=True,
-            )
+            try:
+                subprocess.run(
+                    ["g++", "Pers.cpp", "-O3", "-fpermissive", "-o", "perseus"],
+                    cwd=soft,
+                    check=True,
+                )
+            except subprocess.CalledProcessError:
+                print("Perseus needs GCC<11 to be built")
         elif soft == "diamorse":
             # build diamorse
             try:
