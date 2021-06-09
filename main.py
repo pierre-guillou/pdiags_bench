@@ -371,25 +371,15 @@ def compute_diamorse(fname, times):
     dataset = dataset_name(fname)
     logging.info("Processing %s with Diamorse...", dataset)
     outp = f"diagrams/{dataset}_Diamorse.gudhi"
-    cmd = ["python2", "diamorse/python/persistence.py", fname, "-r"]
+    cmd = ["python2", "diamorse/python/persistence.py", fname, "-r", "-o", outp]
 
-    out, err = launch_process(cmd, env=dict())  # reset environment for Python2
+    _, err = launch_process(cmd, env=dict())  # reset environment for Python2
     elapsed, mem = get_time_mem(err)
     res = {
         "prec": 0.0,
         "pers": elapsed,
         "mem": mem,
     }
-
-    # convert output to Gudhi format on-the-fly
-    pairs = list()
-    for line in out.splitlines():
-        if line.startswith("#"):
-            continue
-        pairs.append(line.split()[:3])
-    with open(outp, "w") as dst:
-        for birth, death, dim in pairs:
-            dst.write(f"{dim} {birth} {death}\n")
 
     res.update(get_pairs_number(outp))
     times[dataset]["Diamorse"] = {"seq": res}
