@@ -449,7 +449,11 @@ def compute_javaplex(fname, times):
     dataset = dataset_name(fname)
     logging.info("Processing %s with JavaPlex...", dataset)
     outp = f"diagrams/{dataset}_JavaPlex.gudhi"
-    cmd = ["java", "-classpath", ".:javaplex.jar", "jplex_persistence", fname, outp]
+    cmd = (
+        ["java", "-Xmx64G"]
+        + ["-classpath", ".:javaplex.jar"]
+        + ["jplex_persistence", fname, outp]
+    )
 
     def compute_pers_time(output):
         pers_pat = r"^.* (\d+.\d+|\d+) seconds$"
