@@ -88,12 +88,7 @@ def main():
                     check=True,
                 )
                 subprocess.run(
-                    [
-                        "sed",
-                        "s/shell python/shell python2/",
-                        "-i",
-                        "src/python/Makefile",
-                    ],
+                    ["git", "apply", "../patches/diamorse_*.patch"],
                     cwd=soft,
                     check=True,
                 )

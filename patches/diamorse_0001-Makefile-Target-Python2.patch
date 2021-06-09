@@ -1,0 +1,29 @@
+From dad287743c07267e85e8bef4179968a7c0961c54 Mon Sep 17 00:00:00 2001
+From: Pierre Guillou <pierre.guillou@lip6.fr>
+Date: Wed, 9 Jun 2021 16:48:57 +0200
+Subject: [PATCH 1/2] [Makefile] Target Python2
+
+---
+ src/python/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/python/Makefile b/src/python/Makefile
+index 9643dba..da20b88 100644
+--- a/src/python/Makefile
++++ b/src/python/Makefile
+@@ -1,9 +1,9 @@
+-PYTHON_PREFIX  = $(shell python -c "import sys; print sys.prefix")
+-PYTHON_VERSION = $(shell python -c "import sys;\
++PYTHON_PREFIX  = $(shell python2 -c "import sys; print sys.prefix")
++PYTHON_VERSION = $(shell python2 -c "import sys;\
+ print '%d.%d' % (sys.version_info.major, sys.version_info.minor)")
+ 
+ PYTHON_INCL = -I ${PYTHON_PREFIX}/include/python${PYTHON_VERSION}
+-NUMPY_INCL  = -I $(shell python -c "import numpy; print numpy.get_include()")
++NUMPY_INCL  = -I $(shell python2 -c "import numpy; print numpy.get_include()")
+ EXTRA_INCL  = -I ../lib
+ 
+ ifeq ($(CXX),c++)
+-- 
+2.32.0
+

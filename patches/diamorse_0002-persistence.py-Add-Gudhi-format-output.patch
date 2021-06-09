@@ -1,0 +1,45 @@
+From c9c0e8da6a4b3b8858ca8274c9f8014a2b13ba86 Mon Sep 17 00:00:00 2001
+From: Pierre Guillou <pierre.guillou@lip6.fr>
+Date: Wed, 9 Jun 2021 17:03:25 +0200
+Subject: [PATCH 2/2] [persistence.py] Add Gudhi format output
+
+---
+ python/persistence.py | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/python/persistence.py b/python/persistence.py
+index c0a14b3..8ab2856 100755
+--- a/python/persistence.py
++++ b/python/persistence.py
+@@ -53,6 +53,11 @@ def fromTextFile(filename):
+     return result
+ 
+ 
++def toGudhi(outfile, pairs, infile):
++    with open(outfile, "w") as dst:
++        for data in pairs:
++            dst.write("%d %f %f\n" % (data[2], data[0], data[1]))
++
+ def toText(output, pairs, source):
+     output.write("# Persistence pairs for %s\n" % (source,))
+     output.write("#   format: ")
+@@ -165,6 +170,7 @@ if __name__ == '__main__':
+                       action = "store_true", help = "output persistence pairs")
+     parser.add_argument("-s", "--stats", dest = "stats", default = False,
+                       action = "store_true", help = "output some statistics")
++    parser.add_argument("-o", "--outfile", help="Output file name")
+     options = parser.parse_args()
+ 
+     infile = options.infile
+@@ -178,7 +184,7 @@ if __name__ == '__main__':
+     xth = [ "zeroth", "first", "second", "third" ]
+ 
+     if options.raw:
+-        toText(sys.stdout, pairs, infile)
++        toGudhi(options.outfile, pairs, infile)
+ 
+     if options.stats:
+         printStats(pairs)
+-- 
+2.32.0
+
