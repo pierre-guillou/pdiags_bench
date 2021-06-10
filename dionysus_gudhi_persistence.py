@@ -75,6 +75,8 @@ class Ripser_SparseDM:
         dim = 0
         pairs = list()
         for line in self.diag.split("\n"):
+            if line == " [0, )":
+                pairs.append([0, 0, math.inf])
             dim_pat = r"persistence intervals in dim (\d+):"
             try:
                 dim = re.search(dim_pat, line).group(1)
