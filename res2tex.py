@@ -67,14 +67,14 @@ def gen_table(fname, res, simplicial=True):
         for it, val in data[ds].items():
             if isinstance(val, dict):
                 try:
-                    val = val["seq"]["pers"]
-                except KeyError:
                     val = val["para"]["pers"]
+                except KeyError:
+                    val = val["seq"]["pers"]
             curr[cols_dict[it]] = str(val)
         # consistency check
         for i, val in enumerate(curr):
             if i != 0 and val == curr[0]:
-                curr[i] = r"\cellcolor{lightgray}{+10min}"
+                curr[i] = r"\cellcolor{lightgray}{+30min}"
         # sort times in increasing order
         colors = ["green", "lime", "yellow", "orange", "brown", "red", "purple", "violet"]
         stimes = sort_times(curr, cols)
