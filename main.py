@@ -491,8 +491,6 @@ def dispatch(fname, times):
         compute_gudhi_dionysus(fname, times, "Gudhi")
         compute_oineus(fname, times)
         compute_perseus(fname, times, False)
-    elif ext == "pers" and "expl" in fname:
-        compute_perseus(fname, times, True)
     elif ext == "tsc":
         compute_gudhi_dionysus(fname, times, "Gudhi")
         compute_gudhi_dionysus(fname, times, "Dionysus")
