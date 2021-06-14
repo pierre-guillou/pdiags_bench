@@ -53,6 +53,7 @@ def read_file(input_file):
 
         raw = simple.ImageReader(FileNames=[input_file])
         raw.DataScalarType = dtype_pv[dtype]
+        raw.DataByteOrder = "LittleEndian"
         raw.DataExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
         return raw
 
