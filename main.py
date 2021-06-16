@@ -90,6 +90,7 @@ def dataset_name(dsfile):
 
 TIMEOUT_S = 1800  # 30 min
 SEQUENTIAL = False  # parallel
+RESUME = False  # compute every diagram
 
 
 def get_time_mem(txt):
@@ -562,6 +563,11 @@ def dispatch(fname, times):
     backends = file_type.get_backends(slice_type)
 
     for b in backends:
+        dsname = dataset_name(fname)
+        if RESUME and dsname in times and b.value in times[dsname]:
+            logging.info("Skipping %s already processed by %s", dsname, b.value)
+            return
+
         logging.info("Processing %s with %s...", dataset_name(fname), b.value)
 
         try:  # catch exception at every backend call
@@ -613,6 +619,13 @@ def compute_diagrams(args):
     TIMEOUT_S = args.timeout
     global SEQUENTIAL
     SEQUENTIAL = args.sequential
+    global RESUME
+    RESUME = args.resume is not None
+
+    if RESUME:
+        logging.info("Resuming computation from %s", args.resume)
+        with open(args.resume) as src:
+            times = json.load(src)
 
     result_fname = f"results_{datetime.datetime.now().isoformat()}.json"
 
@@ -739,6 +752,11 @@ def main():
         "--only_slices",
         help="Only process 2D datasets",
         action="store_true",
+    )
+    get_diags.add_argument(
+        "-r",
+        "--resume",
+        help="Resume computation from given file",
     )
     get_diags.set_defaults(func=compute_diagrams)
 
