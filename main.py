@@ -234,6 +234,14 @@ class Complex(enum.Enum):
     SIMPLICIAL = enum.auto()
     UNDEFINED = enum.auto()
 
+    @classmethod
+    def from_filename(cls, fname):
+        if "impl" in fname:
+            return cls.CUBICAL
+        if "expl" in fname:
+            return cls.SIMPLICIAL
+        return cls.UNDEFINED
+
 
 def parallel_decorator(func):
     def wrapper(*args, **kwargs):
@@ -548,15 +556,8 @@ def compute_javaplex(fname, times):
 
 
 def dispatch(fname, times):
-    def get_complex_type(fname):
-        if "impl" in fname:
-            return Complex.CUBICAL
-        if "expl" in fname:
-            return Complex.SIMPLICIAL
-        return Complex.UNDEFINED
-
     slice_type = SliceType.SURF if "x1_" in fname else SliceType.VOL
-    complex_type = get_complex_type(fname)
+    complex_type = Complex.from_filename(fname)
     file_type = FileType.from_filename(fname, complex_type)
     backends = file_type.get_backends(slice_type)
 
