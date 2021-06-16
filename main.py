@@ -147,7 +147,8 @@ class SoftBackend(enum.Enum):
     DIPHA = "Dipha"
     CUBICALRIPSER = "CubicalRipser"
     GUDHI = "Gudhi"
-    PERSEUS = "Perseus"
+    PERSEUS_CUB = "Perseus"
+    PERSEUS_SIM = "Perseus"
     DIONYSUS = "Dionysus"
     RIPSER = "Ripser"
     OINEUS = "Oineus"
@@ -155,6 +156,26 @@ class SoftBackend(enum.Enum):
     EIRENE = "Eirene.jl"
     JAVAPLEX = "JavaPlex"
     UNDEFINED = ""
+
+    def get_compute_function(self):
+        dispatcher = {
+            SoftBackend.TTK_FTM: compute_ttk,
+            SoftBackend.TTK_SANDWICH: compute_ttk,
+            SoftBackend.TTK_DIPHA: compute_ttk,
+            SoftBackend.TTK_DIPHAPP: compute_ttk,
+            SoftBackend.DIPHA: compute_dipha,
+            SoftBackend.CUBICALRIPSER: compute_cubrips,
+            SoftBackend.PERSEUS_CUB: compute_perseus,
+            SoftBackend.PERSEUS_SIM: compute_perseus,
+            SoftBackend.GUDHI: compute_gudhi_dionysus,
+            SoftBackend.DIONYSUS: compute_gudhi_dionysus,
+            SoftBackend.RIPSER: compute_gudhi_dionysus,
+            SoftBackend.OINEUS: compute_oineus,
+            SoftBackend.DIAMORSE: compute_diamorse,
+            SoftBackend.EIRENE: compute_eirene,
+            SoftBackend.JAVAPLEX: compute_javaplex,
+        }
+        return dispatcher[self]
 
 
 class FileType(enum.Enum):
@@ -212,10 +233,10 @@ class FileType(enum.Enum):
         if self == FileType.DIPHA_TRI:
             return [SoftBackend.DIPHA]
         if self == FileType.PERS_CUB:
-            return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS]
+            return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS_CUB]
         if self == FileType.PERS_TRI:
             return []  # disable Perseus for simplicial complexes
-            # return [SoftBackend.PERSEUS]
+            # return [SoftBackend.PERSEUS_SIM]
         if self == FileType.TSC:
             ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
             if slice_type == SliceType.SURF:
@@ -260,7 +281,7 @@ def parallel_decorator(func):
 @parallel_decorator
 def compute_ttk(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}.vtu"
+    outp = f"diagrams/{dataset}_{backend.value}.vtu"
     cmd = (
         ["ttkPersistenceDiagramCmd"]
         + ["-i", fname]
@@ -328,9 +349,9 @@ def compute_ttk(fname, times, backend, num_threads=1):
 
 
 @parallel_decorator
-def compute_dipha(fname, times, num_threads=1):
+def compute_dipha(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}.dipha"
+    outp = f"diagrams/{dataset}_{backend.value}.dipha"
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
     if num_threads > 1:
         cmd = ["mpirun", "--use-hwthread-cpus", "-np", str(num_threads)] + cmd
@@ -360,16 +381,16 @@ def compute_dipha(fname, times, num_threads=1):
         "#threads": num_threads,
     }
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault("Dipha", dict()).update(
+    times[dataset].setdefault(backend.value, dict()).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
     store_log(out, dataset, "dipha")
     return elapsed
 
 
-def compute_cubrips(fname, times):
+def compute_cubrips(fname, times, backend):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_CubicalRipser.dipha"
+    outp = f"diagrams/{dataset}_{backend.value}.dipha"
     if "x1_" in dataset:
         binary = "CubicalRipser_2dim/CR2"
     else:
@@ -384,12 +405,13 @@ def compute_cubrips(fname, times):
         "mem": mem,
     }
     res.update(get_pairs_number(outp))
-    times[dataset]["CubicalRipser"] = {"seq": res}
+    times[dataset][backend.value] = {"seq": res}
     return elapsed
 
 
 def compute_gudhi_dionysus(fname, times, backend):
     dataset = dataset_name(fname)
+    backend = backend.value
     outp = f"diagrams/{dataset}_{backend}.gudhi"
 
     def compute_time(output):
@@ -430,9 +452,9 @@ def compute_gudhi_dionysus(fname, times, backend):
 
 
 @parallel_decorator
-def compute_oineus(fname, times, num_threads=1):
+def compute_oineus(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_Oineus.gudhi"
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
 
     def oineus_compute_time(oineus_output):
         pat = r"matrix reduced in (\d+.\d+|\d+)"
@@ -454,16 +476,16 @@ def compute_oineus(fname, times, num_threads=1):
         "#threads": num_threads,
     }
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault("Oineus", dict()).update(
+    times[dataset].setdefault(backend.value, dict()).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
 
     return elapsed
 
 
-def compute_diamorse(fname, times):
+def compute_diamorse(fname, times, backend):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_Diamorse.gudhi"
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r", "-o", outp]
 
     _, err = launch_process(cmd, env=dict())  # reset environment for Python2
@@ -475,14 +497,14 @@ def compute_diamorse(fname, times):
     }
 
     res.update(get_pairs_number(outp))
-    times[dataset]["Diamorse"] = {"seq": res}
+    times[dataset][backend.value] = {"seq": res}
     return elapsed
 
 
-def compute_perseus(fname, times, simplicial):
+def compute_perseus(fname, times, backend):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_Perseus.gudhi"
-    subc = "simtop" if simplicial else "cubtop"
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
+    subc = "simtop" if backend == SoftBackend.PERSEUS_SIM else "cubtop"
     cmd = ["perseus/perseus", subc, fname, "out"]
 
     _, err = launch_process(cmd)
@@ -497,13 +519,13 @@ def compute_perseus(fname, times, simplicial):
     pers2gudhi.main("out", outp)
 
     res.update(get_pairs_number(outp))
-    times[dataset]["Perseus"] = {"seq": res}
+    times[dataset][backend.value] = {"seq": res}
     return elapsed
 
 
-def compute_eirene(fname, times):
+def compute_eirene(fname, times, backend):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_Eirene.gudhi"
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     cmd = ["julia", "call_eirene.jl", fname, outp]
 
     def compute_pers_time(output):
@@ -522,13 +544,13 @@ def compute_eirene(fname, times):
     }
 
     res.update(get_pairs_number(outp))
-    times[dataset]["Eirene"] = {"seq": res}
+    times[dataset][backend.value] = {"seq": res}
     return elapsed
 
 
-def compute_javaplex(fname, times):
+def compute_javaplex(fname, times, backend):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_JavaPlex.gudhi"
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     cmd = (
         ["java", "-Xmx64G"]
         + ["-classpath", ".:javaplex.jar"]
@@ -552,7 +574,7 @@ def compute_javaplex(fname, times):
     }
 
     res.update(get_pairs_number(outp))
-    times[dataset]["JavaPlex"] = {"para": res}
+    times[dataset][backend.value] = {"para": res}
     return elapsed
 
 
@@ -571,29 +593,12 @@ def dispatch(fname, times):
         logging.info("Processing %s with %s...", dataset_name(fname), b.value)
 
         try:  # catch exception at every backend call
-            if b in [
-                SoftBackend.TTK_FTM,
-                SoftBackend.TTK_SANDWICH,
-                SoftBackend.TTK_DIPHA,
-                SoftBackend.TTK_DIPHAPP,
-            ]:
-                el = compute_ttk(fname, times, b)
-            elif b == SoftBackend.DIPHA:
-                el = compute_dipha(fname, times)
-            elif b == SoftBackend.CUBICALRIPSER:
-                el = compute_cubrips(fname, times)
-            elif b == SoftBackend.PERSEUS:
-                el = compute_perseus(fname, times, complex_type == Complex.SIMPLICIAL)
-            elif b in [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.RIPSER]:
-                el = compute_gudhi_dionysus(fname, times, b.value)
-            elif b == SoftBackend.OINEUS:
-                el = compute_oineus(fname, times)
-            elif b == SoftBackend.DIAMORSE:
-                el = compute_diamorse(fname, times)
-            elif b == SoftBackend.EIRENE:
-                el = compute_eirene(fname, times)
-            elif b == SoftBackend.JAVAPLEX:
-                el = compute_javaplex(fname, times)
+            if b == SoftBackend.UNDEFINED:
+                logging.warning("Skipping undefined backend")
+                return
+
+            # call backend compute function
+            el = b.get_compute_function()(fname, times, b)
 
             logging.info("  Done in %.3fs", el)
         except subprocess.TimeoutExpired:
