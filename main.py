@@ -167,6 +167,67 @@ class FileType(enum.Enum):
     EIRENE_CSV = enum.auto()
     UNDEFINED = enum.auto()
 
+    # pylint: disable=R0911
+    @classmethod
+    def from_filename(cls, fname, complex_type):
+        # get file type variant according to file extension and complex type
+        ext = fname.split(".")[-1]
+
+        if ext in ("vtu", "vti"):
+            return cls.VTI_VTU
+        if ext == "dipha":
+            if complex_type == Complex.CUBICAL:
+                return cls.DIPHA_CUB
+            if complex_type == Complex.SIMPLICIAL:
+                return cls.DIPHA_TRI
+        if ext == "pers":
+            if complex_type == Complex.CUBICAL:
+                return cls.PERS_CUB
+            if complex_type == Complex.SIMPLICIAL:
+                return cls.PERS_TRI
+        if ext == "tsc":
+            return cls.TSC
+        if ext == "nc":
+            return cls.NETCDF
+        if ext == "eirene":
+            return cls.EIRENE_CSV
+
+        return cls.UNDEFINED
+
+    def get_backends(self, slice_type):
+        # get backends list from file type variant and slice types
+        if self == FileType.VTI_VTU:
+            ret = [SoftBackend.TTK_SANDWICH]  # our algo
+            if slice_type == SliceType.SURF:
+                # FTM in 2D + our algo
+                return [SoftBackend.TTK_FTM] + ret
+            if slice_type == SliceType.VOL:
+                # our algo
+                # TTK-Dipha: offload Morse-Smale complex to Dipha
+                # TTK-Dipha/Sandwich: offload saddle connectors to Dipha
+                return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
+        if self == FileType.DIPHA_CUB:
+            return [SoftBackend.DIPHA, SoftBackend.CUBICALRIPSER]
+        if self == FileType.DIPHA_TRI:
+            return [SoftBackend.DIPHA]
+        if self == FileType.PERS_CUB:
+            return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS]
+        if self == FileType.PERS_TRI:
+            return []  # disable Perseus for simplicial complexes
+            # return [SoftBackend.PERSEUS]
+        if self == FileType.TSC:
+            ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
+            if slice_type == SliceType.SURF:
+                return ret + [SoftBackend.RIPSER]  # Ripser only in 2D
+            if slice_type == SliceType.VOL:
+                return ret
+        if self == FileType.NETCDF:
+            return [SoftBackend.DIAMORSE]
+        if self == FileType.EIRENE_CSV:
+            return [SoftBackend.EIRENE]
+
+        return SoftBackend.UNDEFINED
+
 
 class Complex(enum.Enum):
     CUBICAL = enum.auto()
@@ -494,69 +555,10 @@ def dispatch(fname, times):
             return Complex.SIMPLICIAL
         return Complex.UNDEFINED
 
-    def get_file_type(fname, complex_type):
-        # process file according to extension
-        ext = fname.split(".")[-1]
-
-        if ext in ("vtu", "vti"):
-            return FileType.VTI_VTU
-        if ext == "dipha":
-            if complex_type == Complex.CUBICAL:
-                return FileType.DIPHA_CUB
-            if complex_type == Complex.SIMPLICIAL:
-                return FileType.DIPHA_TRI
-        if ext == "pers":
-            if complex_type == Complex.CUBICAL:
-                return FileType.PERS_CUB
-            if complex_type == Complex.SIMPLICIAL:
-                return FileType.PERS_TRI
-        if ext == "tsc":
-            return FileType.TSC
-        if ext == "nc":
-            return FileType.NETCDF
-        if ext == "eirene":
-            return FileType.EIRENE_CSV
-
-        return FileType.UNDEFINED
-
-    def get_backends(file_type, slice_type):
-        # get backend from file and slice types
-        if file_type == FileType.VTI_VTU:
-            ret = [SoftBackend.TTK_SANDWICH]
-            if slice_type == SliceType.SURF:
-                # FTM in 2D + our algo
-                return [SoftBackend.TTK_FTM] + ret
-            if slice_type == SliceType.VOL:
-                # our algo
-                # TTK-Dipha: offload Morse-Smale complex to Dipha
-                # TTK-Dipha/Sandwich: offload saddle connectors to Dipha
-                return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
-        if file_type == FileType.DIPHA_CUB:
-            return [SoftBackend.DIPHA, SoftBackend.CUBICALRIPSER]
-        if file_type == FileType.DIPHA_TRI:
-            return [SoftBackend.DIPHA]
-        if file_type == FileType.PERS_CUB:
-            return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS]
-        if file_type == FileType.PERS_TRI:
-            return []  # disable Perseus for simplicial complexes
-            # return [SoftBackend.PERSEUS]
-        if file_type == FileType.TSC:
-            ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
-            if slice_type == SliceType.SURF:
-                return ret + [SoftBackend.RIPSER]
-            if slice_type == SliceType.VOL:
-                return ret
-        if file_type == FileType.NETCDF:
-            return [SoftBackend.DIAMORSE]
-        if file_type == FileType.EIRENE_CSV:
-            return [SoftBackend.EIRENE]
-
-        return SoftBackend.UNDEFINED
-
     slice_type = SliceType.SURF if "x1_" in fname else SliceType.VOL
     complex_type = get_complex_type(fname)
-    file_type = get_file_type(fname, complex_type)
-    backends = get_backends(file_type, slice_type)
+    file_type = FileType.from_filename(fname, complex_type)
+    backends = file_type.get_backends(slice_type)
 
     for b in backends:
         logging.info("Processing %s with %s...", dataset_name(fname), b.value)
