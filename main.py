@@ -13,6 +13,7 @@ import subprocess
 
 import compare_diags
 import convert_datasets
+from convert_datasets import SliceType
 import diagram_distance
 import download_datasets
 import gen_random
@@ -53,7 +54,7 @@ def prepare_datasets(args):
             # 2D slices
             p = multiprocessing.Process(
                 target=convert_datasets.main,
-                args=(dataset, "datasets", 960, convert_datasets.SliceType.SURF),
+                args=(dataset, "datasets", 960, SliceType.SURF),
             )
             p.start()
             p.join()
@@ -137,18 +138,51 @@ def store_log(log, ds_name, app):
         dst.write(log)
 
 
-class TTKBackend(enum.Enum):
-    FTM = 0
-    SANDWICH = 1
-    DIPHA = 2
-    DIPHAPP = 3
+class SoftBackend(enum.Enum):
+    TTK_FTM = "TTK-FTM"
+    TTK_SANDWICH = "TTK-Sandwich"
+    TTK_DIPHA = "TTK/Dipha"
+    TTK_DIPHAPP = "TTK-Sandwich/Dipha"
+    DIPHA = "Dipha"
+    CUBICALRIPSER = "CubicalRipser"
+    GUDHI = "Gudhi"
+    PERSEUS = "Perseus"
+    DIONYSUS = "Dionysus"
+    RIPSER = "Ripser"
+    OINEUS = "Oineus"
+    DIAMORSE = "Diamorse"
+    EIRENE = "Eirene.jl"
+    JAVAPLEX = "JavaPlex"
+    UNDEFINED = ""
+
+
+class FileType(enum.Enum):
+    VTI_VTU = enum.auto()
+    DIPHA_CUB = enum.auto()
+    DIPHA_TRI = enum.auto()
+    PERS_CUB = enum.auto()
+    PERS_TRI = enum.auto()
+    TSC = enum.auto()
+    NETCDF = enum.auto()
+    EIRENE_CSV = enum.auto()
+    UNDEFINED = enum.auto()
+
+
+class Complex(enum.Enum):
+    CUBICAL = enum.auto()
+    SIMPLICIAL = enum.auto()
+    UNDEFINED = enum.auto()
 
 
 def parallel_decorator(func):
     def wrapper(*args, **kwargs):
         if not SEQUENTIAL:
-            func(*args, **kwargs, num_threads=multiprocessing.cpu_count())
-        func(*args, **kwargs, num_threads=1)
+            nt = multiprocessing.cpu_count()
+            logging.info("  Parallel implementation (%s threads)", nt)
+            el = func(*args, **kwargs, num_threads=nt)
+            logging.info("  Done in %.3fs", el)
+        logging.info("  Sequential implementation")
+        return func(*args, **kwargs, num_threads=1)
 
     return wrapper
 
@@ -162,24 +196,17 @@ def compute_ttk(fname, times, backend, num_threads=1):
         + ["-i", fname]
         + ["-d", "4"]
         + ["-a", "ImageFile_Order"]
+        + ["-t", str(num_threads)]
     )
 
-    if backend == TTKBackend.FTM:
+    if backend == SoftBackend.TTK_FTM:
         cmd += ["-B", "0"]
-        key = "TTK-FTM"
-    elif backend == TTKBackend.SANDWICH:
+    elif backend == SoftBackend.TTK_SANDWICH:
         cmd += ["-B", "2"]
-        key = "TTK-Sandwich"
-    elif backend == TTKBackend.DIPHA:
+    elif backend == SoftBackend.TTK_DIPHA:
         cmd += ["-B", "2", "-wd"]
-        key = "TTK/Dipha"
-    elif backend == TTKBackend.DIPHAPP:
+    elif backend == SoftBackend.TTK_DIPHAPP:
         cmd += ["-B", "2", "-wd", "-dpp"]
-        key = "TTK-Sandwich/Dipha"
-
-    logging.info("Processing %s with %s (%d thread(s))...", dataset, key, num_threads)
-
-    cmd.extend(["-t", str(num_threads)])
 
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
@@ -215,12 +242,11 @@ def compute_ttk(fname, times, backend, num_threads=1):
     }
     os.rename("output_port_0.vtu", outp)
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault(key, dict()).update(
+    times[dataset].setdefault(backend.value, dict()).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
 
-    store_log(out, dataset, key.replace("/", "_"))
-    logging.info("  Done in %.3fs", elapsed)
+    store_log(out, dataset, backend.value.replace("/", "_"))
 
     try:
         os.remove("morse.dipha")
@@ -228,11 +254,12 @@ def compute_ttk(fname, times, backend, num_threads=1):
     except FileNotFoundError:
         pass
 
+    return elapsed
+
 
 @parallel_decorator
 def compute_dipha(fname, times, num_threads=1):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with Dipha (%d process(es))...", dataset, num_threads)
     outp = f"diagrams/{dataset}.dipha"
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
     if num_threads > 1:
@@ -266,13 +293,12 @@ def compute_dipha(fname, times, num_threads=1):
     times[dataset].setdefault("Dipha", dict()).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
-    logging.info("  Done in %.3fs", elapsed)
     store_log(out, dataset, "dipha")
+    return elapsed
 
 
 def compute_cubrips(fname, times):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with CubicalRipser...", dataset)
     outp = f"diagrams/{dataset}_CubicalRipser.dipha"
     if "x1_" in dataset:
         binary = "CubicalRipser_2dim/CR2"
@@ -289,12 +315,11 @@ def compute_cubrips(fname, times):
     }
     res.update(get_pairs_number(outp))
     times[dataset]["CubicalRipser"] = {"seq": res}
-    logging.info("  Done in %.3fs", elapsed)
+    return elapsed
 
 
 def compute_gudhi_dionysus(fname, times, backend):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with %s...", dataset, backend)
     outp = f"diagrams/{dataset}_{backend}.gudhi"
 
     def compute_time(output):
@@ -331,13 +356,12 @@ def compute_gudhi_dionysus(fname, times, backend):
         times[dataset][backend] = {"para": res}
     else:
         times[dataset][backend] = {"seq": res}
-    logging.info("  Done in %.3fs", elapsed)
+    return elapsed
 
 
 @parallel_decorator
 def compute_oineus(fname, times, num_threads=1):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with Oineus (%d thread(s))...", dataset, num_threads)
     outp = f"diagrams/{dataset}_Oineus.gudhi"
 
     def oineus_compute_time(oineus_output):
@@ -364,12 +388,11 @@ def compute_oineus(fname, times, num_threads=1):
         {("seq" if num_threads == 1 else "para"): res}
     )
 
-    logging.info("  Done in %.3fs", elapsed)
+    return elapsed
 
 
 def compute_diamorse(fname, times):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with Diamorse...", dataset)
     outp = f"diagrams/{dataset}_Diamorse.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r", "-o", outp]
 
@@ -383,12 +406,11 @@ def compute_diamorse(fname, times):
 
     res.update(get_pairs_number(outp))
     times[dataset]["Diamorse"] = {"seq": res}
-    logging.info("  Done in %.3fs", elapsed)
+    return elapsed
 
 
 def compute_perseus(fname, times, simplicial):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with Perseus...", dataset)
     outp = f"diagrams/{dataset}_Perseus.gudhi"
     subc = "simtop" if simplicial else "cubtop"
     cmd = ["perseus/perseus", subc, fname, "out"]
@@ -406,12 +428,11 @@ def compute_perseus(fname, times, simplicial):
 
     res.update(get_pairs_number(outp))
     times[dataset]["Perseus"] = {"seq": res}
-    logging.info("  Done in %.3fs", elapsed)
+    return elapsed
 
 
 def compute_eirene(fname, times):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with Eirene.jl...", dataset)
     outp = f"diagrams/{dataset}_Eirene.gudhi"
     cmd = ["julia", "call_eirene.jl", fname, outp]
 
@@ -432,12 +453,11 @@ def compute_eirene(fname, times):
 
     res.update(get_pairs_number(outp))
     times[dataset]["Eirene"] = {"seq": res}
-    logging.info("  Done in %.3fs", elapsed)
+    return elapsed
 
 
 def compute_javaplex(fname, times):
     dataset = dataset_name(fname)
-    logging.info("Processing %s with JavaPlex...", dataset)
     outp = f"diagrams/{dataset}_JavaPlex.gudhi"
     cmd = (
         ["java", "-Xmx64G"]
@@ -463,44 +483,116 @@ def compute_javaplex(fname, times):
 
     res.update(get_pairs_number(outp))
     times[dataset]["JavaPlex"] = {"para": res}
-    logging.info("  Done in %.3fs", elapsed)
+    return elapsed
 
 
 def dispatch(fname, times):
-    # process file according to extension
-    ext = fname.split(".")[-1]
-
-    if ext in ("vtu", "vti"):
-        if "x1_" in fname:
-            # FTM in 2D
-            compute_ttk(fname, times, TTKBackend.FTM)
-            # and our algo
-            compute_ttk(fname, times, TTKBackend.SANDWICH)
-        else:
-            # our algo
-            compute_ttk(fname, times, TTKBackend.SANDWICH)
-            # ttk-hybrid: offload Morse-Smale complex to Dipha
-            compute_ttk(fname, times, TTKBackend.DIPHA)
-            # ttk-hybrid++: offload saddle connectors to Dipha
-            compute_ttk(fname, times, TTKBackend.DIPHAPP)
-    elif ext == "dipha":
-        compute_dipha(fname, times)
+    def get_complex_type(fname):
         if "impl" in fname:
-            compute_cubrips(fname, times)
-    elif ext == "pers" and "impl" in fname:
-        compute_gudhi_dionysus(fname, times, "Gudhi")
-        compute_oineus(fname, times)
-        compute_perseus(fname, times, False)
-    elif ext == "tsc":
-        compute_gudhi_dionysus(fname, times, "Gudhi")
-        compute_gudhi_dionysus(fname, times, "Dionysus")
-        if "x1_" in fname:
-            compute_gudhi_dionysus(fname, times, "Ripser")
-        compute_javaplex(fname, times)
-    elif ext == "nc":
-        compute_diamorse(fname, times)
-    elif ext == "eirene":
-        compute_eirene(fname, times)
+            return Complex.CUBICAL
+        if "expl" in fname:
+            return Complex.SIMPLICIAL
+        return Complex.UNDEFINED
+
+    def get_file_type(fname, complex_type):
+        # process file according to extension
+        ext = fname.split(".")[-1]
+
+        if ext in ("vtu", "vti"):
+            return FileType.VTI_VTU
+        if ext == "dipha":
+            if complex_type == Complex.CUBICAL:
+                return FileType.DIPHA_CUB
+            if complex_type == Complex.SIMPLICIAL:
+                return FileType.DIPHA_TRI
+        if ext == "pers":
+            if complex_type == Complex.CUBICAL:
+                return FileType.PERS_CUB
+            if complex_type == Complex.SIMPLICIAL:
+                return FileType.PERS_TRI
+        if ext == "tsc":
+            return FileType.TSC
+        if ext == "nc":
+            return FileType.NETCDF
+        if ext == "eirene":
+            return FileType.EIRENE_CSV
+
+        return FileType.UNDEFINED
+
+    def get_backends(file_type, slice_type):
+        # get backend from file and slice types
+        if file_type == FileType.VTI_VTU:
+            ret = [SoftBackend.TTK_SANDWICH]
+            if slice_type == SliceType.SURF:
+                # FTM in 2D + our algo
+                return [SoftBackend.TTK_FTM] + ret
+            if slice_type == SliceType.VOL:
+                # our algo
+                # TTK-Dipha: offload Morse-Smale complex to Dipha
+                # TTK-Dipha/Sandwich: offload saddle connectors to Dipha
+                return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
+        if file_type == FileType.DIPHA_CUB:
+            return [SoftBackend.DIPHA, SoftBackend.CUBICALRIPSER]
+        if file_type == FileType.DIPHA_TRI:
+            return [SoftBackend.DIPHA]
+        if file_type == FileType.PERS_CUB:
+            return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS]
+        if file_type == FileType.PERS_TRI:
+            return []  # disable Perseus for simplicial complexes
+            # return [SoftBackend.PERSEUS]
+        if file_type == FileType.TSC:
+            ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
+            if slice_type == SliceType.SURF:
+                return ret + [SoftBackend.RIPSER]
+            if slice_type == SliceType.VOL:
+                return ret
+        if file_type == FileType.NETCDF:
+            return [SoftBackend.DIAMORSE]
+        if file_type == FileType.EIRENE_CSV:
+            return [SoftBackend.EIRENE]
+
+        return SoftBackend.UNDEFINED
+
+    slice_type = SliceType.SURF if "x1_" in fname else SliceType.VOL
+    complex_type = get_complex_type(fname)
+    file_type = get_file_type(fname, complex_type)
+    backends = get_backends(file_type, slice_type)
+
+    for b in backends:
+        logging.info("Processing %s with %s...", dataset_name(fname), b.value)
+
+        try:  # catch exception at every backend call
+            if b in [
+                SoftBackend.TTK_FTM,
+                SoftBackend.TTK_SANDWICH,
+                SoftBackend.TTK_DIPHA,
+                SoftBackend.TTK_DIPHAPP,
+            ]:
+                el = compute_ttk(fname, times, b)
+            elif b == SoftBackend.DIPHA:
+                el = compute_dipha(fname, times)
+            elif b == SoftBackend.CUBICALRIPSER:
+                el = compute_cubrips(fname, times)
+            elif b == SoftBackend.PERSEUS:
+                el = compute_perseus(fname, times, complex_type == Complex.SIMPLICIAL)
+            elif b in [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.RIPSER]:
+                el = compute_gudhi_dionysus(fname, times, b.value)
+            elif b == SoftBackend.OINEUS:
+                el = compute_oineus(fname, times)
+            elif b == SoftBackend.DIAMORSE:
+                el = compute_diamorse(fname, times)
+            elif b == SoftBackend.EIRENE:
+                el = compute_eirene(fname, times)
+            elif b == SoftBackend.JAVAPLEX:
+                el = compute_javaplex(fname, times)
+
+            logging.info("  Done in %.3fs", el)
+        except subprocess.TimeoutExpired:
+            logging.warning(
+                "  Timeout reached after %ds, computation aborted", TIMEOUT_S
+            )
+        except subprocess.CalledProcessError:
+            logging.error("  Process aborted")
 
 
 def compute_diagrams(args):
@@ -534,12 +626,8 @@ def compute_diagrams(args):
                 "#Vertices": dsname.split("_")[-3],
             }
 
-        try:
-            dispatch(fname, times)
-        except subprocess.TimeoutExpired:
-            logging.warning("Timeout reached after %ds, computation aborted", TIMEOUT_S)
-        except subprocess.CalledProcessError:
-            logging.error("  Process aborted")
+        # call dispatch function per dataset
+        dispatch(fname, times)
 
         # write partial results after every dataset computation
         with open(result_fname, "w") as dst:
