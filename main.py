@@ -228,6 +228,7 @@ class FileType(enum.Enum):
                 # TTK-Dipha: offload Morse-Smale complex to Dipha
                 # TTK-Dipha/Sandwich: offload saddle connectors to Dipha
                 return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
+            return ret
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.CUBICALRIPSER]
         if self == FileType.DIPHA_TRI:
@@ -239,7 +240,7 @@ class FileType(enum.Enum):
             # return [SoftBackend.PERSEUS_SIM]
         if self == FileType.TSC:
             ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
-            if slice_type == SliceType.SURF:
+            if slice_type in (SliceType.SURF, SliceType.LINE):
                 return ret + [SoftBackend.RIPSER]  # Ripser only in 2D
             if slice_type == SliceType.VOL:
                 return ret
@@ -248,7 +249,7 @@ class FileType(enum.Enum):
         if self == FileType.EIRENE_CSV:
             return [SoftBackend.EIRENE]
 
-        return SoftBackend.UNDEFINED
+        return [SoftBackend.UNDEFINED]
 
 
 class Complex(enum.Enum):
@@ -580,7 +581,7 @@ def compute_javaplex(fname, times, backend):
 
 
 def dispatch(fname, times):
-    slice_type = SliceType.SURF if "x1_" in fname else SliceType.VOL
+    slice_type = SliceType.from_filename(fname)
     complex_type = Complex.from_filename(fname)
     file_type = FileType.from_filename(fname, complex_type)
     backends = file_type.get_backends(slice_type)
@@ -591,7 +592,7 @@ def dispatch(fname, times):
             logging.info("Skipping %s already processed by %s", dsname, b.value)
             return
 
-        logging.info("Processing %s with %s...", dataset_name(fname), b.value)
+        logging.info("Processing %s with %s...", fname.split("/")[-1], b.value)
 
         try:  # catch exception at every backend call
             if b == SoftBackend.UNDEFINED:
