@@ -281,7 +281,8 @@ def parallel_decorator(func):
 @parallel_decorator
 def compute_ttk(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_{backend.value}.vtu"
+    bs = backend.value.replace("/", "-")
+    outp = f"diagrams/{dataset}_{bs}.vtu"
     cmd = (
         ["ttkPersistenceDiagramCmd"]
         + ["-i", fname]
@@ -337,7 +338,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
         {("seq" if num_threads == 1 else "para"): res}
     )
 
-    store_log(out, dataset, backend.value.replace("/", "_"))
+    store_log(out, dataset, bs)
 
     try:
         os.remove("morse.dipha")
