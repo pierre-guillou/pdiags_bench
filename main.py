@@ -58,6 +58,14 @@ def prepare_datasets(args):
             )
             p.start()
             p.join()
+        if args.only_lines:
+            # 1D lines
+            p = multiprocessing.Process(
+                target=convert_datasets.main,
+                args=(dataset, "datasets", 1024 ** 2, SliceType.LINE),
+            )
+            p.start()
+            p.join()
 
 
 def get_pairs_number(diag):
@@ -730,6 +738,12 @@ def main():
         "-2",
         "--only_slices",
         help="Only generate 2D slices",
+        action="store_true",
+    )
+    prep_datasets.add_argument(
+        "-1",
+        "--only_lines",
+        help="Only generate 1D lines",
         action="store_true",
     )
     prep_datasets.set_defaults(func=prepare_datasets)
