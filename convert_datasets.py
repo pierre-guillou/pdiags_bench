@@ -65,6 +65,14 @@ class SliceType(enum.Enum):
     SURF = 1
     LINE = 2
 
+    @classmethod
+    def from_filename(cls, fname):
+        if "x1x1_" in fname:
+            return cls.LINE
+        if "x1_" in fname:
+            return cls.SURF
+        return cls.VOL
+
 
 def slice_data(input_dataset, slice_type, dims):
     if slice_type in (SliceType.SURF, SliceType.LINE):
