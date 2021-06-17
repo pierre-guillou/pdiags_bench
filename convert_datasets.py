@@ -66,7 +66,7 @@ class SliceType(enum.Enum):
     LINE = 2
 
 
-def slice_data(input_dataset, slice_type):
+def slice_data(input_dataset, slice_type, dims):
     if slice_type in (SliceType.SURF, SliceType.LINE):
         # force generation of input_vti (otherwise, slice is empty)
         simple.Show(input_dataset)
@@ -75,13 +75,25 @@ def slice_data(input_dataset, slice_type):
         sl0.SliceType.Normal = [0.0, 0.0, 1.0]
 
         if slice_type == SliceType.LINE:
+            # resample to a 2D strip before slicing again
+            rsi = simple.ResampleToImage(Input=sl0)
+            rsi.SamplingDimensions = [1024 ** 2, 3, 1]
+            simple.Show(rsi)  # same here...
+
             # slice along vertical/y axis
-            sl1 = simple.Slice(Input=sl0)
+            sl1 = simple.Slice(Input=rsi)
             sl1.SliceType.Normal = [0.0, 1.0, 0.0]
             return sl1
 
-        return sl0
-    return input_dataset
+        # resample to something like 960x960x1
+        rsi = simple.ResampleToImage(Input=sl0)
+        rsi.SamplingDimensions = dims
+        return rsi
+
+    # resample to something like 192^3
+    rsi = simple.ResampleToImage(Input=input_dataset)
+    rsi.SamplingDimensions = dims
+    return rsi
 
 
 def pipeline(raw_file, raw_stem, dims, slice_type, out_dir):
@@ -93,14 +105,10 @@ def pipeline(raw_file, raw_stem, dims, slice_type, out_dir):
     calc.ResultArrayName = "ImageFile"
 
     # get a slice
-    cut = slice_data(calc, slice_type)
-
-    # resample to 192^3
-    rsi = simple.ResampleToImage(Input=cut)
-    rsi.SamplingDimensions = dims
+    cut = slice_data(calc, slice_type, dims)
 
     # compute order field
-    arrprec = simple.TTKArrayPreconditioning(Input=rsi)
+    arrprec = simple.TTKArrayPreconditioning(Input=cut)
     arrprec.PointDataArrays = ["ImageFile"]
 
     # trash input scalar field, save order field
@@ -108,7 +116,8 @@ def pipeline(raw_file, raw_stem, dims, slice_type, out_dir):
     pa.PointDataArrays = ["ImageFile_Order"]
 
     # save implicit mesh
-    write_output(pa, raw_stem + "_order_impl", out_dir, False)
+    if slice_type != SliceType.LINE:
+        write_output(pa, raw_stem + "_order_impl", out_dir, False)
 
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
