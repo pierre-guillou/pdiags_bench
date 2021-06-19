@@ -163,7 +163,6 @@ class SoftBackend(enum.Enum):
     DIAMORSE = "Diamorse"
     EIRENE = "Eirene.jl"
     JAVAPLEX = "JavaPlex"
-    UNDEFINED = ""
 
     def get_compute_function(self):
         dispatcher = {
@@ -257,7 +256,7 @@ class FileType(enum.Enum):
         if self == FileType.EIRENE_CSV:
             return [SoftBackend.EIRENE]
 
-        return [SoftBackend.UNDEFINED]
+        return []
 
 
 class Complex(enum.Enum):
@@ -603,9 +602,6 @@ def dispatch(fname, times):
         logging.info("Processing %s with %s...", fname.split("/")[-1], b.value)
 
         try:  # catch exception at every backend call
-            if b == SoftBackend.UNDEFINED:
-                logging.warning("Skipping undefined backend")
-                return
 
             # call backend compute function
             el = b.get_compute_function()(fname, times, b)
