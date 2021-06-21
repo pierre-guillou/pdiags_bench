@@ -611,8 +611,10 @@ def dispatch(fname, times):
             logging.warning(
                 "  Timeout reached after %ds, computation aborted", TIMEOUT_S
             )
+            times[dsname].setdefault(b.value, dict()).update({"timeout": TIMEOUT_S})
         except subprocess.CalledProcessError:
             logging.error("  Process aborted")
+            times[dsname].setdefault(b.value, dict()).update({"error": "abort"})
 
 
 def compute_diagrams(args):
