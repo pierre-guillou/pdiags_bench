@@ -514,7 +514,7 @@ def compute_perseus(fname, times, backend):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     subc = "simtop" if backend == SoftBackend.PERSEUS_SIM else "cubtop"
-    cmd = ["perseus/perseus", subc, fname, "out"]
+    cmd = ["perseus/perseus", subc, fname]
 
     _, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
@@ -525,7 +525,7 @@ def compute_perseus(fname, times, backend):
     }
 
     # convert output to Gudhi format
-    pers2gudhi.main("out", outp)
+    pers2gudhi.main("output", outp)
 
     res.update(get_pairs_number(outp))
     times[dataset][backend.value] = {"seq": res}
