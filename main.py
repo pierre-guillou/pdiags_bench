@@ -660,7 +660,7 @@ def compute_diagrams(args):
 
         # write partial results after every dataset computation
         with open(result_fname, "w") as dst:
-            dst.write(json.dumps(times))
+            json.dump(times, dst, indent=4)
 
     return times
 
