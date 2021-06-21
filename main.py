@@ -155,8 +155,8 @@ class SoftBackend(enum.Enum):
     DIPHA = "Dipha"
     CUBICALRIPSER = "CubicalRipser"
     GUDHI = "Gudhi"
-    PERSEUS_CUB = "Perseus"
-    PERSEUS_SIM = "Perseus"
+    PERSEUS_CUB = "Perseus_cubtop"
+    PERSEUS_SIM = "Perseus_simtop"
     DIONYSUS = "Dionysus"
     RIPSER = "Ripser"
     OINEUS = "Oineus"
@@ -528,7 +528,7 @@ def compute_perseus(fname, times, backend):
     pers2gudhi.main("output", outp)
 
     res.update(get_pairs_number(outp))
-    times[dataset][backend.value] = {"seq": res}
+    times[dataset][backend.value.split("_")[0]] = {"seq": res}
     return elapsed
 
 
