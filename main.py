@@ -247,7 +247,7 @@ class FileType(enum.Enum):
                 # TTK-Dipha: offload Morse-Smale complex to Dipha
                 # TTK-Dipha/Sandwich: offload saddle connectors to Dipha
                 return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
-            return ret
+            return ret  # 1D lines
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.CUBICALRIPSER]
         if self == FileType.DIPHA_TRI:
@@ -655,9 +655,11 @@ def compute_diagrams(args):
     result_fname = f"results_{datetime.datetime.now().isoformat()}.json"
 
     for fname in sorted(glob.glob("datasets/*")):
-        if "x1_" in fname and args.only_cubes and not args.only_slices:
+        if args.only_lines and "x1x1_" not in fname:
             continue
-        if not "x1_" in fname and args.only_slices and not args.only_cubes:
+        if args.only_slices and ("x1_" not in fname or "x1x1_" in fname):
+            continue
+        if args.only_cubes and "x1_" in fname:
             continue
 
         # initialize compute times table
@@ -759,7 +761,7 @@ def main():
 
     get_diags = subparsers.add_parser("compute_diagrams")
     get_diags.add_argument(
-        "-1",
+        "-s",
         "--sequential",
         help="Disable the multi-threading support",
         action="store_true",
@@ -781,6 +783,12 @@ def main():
         "-2",
         "--only_slices",
         help="Only process 2D datasets",
+        action="store_true",
+    )
+    get_diags.add_argument(
+        "-1",
+        "--only_lines",
+        help="Only process 1D datasets",
         action="store_true",
     )
     get_diags.add_argument(
