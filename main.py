@@ -165,6 +165,7 @@ class SoftBackend(enum.Enum):
     TTK_DIPHA = "TTK/Dipha"
     TTK_DIPHAPP = "TTK-Sandwich/Dipha"
     DIPHA = "Dipha"
+    DIPHA_MPI = "Dipha_MPI"
     CUBICALRIPSER = "CubicalRipser"
     GUDHI = "Gudhi"
     PERSEUS_CUB = "Perseus_cubtop"
@@ -183,6 +184,7 @@ class SoftBackend(enum.Enum):
             SoftBackend.TTK_DIPHA: compute_ttk,
             SoftBackend.TTK_DIPHAPP: compute_ttk,
             SoftBackend.DIPHA: compute_dipha,
+            SoftBackend.DIPHA_MPI: compute_dipha,
             SoftBackend.CUBICALRIPSER: compute_cubrips,
             SoftBackend.PERSEUS_CUB: compute_perseus,
             SoftBackend.PERSEUS_SIM: compute_perseus,
@@ -249,9 +251,9 @@ class FileType(enum.Enum):
                 return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
             return ret  # 1D lines
         if self == FileType.DIPHA_CUB:
-            return [SoftBackend.DIPHA, SoftBackend.CUBICALRIPSER]
+            return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
         if self == FileType.DIPHA_TRI:
-            return [SoftBackend.DIPHA]
+            return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI]
         if self == FileType.PERS_CUB:
             return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS_CUB]
         if self == FileType.PERS_TRI:
@@ -369,12 +371,14 @@ def compute_ttk(fname, times, backend, num_threads=1):
     return elapsed
 
 
-@parallel_decorator
-def compute_dipha(fname, times, backend, num_threads=1):
+def compute_dipha(fname, times, backend):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_{backend.value}.dipha"
+    b = backend.value.split("_")[0]
+    outp = f"diagrams/{dataset}_{b}.dipha"
     cmd = ["build_dipha/dipha", "--benchmark", fname, outp]
-    if num_threads > 1:
+    num_threads = 1
+    if backend is SoftBackend.DIPHA_MPI:
+        num_threads = multiprocessing.cpu_count()
         cmd = ["mpirun", "--use-hwthread-cpus", "-np", str(num_threads)] + cmd
 
     out, err = launch_process(cmd)
@@ -402,7 +406,7 @@ def compute_dipha(fname, times, backend, num_threads=1):
         "#threads": num_threads,
     }
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault(backend.value, dict()).update(
+    times[dataset].setdefault(b, dict()).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
     store_log(out, dataset, "dipha")
@@ -623,7 +627,9 @@ def dispatch(fname, times):
             logging.warning(
                 "  Timeout reached after %ds, computation aborted", TIMEOUT_S
             )
-            times[dsname].setdefault(b.value, dict()).update({"timeout": TIMEOUT_S})
+            times[dsname].setdefault(b.value.replace("_", "/"), dict()).update(
+                {"timeout": TIMEOUT_S}
+            )
         except subprocess.CalledProcessError:
             logging.error("  Process aborted")
             times[dsname].setdefault(b.value, dict()).update({"error": "abort"})
