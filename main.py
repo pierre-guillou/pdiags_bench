@@ -36,7 +36,7 @@ def prepare_datasets(args):
 
     # also generate a random and an elevation datasets
     for field in ["elevation", "random"]:
-        gen_random.main(min(args.max_resample_size, 64), field, "raws")
+        gen_random.main(64, field, "raws")
 
     create_dir("datasets")
     for dataset in sorted(glob.glob("raws/*.raw") + glob.glob("raws/*.vti")):
@@ -44,25 +44,37 @@ def prepare_datasets(args):
         # separate processes
         if args.only_cubes:
             # 3D cubes
+            if args.max_resample_size is None:
+                rs = convert_datasets.RESAMPL_3D
+            else:
+                rs = args.max_resample_size
             p = multiprocessing.Process(
                 target=convert_datasets.main,
-                args=(dataset, "datasets", args.max_resample_size),
+                args=(dataset, "datasets", rs, SliceType.VOL),
             )
             p.start()
             p.join()
         if args.only_slices:
             # 2D slices
+            if args.max_resample_size is None:
+                rs = convert_datasets.RESAMPL_2D
+            else:
+                rs = args.max_resample_size
             p = multiprocessing.Process(
                 target=convert_datasets.main,
-                args=(dataset, "datasets", 960, SliceType.SURF),
+                args=(dataset, "datasets", rs, SliceType.SURF),
             )
             p.start()
             p.join()
         if args.only_lines:
             # 1D lines
+            if args.max_resample_size is None:
+                rs = convert_datasets.RESAMPL_1D
+            else:
+                rs = args.max_resample_size
             p = multiprocessing.Process(
                 target=convert_datasets.main,
-                args=(dataset, "datasets", 1024 ** 2, SliceType.LINE),
+                args=(dataset, "datasets", rs, SliceType.LINE),
             )
             p.start()
             p.join()
@@ -724,7 +736,6 @@ def main():
         "--max_resample_size",
         help="Maximum size of the resampled datasets (vertices per edge)",
         type=int,
-        default=convert_datasets.RESAMPL,
     )
     prep_datasets.add_argument(
         "-3",
