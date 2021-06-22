@@ -7,7 +7,9 @@ from paraview import simple
 
 import vti2nc3
 
-RESAMPL = 192
+RESAMPL_3D = 192
+RESAMPL_2D = 960
+RESAMPL_1D = 1024 ** 2
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
 
@@ -87,7 +89,7 @@ def slice_data(input_dataset, slice_type, dims):
         if slice_type == SliceType.LINE:
             # resample to a 2D strip before slicing again
             rsi = simple.ResampleToImage(Input=sl0)
-            rsi.SamplingDimensions = [1024 ** 2, 3, 1]
+            rsi.SamplingDimensions = [dims[0], 3, 1]
             simple.Show(rsi)  # same here...
 
             # slice along vertical/y axis
@@ -137,7 +139,7 @@ def pipeline(raw_file, raw_stem, dims, slice_type, out_dir):
     write_output(rgi, raw_stem + "_order_expl", out_dir, True)
 
 
-def main(raw_file, out_dir="", resampl_size=RESAMPL, slice_type=SliceType.VOL):
+def main(raw_file, out_dir="", resampl_size=RESAMPL_3D, slice_type=SliceType.VOL):
     if raw_file == "":
         return
 
@@ -184,7 +186,6 @@ if __name__ == "__main__":
         "--resampling_size",
         type=int,
         help="Resampling to a cube of given vertices edge",
-        default=RESAMPL,
     )
     parser.add_argument(
         "-2",
@@ -205,9 +206,15 @@ if __name__ == "__main__":
 
     if args.slice:
         stype = SliceType.SURF
+        if args.resampling_size is None:
+            args.resampling_size = RESAMPL_2D
     elif args.line:
         stype = SliceType.LINE
+        if args.resampling_size is None:
+            args.resampling_size = RESAMPL_1D
     else:
         stype = SliceType.VOL
+        if args.resampling_size is None:
+            args.resampling_size = RESAMPL_3D
 
     main(args.raw_file, args.dest_dir, args.resampling_size, stype)
