@@ -42,7 +42,7 @@ def prepare_datasets(args):
     for dataset in sorted(glob.glob("raws/*.raw") + glob.glob("raws/*.vti")):
         # reduce RAM usage by isolating datasets manipulation in
         # separate processes
-        if args.only_cubes or not args.only_slices:
+        if args.only_cubes:
             # 3D cubes
             p = multiprocessing.Process(
                 target=convert_datasets.main,
@@ -50,7 +50,7 @@ def prepare_datasets(args):
             )
             p.start()
             p.join()
-        if args.only_slices or not args.only_cubes:
+        if args.only_slices:
             # 2D slices
             p = multiprocessing.Process(
                 target=convert_datasets.main,
