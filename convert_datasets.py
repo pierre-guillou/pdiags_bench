@@ -1,5 +1,6 @@
 import argparse
 import enum
+import logging
 import time
 
 from paraview import simple
@@ -7,6 +8,7 @@ from paraview import simple
 import vti2nc3
 
 RESAMPL = 192
+logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
 
 def write_output(outp, fname, out_dir, explicit):
@@ -159,13 +161,13 @@ def main(raw_file, out_dir="", resampl_size=RESAMPL, slice_type=SliceType.VOL):
         # not an Open-Scivis-Datasets raw file (elevation or random)
         raw_stem = f"{raw_stem}_{extent_s}"
 
-    print(f"Converting {raw_file} to input formats (resampled to {extent_s})")
+    logging.info("Converting %s to input formats (resampled to %s)", raw_file, extent_s)
     beg = time.time()
 
     pipeline(raw_file, raw_stem, dims, slice_type, out_dir)
 
     end = time.time()
-    print(f"Converted {raw_file} (took {round(end - beg, 3)}s)")
+    logging.info("Converted %s (took %ss)", raw_file, round(end - beg, 3))
 
 
 if __name__ == "__main__":
