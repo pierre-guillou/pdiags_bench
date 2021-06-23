@@ -66,10 +66,20 @@ def gen_table(fname, res, simplicial=True):
         curr = [ds_name] * len(cols)
         for it, val in data[ds].items():
             if isinstance(val, dict):
-                try:
+                if "para" in val.keys():
                     val = val["para"]["pers"]
-                except KeyError:
+                elif "seq" in val.keys():
                     val = val["seq"]["pers"]
+                elif "timeout" in val.keys():
+                    if val["timeout"] > 60 :
+                        timeout = int(val["timeout"] / 60)
+                        timeout = f"+{timeout}min"
+                    else:
+                        timeout = val["timeout"]
+                        timeout = f"+{timeout}s"
+                    val = r"\cellcolor{lightgray}%s" % timeout
+                else:
+                    val = r"\cellcolor{lightgray}{Err.}"
             curr[cols_dict[it]] = str(val)
         # consistency check
         for i, val in enumerate(curr):
