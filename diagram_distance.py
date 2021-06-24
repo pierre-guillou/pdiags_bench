@@ -1,6 +1,7 @@
 import argparse
 import enum
 import json
+import logging
 import os
 import pathlib
 import re
@@ -8,6 +9,7 @@ import subprocess
 
 from paraview import simple
 
+logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
 def load_diagram(diag):
     if diag.endswith("vtu"):
@@ -79,7 +81,7 @@ def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
     try:
         proc = subprocess.run(cmd, capture_output=True, check=True)
     except subprocess.CalledProcessError:
-        print(f"Error computing distance between {fdiag0} and {fdiag1}")
+        logging.error("Could not compute distance between %s and %s", fdiag0, fdiag1)
         return None
     matches = re.findall(pattern, str(proc.stdout))
     matches = [float(m) for m in matches]
@@ -92,7 +94,7 @@ def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
 def get_file_list(diag_file):
     p = pathlib.Path(diag_file)
     if not p.exists():
-        print(f"Error: {diag_file} not found")
+        logging.error("File not found: %s", diag_file)
         return None
     stem = "_".join(p.stem.split("_")[:-1])
     l = sorted(p.parent.glob(f"{stem}*"))
@@ -107,7 +109,7 @@ def main(diag_file, threshold, method, write_to_file=True):
     dipha_diag = str(diags[0])
     res = dict()
     for diag in diags[1:]:
-        print(f"Computing distance between {dipha_diag} and {str(diag)}...")
+        logging.info("Computing distance between %s and %s...", dipha_diag, str(diag))
         res[str(diag.name)] = get_diag_dist(dipha_diag, str(diag), threshold, method)
 
     if write_to_file:
