@@ -1,6 +1,9 @@
 import argparse
 import enum
+import os
 import pathlib
+import re
+import subprocess
 
 from paraview import simple
 
@@ -16,11 +19,69 @@ def load_diagram(diag):
 
 
 class DistMethod(enum.Enum):
-    BOTTLENECK = 0
-    AUCTION = 1
+    BOTTLENECK = enum.auto()
+    AUCTION = enum.auto()
 
     def __str__(self):
         return super().name.lower()
+
+
+def compare_diags(fdiag0, fdiag1, thr_bound, method=DistMethod.AUCTION):
+    diag0 = load_diagram(fdiag0)
+    diag1 = load_diagram(fdiag1)
+
+    if method == DistMethod.AUCTION:
+        gd = simple.GroupDatasets(Input=[diag0, diag1])
+        thrange = gd.GetCellDataInformation()["Persistence"].GetComponentRange(0)
+        thr = simple.Threshold(Input=gd)
+        thr.Scalars = ["CELLS", "Persistence"]
+        thr.ThresholdRange = [thr_bound * thrange[1], thrange[1]]
+        dist = simple.TTKPersistenceDiagramClustering(Input=thr)
+        dist.Maximalcomputationtimes = 10.0
+
+    elif method == DistMethod.BOTTLENECK:
+        thr0range = diag0.GetCellDataInformation()["Persistence"].GetComponentRange(0)
+        thr0 = simple.Threshold(Input=diag0)
+        thr0.Scalars = ["CELLS", "Persistence"]
+        thr0.ThresholdRange = [thr_bound * thr0range[1], thr0range[1]]
+        thr1range = diag1.GetCellDataInformation()["Persistence"].GetComponentRange(0)
+        thr1 = simple.Threshold(Input=diag1)
+        thr1.Scalars = ["CELLS", "Persistence"]
+        thr1.ThresholdRange = [thr_bound * thr1range[1], thr1range[1]]
+        dist = simple.TTKBottleneckDistance(
+            Persistencediagram1=thr0,
+            Persistencediagram2=thr1,
+        )
+
+    simple.SaveData("dist.vtu", Input=dist)
+    os.remove("dist.vtu")
+
+
+def entry_point(fdiag0, fdiag1, threshold_bound, method):
+    float_re = r"(\d+\.\d+|\d+)"
+    if method == DistMethod.AUCTION:
+        pattern = re.compile(
+            rf"(?:Min-saddle|Saddle-saddle|Saddle-max) cost\s+:\s+{float_re}"
+        )
+    elif method == DistMethod.BOTTLENECK:
+        pattern = re.compile(rf"diag(?:Max|Min|Sad)\({float_re}\)")
+
+    # launch compare_diags through subprocess to capture stdout
+    cmd = (
+        ["python", __file__]
+        + ["-p", fdiag0, fdiag1]
+        + ["-m", str(method)]
+        + ["-t", str(threshold_bound)]
+    )
+
+    proc = subprocess.run(cmd, capture_output=True, check=True)
+    matches = re.findall(pattern, str(proc.stdout))
+    matches = [float(m) for m in matches]
+    pairTypes = ["min-sad", "sad-sad", "sad-max"]
+
+    dists = dict(zip(pairTypes, matches))
+    print(dists)
+    return dists
 
 
 def main(diag_file):
