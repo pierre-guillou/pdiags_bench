@@ -1,5 +1,6 @@
 import argparse
 import enum
+import json
 import os
 import pathlib
 import re
@@ -26,28 +27,29 @@ class DistMethod(enum.Enum):
         return super().name.lower()
 
 
-def compare_diags(fdiag0, fdiag1, thr_bound, method=DistMethod.AUCTION):
-    diag0 = load_diagram(fdiag0)
-    diag1 = load_diagram(fdiag1)
+def compare_diags(args):
 
-    if method == DistMethod.AUCTION:
+    diag0 = load_diagram(args.diags[0])
+    diag1 = load_diagram(args.diags[1])
+
+    if args.method == DistMethod.AUCTION:
         gd = simple.GroupDatasets(Input=[diag0, diag1])
         thrange = gd.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr = simple.Threshold(Input=gd)
         thr.Scalars = ["CELLS", "Persistence"]
-        thr.ThresholdRange = [thr_bound * thrange[1], thrange[1]]
+        thr.ThresholdRange = [args.thr_bound * thrange[1], thrange[1]]
         dist = simple.TTKPersistenceDiagramClustering(Input=thr)
         dist.Maximalcomputationtimes = 10.0
 
-    elif method == DistMethod.BOTTLENECK:
+    elif args.method == DistMethod.BOTTLENECK:
         thr0range = diag0.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr0 = simple.Threshold(Input=diag0)
         thr0.Scalars = ["CELLS", "Persistence"]
-        thr0.ThresholdRange = [thr_bound * thr0range[1], thr0range[1]]
+        thr0.ThresholdRange = [args.thr_bound * thr0range[1], thr0range[1]]
         thr1range = diag1.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr1 = simple.Threshold(Input=diag1)
         thr1.Scalars = ["CELLS", "Persistence"]
-        thr1.ThresholdRange = [thr_bound * thr1range[1], thr1range[1]]
+        thr1.ThresholdRange = [args.thr_bound * thr1range[1], thr1range[1]]
         dist = simple.TTKBottleneckDistance(
             Persistencediagram1=thr0,
             Persistencediagram2=thr1,
@@ -57,7 +59,7 @@ def compare_diags(fdiag0, fdiag1, thr_bound, method=DistMethod.AUCTION):
     os.remove("dist.vtu")
 
 
-def entry_point(fdiag0, fdiag1, threshold_bound, method):
+def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
     float_re = r"(\d+\.\d+|\d+)"
     if method == DistMethod.AUCTION:
         pattern = re.compile(
@@ -69,49 +71,50 @@ def entry_point(fdiag0, fdiag1, threshold_bound, method):
     # launch compare_diags through subprocess to capture stdout
     cmd = (
         ["python", __file__]
-        + ["-p", fdiag0, fdiag1]
+        + [fdiag0, fdiag1]
         + ["-m", str(method)]
         + ["-t", str(threshold_bound)]
     )
 
-    proc = subprocess.run(cmd, capture_output=True, check=True)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, check=True)
+    except subprocess.CalledProcessError:
+        print(f"Error computing distance between {fdiag0} and {fdiag1}")
+        return None
     matches = re.findall(pattern, str(proc.stdout))
     matches = [float(m) for m in matches]
     pairTypes = ["min-sad", "sad-sad", "sad-max"]
 
     dists = dict(zip(pairTypes, matches))
-    print(dists)
     return dists
 
 
-def main(diag_file):
+def get_file_list(diag_file):
     p = pathlib.Path(diag_file)
     if not p.exists():
         print(f"Error: {diag_file} not found")
-        return
+        return None
     stem = "_".join(p.stem.split("_")[:-1])
     l = sorted(p.parent.glob(f"{stem}*"))
-    diags = {d.name: load_diagram(str(d)) for d in l}
+    idx = next(i for i, v in enumerate(l) if "_Dipha" in str(v))
+    l[0], l[idx] = l[idx], l[0]
+    return l, stem
 
-    arred = list()
-    for n, d in diags.items():
-        ae = simple.TTKArrayEditor(Target=d)
-        ae.TargetAttributeType = "Field Data"
-        ae.DataString = f"Name,{n}"
-        arred.append(ae)
 
-    gd = simple.GroupDatasets(Input=arred)
+def main(diag_file, threshold, method, write_to_file=True):
+    diags, stem = get_file_list(diag_file)
 
-    thr = simple.Threshold(Input=gd)
-    thr.Scalars = ["CELLS", "IsFinite"]
-    thr.ThresholdRange = [1.0, 1.0]
+    dipha_diag = str(diags[0])
+    res = dict()
+    for diag in diags[1:]:
+        print(f"Computing distance between {dipha_diag} and {str(diag)}...")
+        res[str(diag.name)] = get_diag_dist(dipha_diag, str(diag), threshold, method)
 
-    pairsType = ["min-saddle pairs", "saddle-saddle pairs", "saddle-max pairs"]
-    for pt in pairsType:
-        distmat = simple.TTKPersistenceDiagramDistanceMatrix(Input=thr)
-        distmat.Criticalpairsused = pt
-        ptf = pt.split()[0].replace("-", "_")
-        simple.SaveData(f"dist_{stem}_{ptf}.csv", Input=distmat)
+    if write_to_file:
+        with open(f"dist_Dipha_{stem}.json", "w") as dst:
+            json.dump(res, dst, indent=4)
+
+    return res
 
 
 if __name__ == "__main__":
@@ -120,6 +123,35 @@ if __name__ == "__main__":
             "Compute distance matrices between a series of persistence diagrams"
         )
     )
-    parser.add_argument("diag0", help="Path to first persistence diagram")
-    args = parser.parse_args()
-    main(args.diag0)
+
+    parser.add_argument(
+        "diags", nargs="+", help="Path to persistence diagrams to compare"
+    )
+    parser.add_argument(
+        "-m",
+        "--method",
+        help="Distance Method",
+        choices=["auction", "bottleneck"],
+        default="auction",
+    )
+    parser.add_argument(
+        "-t",
+        "--thr_bound",
+        type=float,
+        help="Threshold persistence below value before computing distance",
+        default=0.01,
+    )
+
+    cli_args = parser.parse_args()
+
+    if cli_args.method == "auction":
+        cli_args.method = DistMethod.AUCTION
+    elif cli_args.method == "bottleneck":
+        cli_args.method = DistMethod.BOTTLENECK
+    else:
+        raise argparse.ArgumentError
+
+    if len(cli_args.diags) == 1:
+        main(cli_args.diags[0], cli_args.thr_bound, cli_args.method)
+    else:
+        compare_diags(cli_args)

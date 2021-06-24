@@ -686,34 +686,21 @@ def compute_diagrams(args):
 
 
 def compute_distances(args):
-    # list of datasets that have at least one persistence diagram
-    datasets = sorted(set(f.split(".")[0] for f in glob.glob("diagrams/*")))
-
-    dists = dict()
-
     if args.method == "auction":
         distmeth = diagram_distance.DistMethod.AUCTION
     elif args.method == "bottleneck":
         distmeth = diagram_distance.DistMethod.BOTTLENECK
 
-    for ds in datasets:
-        ttk_diag = ds + ".vtu"
-        dipha_diag = ds + ".dipha"
-        empty_diag = "empty.vtu"
+    res = dict()
+    for ds in sorted(glob.glob("diagrams/*_expl_Dipha.dipha")):
+        res[ds.split("/")[-1]] = diagram_distance.main(
+            ds, args.threshold_value, distmeth, False
+        )
 
-        if os.path.isfile(ttk_diag) and os.path.isfile(dipha_diag):
-            dists[ds] = {
-                "ttk-dipha": diagram_distance.main(
-                    dipha_diag, ttk_diag, args.threshold_value, distmeth
-                ),
-                "empty-dipha": diagram_distance.main(
-                    dipha_diag, empty_diag, args.threshold_value, distmeth
-                ),
-            }
+        with open("distances.json", "w") as dst:
+            json.dump(res, dst, indent=4)
 
-    with open("distances", "w") as dst:
-        dst.write(json.dumps(dists))
-    return dists
+    return res
 
 
 def main():
