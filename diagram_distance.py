@@ -81,16 +81,26 @@ def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
 
     # launch compare_diags through subprocess to capture stdout
     cmd = (
-        ["python", __file__]
+        ["/usr/bin/timeout", "--preserve-status", "60"]
+        + ["python", __file__]
         + [fdiag0, fdiag1]
         + ["-m", str(method)]
         + ["-t", str(threshold_bound)]
     )
 
     try:
+        logging.info(
+            "Computing %s distance between %s and %s...",
+            method.name.lower(),
+            fdiag0,
+            fdiag1,
+        )
+        beg = time.time()
         proc = subprocess.run(cmd, capture_output=True, check=True)
+        end = time.time()
+        logging.info("  Done in %.3fs", end - beg)
     except subprocess.CalledProcessError:
-        logging.error("Could not compute distance between %s and %s", fdiag0, fdiag1)
+        logging.error("  Could not compute distance")
         return None
     matches = re.findall(pattern, str(proc.stdout))
     matches = [round(float(m), 1) for m in matches]
@@ -118,16 +128,7 @@ def main(diag_file, threshold, method, write_to_file=True):
     dipha_diag = str(diags[0])
     res = dict()
     for diag in diags[1:]:
-        logging.info(
-            "Computing %s distance between %s and %s...",
-            method.name.lower(),
-            dipha_diag,
-            str(diag),
-        )
-        beg = time.time()
         res[str(diag.name)] = get_diag_dist(dipha_diag, str(diag), threshold, method)
-        end = time.time()
-        logging.info("  Done in %.3fs", end - beg)
 
     if write_to_file:
         with open(f"dist_Dipha_{stem}.json", "w") as dst:
