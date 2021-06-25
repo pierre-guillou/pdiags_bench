@@ -6,10 +6,12 @@ import os
 import pathlib
 import re
 import subprocess
+import time
 
 from paraview import simple
 
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
+
 
 def load_diagram(diag):
     if diag.endswith("vtu"):
@@ -84,7 +86,7 @@ def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
         logging.error("Could not compute distance between %s and %s", fdiag0, fdiag1)
         return None
     matches = re.findall(pattern, str(proc.stdout))
-    matches = [float(m) for m in matches]
+    matches = [round(float(m), 1) for m in matches]
     pairTypes = ["min-sad", "sad-sad", "sad-max"]
 
     dists = dict(zip(pairTypes, matches))
@@ -109,8 +111,16 @@ def main(diag_file, threshold, method, write_to_file=True):
     dipha_diag = str(diags[0])
     res = dict()
     for diag in diags[1:]:
-        logging.info("Computing distance between %s and %s...", dipha_diag, str(diag))
+        logging.info(
+            "Computing %s distance between %s and %s...",
+            method.name.lower(),
+            dipha_diag,
+            str(diag),
+        )
+        beg = time.time()
         res[str(diag.name)] = get_diag_dist(dipha_diag, str(diag), threshold, method)
+        end = time.time()
+        logging.info("  Done in %.3fs", end - beg)
 
     if write_to_file:
         with open(f"dist_Dipha_{stem}.json", "w") as dst:
