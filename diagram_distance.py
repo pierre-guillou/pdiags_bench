@@ -36,22 +36,29 @@ def compare_diags(args):
     diag0 = load_diagram(args.diags[0])
     diag1 = load_diagram(args.diags[1])
 
+    fin0 = simple.Threshold(Input=diag0)
+    fin0.Scalars = ["CELLS", "IsFinite"]
+    fin0.ThresholdRange = [1, 1]
+    fin1 = simple.Threshold(Input=diag1)
+    fin1.Scalars = ["CELLS", "IsFinite"]
+    fin1.ThresholdRange = [1, 1]
+
     if args.method == DistMethod.AUCTION:
-        gd = simple.GroupDatasets(Input=[diag0, diag1])
+        gd = simple.GroupDatasets(Input=[fin0, fin1])
         thrange = gd.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr = simple.Threshold(Input=gd)
         thr.Scalars = ["CELLS", "Persistence"]
         thr.ThresholdRange = [args.thr_bound * thrange[1], thrange[1]]
         dist = simple.TTKPersistenceDiagramClustering(Input=thr)
-        dist.Maximalcomputationtimes = 10.0
+        dist.Maximalcomputationtimes = 100.0
 
     elif args.method == DistMethod.BOTTLENECK:
-        thr0range = diag0.GetCellDataInformation()["Persistence"].GetComponentRange(0)
-        thr0 = simple.Threshold(Input=diag0)
+        thr0range = fin0.GetCellDataInformation()["Persistence"].GetComponentRange(0)
+        thr0 = simple.Threshold(Input=fin0)
         thr0.Scalars = ["CELLS", "Persistence"]
         thr0.ThresholdRange = [args.thr_bound * thr0range[1], thr0range[1]]
-        thr1range = diag1.GetCellDataInformation()["Persistence"].GetComponentRange(0)
-        thr1 = simple.Threshold(Input=diag1)
+        thr1range = fin1.GetCellDataInformation()["Persistence"].GetComponentRange(0)
+        thr1 = simple.Threshold(Input=fin1)
         thr1.Scalars = ["CELLS", "Persistence"]
         thr1.ThresholdRange = [args.thr_bound * thr1range[1], thr1range[1]]
         dist = simple.TTKBottleneckDistance(
