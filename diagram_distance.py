@@ -141,7 +141,7 @@ if __name__ == "__main__":
         "--thr_bound",
         type=float,
         help="Threshold persistence below value before computing distance",
-        default=0.01,
+        default=0.0,
     )
 
     cli_args = parser.parse_args()
