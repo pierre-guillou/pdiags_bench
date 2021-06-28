@@ -627,6 +627,8 @@ def dispatch(fname, times):
             logging.warning(
                 "  Timeout reached after %ds, computation aborted", TIMEOUT_S
             )
+            if "Perseus" in b:
+                b = "Perseus"
             times[dsname].setdefault(b.value.replace("_", "/"), dict()).update(
                 {"timeout": TIMEOUT_S}
             )

@@ -84,7 +84,7 @@ def gen_table(fname, res, simplicial=True):
         # consistency check
         for i, val in enumerate(curr):
             if i != 0 and val == curr[0]:
-                curr[i] = r"\cellcolor{lightgray}{+30min}"
+                curr[i] = r"\cellcolor{lightgray}{No res}"
         # sort times in increasing order
         colors = ["green", "lime", "yellow", "orange", "brown", "red", "purple", "violet"]
         stimes = sort_times(curr, cols)
