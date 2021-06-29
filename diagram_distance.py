@@ -31,17 +31,21 @@ class DistMethod(enum.Enum):
         return super().name.lower()
 
 
-def compare_diags(args):
+def compare_diags(args, onlyFinite=False):
 
     diag0 = load_diagram(args.diags[0])
     diag1 = load_diagram(args.diags[1])
 
-    fin0 = simple.Threshold(Input=diag0)
-    fin0.Scalars = ["CELLS", "IsFinite"]
-    fin0.ThresholdRange = [1, 1]
-    fin1 = simple.Threshold(Input=diag1)
-    fin1.Scalars = ["CELLS", "IsFinite"]
-    fin1.ThresholdRange = [1, 1]
+    if onlyFinite:
+        fin0 = simple.Threshold(Input=diag0)
+        fin0.Scalars = ["CELLS", "IsFinite"]
+        fin0.ThresholdRange = [1, 1]
+        fin1 = simple.Threshold(Input=diag1)
+        fin1.Scalars = ["CELLS", "IsFinite"]
+        fin1.ThresholdRange = [1, 1]
+    else:
+        fin0 = diag0
+        fin1 = diag1
 
     if args.method == DistMethod.AUCTION:
         gd = simple.GroupDatasets(Input=[fin0, fin1])
