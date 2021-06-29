@@ -13,11 +13,12 @@ import subprocess
 
 import compare_diags
 import convert_datasets
-from convert_datasets import SliceType
 import diagram_distance
 import download_datasets
 import gen_random
+import gudhi_diag_inf
 import pers2gudhi
+from convert_datasets import SliceType
 
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
@@ -684,6 +685,8 @@ def compute_diagrams(args):
         with open(result_fname, "w") as dst:
             json.dump(times, dst, indent=4)
 
+    # post-process generated Gudhi diagrams
+    gudhi_diag_inf.main()
     return times
 
 
