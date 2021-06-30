@@ -1,7 +1,10 @@
+import sys
+
 import numpy as np
-import PIL.Image
-from ripser import ripser
-from scipy import sparse
+import ripser
+import scipy.sparse
+import vtk
+from vtk.numpy_interface import dataset_adapter as dsa
 
 
 def lower_star_img(img):
@@ -40,12 +43,25 @@ def lower_star_img(img):
             J = np.concatenate((J, thisJ.flatten()))
             V = np.concatenate((V, thisD.flatten()))
 
-    sparseDM = sparse.coo_matrix((V, (I, J)), shape=(idxs.size, idxs.size))
+    sparseDM = scipy.sparse.coo_matrix((V, (I, J)), shape=(idxs.size, idxs.size))
 
-    return ripser(sparseDM, distance_matrix=True, maxdim=1)["dgms"][0]
+    return ripser.ripser(sparseDM, distance_matrix=True, maxdim=1)["dgms"]
 
 
 if __name__ == "__main__":
-    cells_grey = np.asarray(PIL.Image.open("Cells.jpg").convert("L"))
-    dgm = lower_star_img(-cells_grey)
+    fname = sys.argv[1]
+    if "x1x1_" in fname:
+        reader = vtk.vtkXMLUnstructuredGridReader()
+    elif "x1_" in fname:
+        reader = vtk.vtkXMLImageDataReader()
+    reader.SetFileName(fname)
+    reader.Update()
+    image_data = reader.GetOutput()
+    if "x1x1_" in fname:
+        dims = (-1, 1)
+    elif "x1_" in fname:
+        dims = image_data.GetDimensions()[0:2]
+    dataset = dsa.WrapDataObject(image_data)
+    array = dataset.PointData["ImageFile_Order"].reshape(dims)
+    dgm = lower_star_img(array)
     print(dgm)
