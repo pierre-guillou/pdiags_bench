@@ -61,6 +61,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
                     print(f"{RED}{d}{ENDC}")
                 else:
                     print(d)
+    return 1.0 - diffrat
 
 
 def main(diag0, diag1, show_diff=True):
@@ -68,8 +69,10 @@ def main(diag0, diag1, show_diff=True):
     pairs0 = read_diag(diag0)
     pairs1 = read_diag(diag1)
     diag_type = ["min-saddle", "saddle-saddle", "saddle-max"]
+    res = dict()
     for p0, p1, t in zip(pairs0, pairs1, diag_type):
-        compare_pairs(p0, p1, t, show_diff)
+        res[t] = compare_pairs(p0, p1, t, show_diff)
+    return res
 
 
 if __name__ == "__main__":
