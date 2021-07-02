@@ -123,16 +123,19 @@ class Gudhi_SimplexTree:
         import gudhi
 
         self.st = gudhi.SimplexTree()
+        self.pairs = list()
         print("Using the Gudhi Simplex Tree backend")
 
     def add(self, verts, val):
         self.st.insert(verts, filtration=val)
 
     def compute_pers(self):
-        self.st.compute_persistence()
+        self.pairs = self.st.persistence()
 
     def write_diag(self, output):
-        self.st.write_persistence_diagram(output)
+        with open(output, "w") as dst:
+            for dim, (birth, death) in self.pairs:
+                dst.write(f"{dim} {birth} {death}\n")
 
 
 def compute_persistence(wrapper, dims, values, cpx, output):
