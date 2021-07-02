@@ -699,7 +699,7 @@ def compute_distances(args):
     res = dict()
     for ds in sorted(glob.glob("diagrams/*_expl_Dipha.dipha")):
         res[ds.split("/")[-1]] = diagram_distance.main(
-            ds, args.threshold_value, distmeth, False
+            ds, args.pers_threshold, distmeth, args.timeout, False
         )
 
         with open("distances.json", "w") as dst:
@@ -806,11 +806,18 @@ def main():
         default="auction",
     )
     get_dists.add_argument(
-        "-t",
-        "--threshold_value",
+        "-p",
+        "--pers_threshold",
         type=float,
         help="Threshold persistence below value before computing distance",
         default=0.0,
+    )
+    get_dists.add_argument(
+        "-t",
+        "--timeout",
+        help="Timeout in seconds of every persistence diagram computation",
+        type=int,
+        default=TIMEOUT_S,
     )
 
     cli_args = parser.parse_args()

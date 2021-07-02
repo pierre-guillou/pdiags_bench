@@ -52,7 +52,7 @@ def compare_diags(args, onlyFinite=False):
         thrange = gd.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr = simple.Threshold(Input=gd)
         thr.Scalars = ["CELLS", "Persistence"]
-        thr.ThresholdRange = [args.thr_bound * thrange[1], thrange[1]]
+        thr.ThresholdRange = [args.pers_threshold * thrange[1], thrange[1]]
         dist = simple.TTKPersistenceDiagramClustering(Input=thr)
         dist.Maximalcomputationtimes = 100.0
 
@@ -60,11 +60,11 @@ def compare_diags(args, onlyFinite=False):
         thr0range = fin0.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr0 = simple.Threshold(Input=fin0)
         thr0.Scalars = ["CELLS", "Persistence"]
-        thr0.ThresholdRange = [args.thr_bound * thr0range[1], thr0range[1]]
+        thr0.ThresholdRange = [args.pers_threshold * thr0range[1], thr0range[1]]
         thr1range = fin1.GetCellDataInformation()["Persistence"].GetComponentRange(0)
         thr1 = simple.Threshold(Input=fin1)
         thr1.Scalars = ["CELLS", "Persistence"]
-        thr1.ThresholdRange = [args.thr_bound * thr1range[1], thr1range[1]]
+        thr1.ThresholdRange = [args.pers_threshold * thr1range[1], thr1range[1]]
         dist = simple.TTKBottleneckDistance(
             Persistencediagram1=thr0,
             Persistencediagram2=thr1,
@@ -74,7 +74,7 @@ def compare_diags(args, onlyFinite=False):
     os.remove("dist.vtu")
 
 
-def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
+def get_diag_dist(fdiag0, fdiag1, threshold_bound, method, timeout):
     float_re = r"(\d+\.\d+|\d+)"
     if method == DistMethod.AUCTION:
         pattern = re.compile(
@@ -85,11 +85,11 @@ def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
 
     # launch compare_diags through subprocess to capture stdout
     cmd = (
-        ["/usr/bin/timeout", "--preserve-status", "60"]
+        ["/usr/bin/timeout", "--preserve-status", str(timeout + 2)]
         + ["python", __file__]
         + [fdiag0, fdiag1]
         + ["-m", str(method)]
-        + ["-t", str(threshold_bound)]
+        + ["-p", str(threshold_bound)]
     )
 
     try:
@@ -100,11 +100,14 @@ def get_diag_dist(fdiag0, fdiag1, threshold_bound, method):
             fdiag1,
         )
         beg = time.time()
-        proc = subprocess.run(cmd, capture_output=True, check=True)
+        proc = subprocess.run(cmd, capture_output=True, check=True, timeout=timeout)
         end = time.time()
         logging.info("  Done in %.3fs", end - beg)
     except subprocess.CalledProcessError:
         logging.error("  Could not compute distance")
+        return None
+    except subprocess.TimeoutExpired:
+        logging.warning("  Timeout expired after %ds", timeout)
         return None
     matches = re.findall(pattern, str(proc.stdout))
     matches = [round(float(m), 1) for m in matches]
@@ -126,13 +129,15 @@ def get_file_list(diag_file):
     return l, stem
 
 
-def main(diag_file, threshold, method, write_to_file=True):
+def main(diag_file, threshold, method, timeout, write_to_file=True):
     diags, stem = get_file_list(diag_file)
 
     dipha_diag = str(diags[0])
     res = dict()
     for diag in diags[1:]:
-        res[str(diag.name)] = get_diag_dist(dipha_diag, str(diag), threshold, method)
+        res[str(diag.name)] = get_diag_dist(
+            dipha_diag, str(diag), threshold, method, timeout
+        )
 
     if write_to_file:
         with open(f"dist_Dipha_{stem}.json", "w") as dst:
@@ -159,11 +164,18 @@ if __name__ == "__main__":
         default="auction",
     )
     parser.add_argument(
-        "-t",
-        "--thr_bound",
+        "-p",
+        "--pers_threshold",
         type=float,
         help="Threshold persistence below value before computing distance",
         default=0.0,
+    )
+    parser.add_argument(
+        "-t",
+        "--timeout",
+        type=int,
+        help="Timeout in seconds",
+        default=1800,  # 30min
     )
 
     cli_args = parser.parse_args()
@@ -176,6 +188,11 @@ if __name__ == "__main__":
         raise argparse.ArgumentError
 
     if len(cli_args.diags) == 1:
-        main(cli_args.diags[0], cli_args.thr_bound, cli_args.method)
+        main(
+            cli_args.diags[0],
+            cli_args.pers_threshold,
+            cli_args.method,
+            cli_args.timeout,
+        )
     else:
         compare_diags(cli_args)
