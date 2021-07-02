@@ -8,7 +8,7 @@ def replace_inf(diag):
     patt = re.compile(r".*_(\d+)x(\d+)x(\d+)_.*")
     dims = re.match(patt, diag.stem).groups()
     dims = [int(d) for d in dims]
-    max_order = dims[0] * dims[1] * dims[2]
+    max_order = dims[0] * dims[1] * dims[2] - 1
     out_pairs = list()
     found = False
     for line in pairs.split("\n"):
