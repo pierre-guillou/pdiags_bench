@@ -28,6 +28,8 @@ def read_diag(diag):
     diag = read_file(diag)
     ptype = diag.GetCellData().GetArray("PairType")
     pts = diag.GetPoints()
+    if pts is None:
+        return []
     assert 2 * ptype.GetNumberOfTuples() - 2 == pts.GetNumberOfPoints()
     pairs = [list() for i in range(3)]
     for i in range(ptype.GetNumberOfTuples()):
