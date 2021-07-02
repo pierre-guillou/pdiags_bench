@@ -10,6 +10,8 @@ import time
 
 from paraview import simple
 
+import compare_diags as cd
+
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
 
@@ -26,6 +28,7 @@ def load_diagram(diag):
 class DistMethod(enum.Enum):
     BOTTLENECK = enum.auto()
     AUCTION = enum.auto()
+    LEXICO = enum.auto()
 
     def __str__(self):
         return super().name.lower()
@@ -135,9 +138,12 @@ def main(diag_file, threshold, method, timeout, write_to_file=True):
     dipha_diag = str(diags[0])
     res = dict()
     for diag in diags[1:]:
-        res[str(diag.name)] = get_diag_dist(
-            dipha_diag, str(diag), threshold, method, timeout
-        )
+        if method == DistMethod.LEXICO:
+            res[str(diag.name)] = cd.main(dipha_diag, str(diag), False)
+        else:
+            res[str(diag.name)] = get_diag_dist(
+                dipha_diag, str(diag), threshold, method, timeout
+            )
 
     if write_to_file:
         with open(f"dist_Dipha_{stem}.json", "w") as dst:

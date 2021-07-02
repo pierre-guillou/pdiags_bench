@@ -695,6 +695,8 @@ def compute_distances(args):
         distmeth = diagram_distance.DistMethod.AUCTION
     elif args.method == "bottleneck":
         distmeth = diagram_distance.DistMethod.BOTTLENECK
+    elif args.method == "lexico":
+        distmeth = diagram_distance.DistMethod.LEXICO
 
     res = dict()
     for ds in sorted(glob.glob("diagrams/*_expl_Dipha.dipha")):
@@ -802,7 +804,7 @@ def main():
         "-m",
         "--method",
         help="Comparison method",
-        choices=["auction", "bottleneck"],
+        choices=["auction", "bottleneck", "lexico"],
         default="auction",
     )
     get_dists.add_argument(
