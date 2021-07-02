@@ -7,6 +7,8 @@ import sys
 
 import dionysus
 import numpy as np
+import ripser
+import scipy.sparse
 
 
 def read_simplicial_complex(dataset):
@@ -47,6 +49,7 @@ class Ripser_SparseDM:
     def __init__(self):
         self.dist_mat = None
         self.diag = None
+        self.maxdim = 0
         print("Using the Ripser.py backend")
 
     def fill_dist_mat(self, dims, vals, edges):
@@ -54,6 +57,11 @@ class Ripser_SparseDM:
         I = np.zeros(dims[0] + 2 * dims[1], dtype=np.int32)
         J = np.zeros(dims[0] + 2 * dims[1], dtype=np.int32)
         V = np.zeros(dims[0] + 2 * dims[1], dtype=np.double)
+
+        if dims[2] != 0:
+            self.maxdim = 1
+        if dims[3] != 0:
+            self.maxdim = 2
 
         for i in range(dims[0]):
             I[i] = i
@@ -69,41 +77,18 @@ class Ripser_SparseDM:
             V[o + 0] = vals[dims[0] + i]
             V[o + 1] = vals[dims[0] + i]
 
-        self.dist_mat = "\n".join([f"{i} {j} {v}" for i, j, v in zip(I, J, V)])
+        self.dist_mat = scipy.sparse.coo_matrix((V, (I, J)), shape=(dims[0], dims[0]))
 
     def compute_pers(self):
-        proc = subprocess.run(
-            ["ripser/ripser", "--format", "sparse"],
-            check=True,
-            input=self.dist_mat.encode(),
-            capture_output=True,
-        )
-        self.diag = proc.stdout.decode()
+        self.diag = ripser.ripser(
+            self.dist_mat, distance_matrix=True, maxdim=self.maxdim
+        )["dgms"]
 
     def write_diag(self, output):
-        dim = 0
-        pairs = list()
-        for line in self.diag.split("\n"):
-            if line == " [0, )":
-                pairs.append([0, 0, math.inf])
-            dim_pat = r"persistence intervals in dim (\d+):"
-            try:
-                dim = re.search(dim_pat, line).group(1)
-            except AttributeError:
-                pass
-            pair_pat = r"\[(\d+),(\d+)\)"
-            try:
-                birth, death = re.search(pair_pat, line).groups()
-                pairs.append([dim, birth, death])
-            except AttributeError:
-                pass
-
         with open(output, "w") as dst:
-            for dim, birth, death in pairs:
-                if int(dim) == 0 and float(birth) == 0 and float(death) != math.inf:
-                    # filter out min-sad pairs beginning from 0
-                    continue
-                dst.write(f"{dim} {birth} {death}\n")
+            for dim, pairs in enumerate(self.diag):
+                for birth, death in pairs:
+                    dst.write(f"{dim} {birth} {death}\n")
 
 
 class Dionysus_Filtration:

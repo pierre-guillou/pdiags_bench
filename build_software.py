@@ -55,7 +55,6 @@ def main():
         "gudhi",
         "oineus",
         "perseus",
-        "ripser",
         "JavaPlex",
     ]
 
@@ -95,13 +94,6 @@ def main():
                 subprocess.run(["make", "all"], cwd=soft, check=True)
             except subprocess.CalledProcessError:
                 print("Missing cython, python2-numpy to build diamorse")
-        elif soft == "ripser":
-            subprocess.run(
-                ["g++", "-std=c++11", "-O3", "ripser.cpp"]
-                + ["-o", "ripser", "-DNDEBUG", "-DUSE_ROBINHOOD_HASHMAP"],
-                cwd=soft,
-                check=True,
-            )
         elif soft == "Eirene.jl":
             subprocess.run(["julia", "-e", 'using Pkg; Pkg.add("Eirene")'], check=True)
         elif soft == "JavaPlex":
