@@ -51,14 +51,23 @@ class Ripser_SparseDM:
 
     def fill_dist_mat(self, dims, vals, edges):
         edges = edges.reshape(-1, 2)
-        I = np.zeros(dims[1], dtype=np.int32)
-        J = np.zeros(dims[1], dtype=np.int32)
-        V = np.zeros(dims[1], dtype=np.double)
+        I = np.zeros(dims[0] + 2 * dims[1], dtype=np.int32)
+        J = np.zeros(dims[0] + 2 * dims[1], dtype=np.int32)
+        V = np.zeros(dims[0] + 2 * dims[1], dtype=np.double)
+
+        for i in range(dims[0]):
+            I[i] = i
+            J[i] = i
+            V[i] = vals[i]
 
         for i, e in enumerate(edges):
-            I[i] = e[0]
-            J[i] = e[1]
-            V[i] = vals[dims[0] + i]
+            o = dims[0] + 2 * i
+            I[o + 0] = e[0]
+            J[o + 0] = e[1]
+            I[o + 1] = e[1]
+            J[o + 1] = e[0]
+            V[o + 0] = vals[dims[0] + i]
+            V[o + 1] = vals[dims[0] + i]
 
         self.dist_mat = "\n".join([f"{i} {j} {v}" for i, j, v in zip(I, J, V)])
 
