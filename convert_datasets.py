@@ -8,7 +8,7 @@ from paraview import simple
 import vti2nc3
 
 RESAMPL_3D = 192
-RESAMPL_2D = 960
+RESAMPL_2D = 768
 RESAMPL_1D = 1024 ** 2
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
@@ -97,7 +97,7 @@ def slice_data(input_dataset, slice_type, dims):
             sl1.SliceType.Normal = [0.0, 1.0, 0.0]
             return sl1
 
-        # resample to something like 960x960x1
+        # resample to something like 768x768x1
         rsi = simple.ResampleToImage(Input=sl0)
         rsi.SamplingDimensions = dims
         return rsi
