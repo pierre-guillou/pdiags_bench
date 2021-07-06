@@ -628,9 +628,10 @@ def dispatch(fname, times):
             logging.warning(
                 "  Timeout reached after %ds, computation aborted", TIMEOUT_S
             )
-            if "Perseus" in b:
-                b = "Perseus"
-            times[dsname].setdefault(b.value.replace("_", "/"), dict()).update(
+            bv = b.value
+            if "Perseus" in bv:
+                bv = "Perseus"
+            times[dsname].setdefault(bv.replace("_", "/"), dict()).update(
                 {"timeout": TIMEOUT_S}
             )
         except subprocess.CalledProcessError:
