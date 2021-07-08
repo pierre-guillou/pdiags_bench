@@ -34,44 +34,24 @@ class DistMethod(enum.Enum):
         return super().name.lower()
 
 
-def compare_diags(args, onlyFinite=False):
+def compare_diags(args):
 
     diag0 = load_diagram(args.diags[0])
     diag1 = load_diagram(args.diags[1])
 
-    if onlyFinite:
-        fin0 = simple.Threshold(Input=diag0)
-        fin0.Scalars = ["CELLS", "IsFinite"]
-        fin0.ThresholdRange = [1, 1]
-        fin1 = simple.Threshold(Input=diag1)
-        fin1.Scalars = ["CELLS", "IsFinite"]
-        fin1.ThresholdRange = [1, 1]
-    else:
-        fin0 = diag0
-        fin1 = diag1
-
     if args.method == DistMethod.AUCTION:
-        gd = simple.GroupDatasets(Input=[fin0, fin1])
-        thrange = gd.GetCellDataInformation()["Persistence"].GetComponentRange(0)
-        thr = simple.Threshold(Input=gd)
-        thr.Scalars = ["CELLS", "Persistence"]
-        thr.ThresholdRange = [args.pers_threshold * thrange[1], thrange[1]]
-        dist = simple.TTKPersistenceDiagramClustering(Input=thr)
+        gd = simple.GroupDatasets(Input=[diag0, diag1])
+        dist = simple.TTKPersistenceDiagramClustering(Input=gd)
         dist.Maximalcomputationtimes = 100.0
+        dist.Forceminimumprecisiononmatchings = True
+        dist.Minimalrelativeprecision = args.pers_threshold / 100.0
 
     elif args.method == DistMethod.BOTTLENECK:
-        thr0range = fin0.GetCellDataInformation()["Persistence"].GetComponentRange(0)
-        thr0 = simple.Threshold(Input=fin0)
-        thr0.Scalars = ["CELLS", "Persistence"]
-        thr0.ThresholdRange = [args.pers_threshold * thr0range[1], thr0range[1]]
-        thr1range = fin1.GetCellDataInformation()["Persistence"].GetComponentRange(0)
-        thr1 = simple.Threshold(Input=fin1)
-        thr1.Scalars = ["CELLS", "Persistence"]
-        thr1.ThresholdRange = [args.pers_threshold * thr1range[1], thr1range[1]]
         dist = simple.TTKBottleneckDistance(
-            Persistencediagram1=thr0,
-            Persistencediagram2=thr1,
+            Persistencediagram1=diag0,
+            Persistencediagram2=diag1,
         )
+        dist.Persistencethreshold = args.pers_threshold
 
     simple.SaveData("dist.vtu", Input=dist)
     os.remove("dist.vtu")
@@ -174,7 +154,7 @@ if __name__ == "__main__":
         "--pers_threshold",
         type=float,
         help="Threshold persistence below value before computing distance",
-        default=0.0,
+        default=1,
     )
     parser.add_argument(
         "-t",
