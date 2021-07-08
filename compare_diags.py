@@ -48,7 +48,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
     if math.isclose(diffrat, 1.0):
         print(f"> Identical {ptype} pairs")
     else:
-        print(f"> Differences in {ptype} pairs (similarity ratio: {diffrat})")
+        print(f"> Differences in {ptype} pairs (distance ratio: {diffrat})")
         if show_diff:
             p0 = [str(a) + " " + str(b) for (a, b) in pairs0]
             p1 = [str(a) + " " + str(b) for (a, b) in pairs1]
@@ -70,7 +70,12 @@ def main(diag0, diag1, show_diff=True):
     print(f"Comparing {diag0} and {diag1}...")
     pairs0 = read_diag(diag0)
     pairs1 = read_diag(diag1)
-    diag_type = ["min-saddle", "saddle-saddle", "saddle-max"]
+    if len(pairs0[1]) == 0:
+        diag_type = ["min-max"]
+    elif len(pairs0[2]) == 0:
+        diag_type = ["min-saddle", "saddle-max"]
+    else:
+        diag_type = ["min-saddle", "saddle-saddle", "saddle-max"]
     res = dict()
     for p0, p1, t in zip(pairs0, pairs1, diag_type):
         res[t] = compare_pairs(p0, p1, t, show_diff)
