@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
+import argparse
 import difflib
-import glob
 import math
-import sys
 
 import topologytoolkit as ttk
 import vtk
@@ -83,9 +82,12 @@ def main(diag0, diag1, show_diff=True):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        main(sys.argv[1], sys.argv[2], True)
-    else:
-        expl_diags = sorted(glob.glob("diagrams/*_order_sfnorm_expl*"))
-        for k in range(len(expl_diags) // 2):
-            main(expl_diags[2 * k], expl_diags[2 * k + 1])
+    parser = argparse.ArgumentParser(
+        description="Compare two diagrams with Python difflib"
+    )
+    parser.add_argument("diag0", help="First diagram")
+    parser.add_argument("diag1", help="Second diagram")
+    parser.add_argument("-s", "--show_diff", help="Show diff", action="store_true")
+
+    args = parser.parse_args()
+    main(args.diag0, args.diag1, args.show_diff)
