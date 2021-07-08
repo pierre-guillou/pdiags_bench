@@ -38,7 +38,7 @@ def read_diag(diag):
             continue
         pairs[j].append(pts.GetPoint(2 * i + 1)[0:2])
     for pr in pairs:
-        pr.sort(key=lambda x: x[1])
+        pr.sort()
     return pairs
 
 
