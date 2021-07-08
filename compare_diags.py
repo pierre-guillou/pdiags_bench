@@ -41,28 +41,51 @@ def read_diag(diag):
     return pairs
 
 
+def print_diff(pairs0, pairs1):
+    p0 = [str(a) + " " + str(b) for (a, b) in pairs0]
+    p1 = [str(a) + " " + str(b) for (a, b) in pairs1]
+    diff = difflib.unified_diff(p0, p1)
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    ENDC = "\033[0m"
+    for d in diff:
+        if d.startswith("+"):
+            print(f"{GREEN}{d}{ENDC}")
+        elif d.startswith("-"):
+            print(f"{RED}{d}{ENDC}")
+        else:
+            print(d)
+
+
 def compare_pairs(pairs0, pairs1, ptype, show_diff):
     sm = difflib.SequenceMatcher(isjunk=None, a=pairs0, b=pairs1)
     diffrat = sm.ratio()
     if math.isclose(diffrat, 1.0):
         print(f"> Identical {ptype} pairs")
-    else:
-        print(f"> Differences in {ptype} pairs (distance ratio: {diffrat})")
-        if show_diff:
-            p0 = [str(a) + " " + str(b) for (a, b) in pairs0]
-            p1 = [str(a) + " " + str(b) for (a, b) in pairs1]
-            diff = difflib.unified_diff(p0, p1)
-            GREEN = "\033[92m"
-            RED = "\033[91m"
-            ENDC = "\033[0m"
-            for d in diff:
-                if d.startswith("+"):
-                    print(f"{GREEN}{d}{ENDC}")
-                elif d.startswith("-"):
-                    print(f"{RED}{d}{ENDC}")
-                else:
-                    print(d)
-    return 1.0 - diffrat
+        return 0.0
+
+    if show_diff:
+        print_diff(pairs0, pairs1)
+
+    # compute an overapproximation of the Wasserstein distance
+    res = 0.0
+    for opc in sm.get_opcodes():
+        if opc[0] == "replace":
+            sl = slice(opc[1], opc[2])
+            for a, b in zip(pairs0[sl], pairs1[sl]):
+                res += (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+        elif opc[0] == "delete":
+            sl = slice(opc[1], opc[2])
+            for a in pairs0[sl]:
+                res += a[0] ** 2 + a[1] ** 2
+        elif opc[0] == "insert":
+            sl = slice(opc[3], opc[4])
+            for b in pairs1[sl]:
+                res += b[0] ** 2 + b[1] ** 2
+    wass_dist = math.sqrt(res)
+
+    print(f"> Differences in {ptype} pairs (Wasserstein approx: {wass_dist})")
+    return wass_dist
 
 
 def main(diag0, diag1, show_diff=True):
