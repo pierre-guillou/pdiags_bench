@@ -2,6 +2,7 @@
 
 import argparse
 import difflib
+import itertools
 import math
 
 import topologytoolkit as ttk
@@ -69,19 +70,11 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
 
     # compute an overapproximation of the Wasserstein distance
     res = 0.0
-    for opc in sm.get_opcodes():
-        if opc[0] == "replace":
-            sl = slice(opc[1], opc[2])
-            for a, b in zip(pairs0[sl], pairs1[sl]):
-                res += (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
-        elif opc[0] == "delete":
-            sl = slice(opc[1], opc[2])
-            for a in pairs0[sl]:
-                res += a[0] ** 2 + a[1] ** 2
-        elif opc[0] == "insert":
-            sl = slice(opc[3], opc[4])
-            for b in pairs1[sl]:
-                res += b[0] ** 2 + b[1] ** 2
+    for (ba, bb), (da, db) in itertools.zip_longest(
+        pairs0, pairs1, fillvalue=(0.0, 0.0)
+    ):
+        res += (bb - ba) ** 2 + (db - da) ** 2
+
     wass_dist = math.sqrt(res)
 
     print(f"> Differences in {ptype} pairs (Wasserstein approx: {wass_dist})")
