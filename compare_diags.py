@@ -84,9 +84,16 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
     for (ba, da), (bb, db) in itertools.zip_longest(rem0, rem1, fillvalue=(0.0, 0.0)):
         res += (bb - ba) ** 2 + (db - da) ** 2
 
+    # compute the distance from pairs0 to the empty diagram
+    # (sum of pairs persistence divided by sqrt(2))
+    ref_dist = sum(d - b for (b, d) in pairs0) / math.sqrt(2.0)
+
     wass_dist = math.sqrt(res)
 
-    print(f"> Differences in {ptype} pairs (Wasserstein approx: {wass_dist})")
+    print(
+        f"> Differences in {ptype} pairs "
+        f"(Wasserstein approx: {wass_dist:.8g}, {wass_dist/ref_dist:.3%} from empty diagram)"
+    )
     return wass_dist
 
 
