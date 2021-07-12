@@ -68,11 +68,20 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
     if show_diff:
         print_diff(pairs0, pairs1)
 
+    # discard common pairs between diagrams
+    rem0 = list()
+    rem1 = list()
+    for opc in sm.get_opcodes():
+        if opc[0] in ["replace", "delete"]:
+            sl = slice(opc[1], opc[2])
+            rem0.extend(pairs0[sl])
+        if opc[0] in ["replace", "insert"]:
+            sl = slice(opc[3], opc[4])
+            rem1.extend(pairs1[sl])
+
     # compute an overapproximation of the Wasserstein distance
     res = 0.0
-    for (ba, bb), (da, db) in itertools.zip_longest(
-        pairs0, pairs1, fillvalue=(0.0, 0.0)
-    ):
+    for (ba, da), (bb, db) in itertools.zip_longest(rem0, rem1, fillvalue=(0.0, 0.0)):
         res += (bb - ba) ** 2 + (db - da) ** 2
 
     wass_dist = math.sqrt(res)
