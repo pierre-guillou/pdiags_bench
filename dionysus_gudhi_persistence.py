@@ -129,7 +129,7 @@ class Gudhi_SimplexTree:
     def write_diag(self, output):
         with open(output, "w") as dst:
             for dim, (birth, death) in self.pairs:
-                dst.write(f"{dim} {birth} {death}\n")
+                dst.write(f"{dim} {birth:.3f} {death:.3f}\n")
 
 
 def compute_persistence(wrapper, dims, values, cpx, output):
@@ -197,7 +197,7 @@ def run(dataset, output, backend="Gudhi", simplicial=True):
 
         with open(output, "w") as dst:
             for dim, (birth, death) in diag:
-                dst.write(f"{dim} {birth} {death}\n")
+                dst.write(f"{dim} {birth:.3f} {death:.3f}\n")
 
         return (0.0, pers)
 
