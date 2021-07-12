@@ -12,6 +12,7 @@ def replace_inf(diag):
     out_pairs = list()
     found = False
     for line in pairs.split("\n"):
+        line = line.lower()
         if "inf" in line:
             line = line.replace("inf", str(max_order))
             found = True
