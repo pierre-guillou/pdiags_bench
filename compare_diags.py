@@ -8,6 +8,8 @@ import math
 import topologytoolkit as ttk
 import vtk
 
+import diagram_distance as diagdist
+
 
 def read_file(fname):
     ext = fname.split(".")[-1]
@@ -79,16 +81,28 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
             sl = slice(opc[3], opc[4])
             rem1.extend(pairs1[sl])
 
-    # compute an overapproximation of the Wasserstein distance
-    res = 0.0
-    for (ba, da), (bb, db) in itertools.zip_longest(rem0, rem1, fillvalue=(0.0, 0.0)):
-        res += (bb - ba) ** 2 + (db - da) ** 2
+    # store rem0 and rem1 in temporary files
+    with open("/tmp/diag0.gudhi", "w") as dst:
+        for b, d in rem0:
+            dst.write(f"0 {b} {d}\n")
+    with open("/tmp/diag1.gudhi", "w") as dst:
+        for b, d in rem1:
+            dst.write(f"0 {b} {d}\n")
+
+    print(f"Comparing {len(rem0)} and {len(rem1)} different pair")
+
+    # compute the distance with bottleneck
+    dists = diagdist.get_diag_dist(
+        "/tmp/diag0.gudhi", "/tmp/diag1.gudhi", 1.0, diagdist.DistMethod.AUCTION, 60
+    )
+    try:
+        wass_dist = dists["sad-max"]
+    except KeyError:
+        wass_dist = dists["min-sad"]
 
     # compute the distance from pairs0 to the empty diagram
     # (sum of pairs persistence divided by sqrt(2))
     ref_dist = sum(d - b for (b, d) in pairs0) / math.sqrt(2.0)
-
-    wass_dist = math.sqrt(res)
 
     print(
         f"> Differences in {ptype} pairs "
