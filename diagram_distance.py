@@ -64,7 +64,7 @@ def get_diag_dist(fdiag0, fdiag1, threshold_bound, method, timeout):
             rf"(?:Min-saddle|Saddle-saddle|Saddle-max) cost\s+:\s+{float_re}"
         )
     elif method == DistMethod.BOTTLENECK:
-        pattern = re.compile(rf"diag(?:Max|Min|Sad)\({float_re}\)")
+        pattern = re.compile(rf"res\({float_re}\)")
 
     # launch compare_diags through subprocess to capture stdout
     cmd = (
