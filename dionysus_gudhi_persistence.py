@@ -256,7 +256,7 @@ def main():
         args.input_dataset,
         args.output_diagram,
         backend=args.backend.capitalize(),
-        simplicial="expl" in args.input_dataset,
+        simplicial="expl" in args.input_dataset or "tsc" in args.input_dataset,
     )
 
 
