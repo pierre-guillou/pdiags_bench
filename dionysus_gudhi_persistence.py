@@ -7,7 +7,6 @@ import sys
 
 import dionysus
 import numpy as np
-import ripser
 import scipy.sparse
 
 
@@ -80,6 +79,7 @@ class Ripser_SparseDM:
         self.dist_mat = scipy.sparse.coo_matrix((V, (I, J)), shape=(dims[0], dims[0]))
 
     def compute_pers(self):
+        import ripser
         self.diag = ripser.ripser(
             self.dist_mat, distance_matrix=True, maxdim=self.maxdim
         )["dgms"]
