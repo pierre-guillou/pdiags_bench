@@ -124,10 +124,6 @@ class Gudhi_SimplexTree:
         self.st.insert(verts, filtration=val)
 
     def compute_pers(self):
-        with open("triangles.ref", "w") as dst:
-            for simplex, filtr in self.st.get_filtration():
-                if len(simplex) == 3:
-                    dst.write(f"{simplex} {int(filtr)}\n")
         self.pairs = self.st.persistence()
 
     def write_diag(self, output):
@@ -154,8 +150,6 @@ def compute_persistence(wrapper, dims, values, cpx, output):
             o = 3 * i
             a = dims[0] + dims[1] + i
             wrapper.add(triangles[o : o + 3], values[a])
-            if i < 10:
-                print(triangles[o:o+3], values[a])
         for i in range(dims[3]):
             o = 4 * i
             a = dims[0] + dims[1] + dims[2] + i
