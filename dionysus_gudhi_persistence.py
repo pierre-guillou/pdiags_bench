@@ -2,8 +2,8 @@ import argparse
 import math
 import re
 import subprocess
-import time
 import sys
+import time
 
 import dionysus
 import numpy as np
@@ -80,6 +80,7 @@ class Ripser_SparseDM:
 
     def compute_pers(self):
         import ripser
+
         self.diag = ripser.ripser(
             self.dist_mat, distance_matrix=True, maxdim=self.maxdim
         )["dgms"]
@@ -125,11 +126,52 @@ class Gudhi_SimplexTree:
 
     def compute_pers(self):
         self.pairs = self.st.persistence()
+        for el in self.st.get_filtration():
+            print(el)
 
-    def write_diag(self, output):
+    def write_diag(self, output, values, dims, edges, triangles, tetras):
+        vOrder = []
+        for i, val in enumerate(values[0: dims[0]]):
+            vOrder.append((i, val))
+        vOrderSorted = sorted(vOrder, key=lambda el: el[1])
+        for i, (j, val) in enumerate(vOrderSorted):
+            vOrderSorted[i] = j, i
+        # vertex id -> original order
+        vOrderSorted = sorted(vOrderSorted, key=lambda el: el[0])
+
+        # simplex order -> simplex id
+        orderS = [None] * sum(dims)
+        for i, v in enumerate(values):
+            orderS[int(v)] = i
+
+        # simplex id -> max original order on vertices
+        sOrder = [None] * sum(dims)
+        func = lambda v : sOrder[v]
+        for vid, vor in vOrderSorted:
+            sOrder[vid] = vor
+        for i in range(dims[1]):
+            o = 2 * i
+            a = dims[0] + i
+            sOrder[a] = max(map(func, edges[o : o + 2]))
+        for i in range(dims[2]):
+            o = 3 * i
+            a = dims[0] + dims[1] + i
+            sOrder[a] = max(map(func, triangles[o : o + 3]))
+        for i in range(dims[3]):
+            o = 4 * i
+            a = dims[0] + dims[1] + dims[2] + i
+            sOrder[a] = max(map(func, tetras[o : o + 4]))
+
         with open(output, "w") as dst:
             for dim, (birth, death) in self.pairs:
-                dst.write(f"{dim} {birth:.3f} {death:.3f}\n")
+                birthn = sOrder[orderS[int(birth)]]
+                if death != math.inf:
+                    deathn = sOrder[orderS[int(death)]]
+                if deathn == birthn:
+                    continue
+                assert birthn < deathn
+
+                dst.write(f"{dim} {birthn:.3f} {deathn:.3f}\n")
 
 
 def compute_persistence(wrapper, dims, values, cpx, output):
@@ -164,7 +206,7 @@ def compute_persistence(wrapper, dims, values, cpx, output):
     pers = round(time.time() - start, 3)
     print(f"Computed persistence: {pers}s")
 
-    wrapper.write_diag(output)
+    wrapper.write_diag(output, values, dims, edges, triangles, tetras)
 
     return (prec, pers)
 
