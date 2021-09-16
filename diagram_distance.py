@@ -53,8 +53,8 @@ def compare_diags(args):
         )
         dist.Persistencethreshold = args.pers_threshold
 
-    simple.SaveData("dist.vtu", Input=dist)
-    os.remove("dist.vtu")
+    simple.SaveData("dist.vtm", Input=dist)
+    os.remove("dist.vtm")
 
 
 def get_diag_dist(fdiag0, fdiag1, threshold_bound, method, timeout):
