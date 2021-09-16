@@ -82,8 +82,10 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
             rem1.extend(pairs1[sl])
 
     def dist_to_empty(pairs):
-        # (sum of pairs persistence divided by sqrt(2))
-        return sum(d - b for (b, d) in pairs) / math.sqrt(2.0)
+        # compute the distance from pairs0 to the empty diagram
+        # (sum of square of pairs persistence divided by 2)
+        sq_dist = sum((d - b) ** 2 for (b, d) in pairs) / 2.0
+        return math.sqrt(sq_dist)
 
     print(f"Comparing {len(rem0)} and {len(rem1)} different pair")
 
