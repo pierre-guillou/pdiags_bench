@@ -24,9 +24,10 @@ def read_file(fname):
     return reader.GetOutput()
 
 
-def read_diag(diag):
+def read_diag(diag, filter_inf=False):
     diag = read_file(diag)
     ptype = diag.GetCellData().GetArray("PairType")
+    ifin = diag.GetCellData().GetArray("IsFinite")
     pts = diag.GetPoints()
     if pts is None:
         return []
@@ -34,7 +35,7 @@ def read_diag(diag):
     pairs = [list() for i in range(3)]
     for i in range(ptype.GetNumberOfTuples()):
         j = int(ptype.GetTuple1(i))
-        if j == -1:
+        if j == -1 or (filter_inf and not bool(ifin.GetTuple1(i))):
             continue
         pairs[j].append(pts.GetPoint(2 * i + 1)[0:2])
     for pr in pairs:
@@ -85,7 +86,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
         sq_dist = sum((d - b) ** 2 for (b, d) in pairs) / 2.0
         return math.sqrt(sq_dist)
 
-    print(f"Comparing {len(rem0)} and {len(rem1)} different pair")
+    print(f"Comparing {len(rem0)} and {len(rem1)} different {ptype} pair")
 
     if len(rem0) == 0:
         # compute distance between rem1 and empty diagram
@@ -138,10 +139,10 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
     return wass_dist
 
 
-def main(diag0, diag1, show_diff=True):
+def main(diag0, diag1, show_diff=True, filter_inf=False):
     print(f"Comparing {diag0} and {diag1}...")
-    pairs0 = read_diag(diag0)
-    pairs1 = read_diag(diag1)
+    pairs0 = read_diag(diag0, filter_inf)
+    pairs1 = read_diag(diag1, filter_inf)
     if len(pairs0[1]) == 0:
         diag_type = ["min-max"]
     elif len(pairs0[2]) == 0:
@@ -161,6 +162,9 @@ if __name__ == "__main__":
     parser.add_argument("diag0", help="First diagram")
     parser.add_argument("diag1", help="Second diagram")
     parser.add_argument("-s", "--show_diff", help="Show diff", action="store_true")
+    parser.add_argument(
+        "-f", "--filter_inf", help="Only consider finite pairs", action="store_true"
+    )
 
     args = parser.parse_args()
-    main(args.diag0, args.diag1, args.show_diff)
+    main(args.diag0, args.diag1, args.show_diff, args.filter_inf)
