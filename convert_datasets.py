@@ -119,13 +119,9 @@ def pipeline(raw_file, raw_stem, dims, slice_type, out_dir):
     # get a slice
     cut = slice_data(calc, slice_type, dims)
 
-    # compute order field
-    arrprec = simple.TTKArrayPreconditioning(Input=cut)
-    arrprec.PointDataArrays = ["ImageFile"]
-
     # trash input scalar field, save order field
-    pa = simple.PassArrays(Input=arrprec)
-    pa.PointDataArrays = ["ImageFile_Order"]
+    pa = simple.PassArrays(Input=cut)
+    pa.PointDataArrays = ["ImageFile"]
 
     # save implicit mesh
     if slice_type != SliceType.LINE:
