@@ -45,8 +45,8 @@ def use_networkx():
             G,
             # nx.spectral_layout(G),
             node_color=color_map,
-            node_size=100,
-            font_size=8,
+            node_size=800,
+            font_size=14,
         )
         plt.show()
 
