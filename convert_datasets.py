@@ -25,17 +25,6 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".vtu", proxy=outp)
         # TTK Simplicial Complex (Gudhi, Dionysus, Ripser)
         simple.SaveData(fname + ".tsc", proxy=outp)
-        # Perseus Uniform Triangulation (Perseus)
-        simple.SaveData(fname + ".pers", proxy=outp)
-        # Eirene.jl Sparse Column Format CSV
-        simple.SaveData(fname + ".eirene", proxy=outp)
-    else:
-        # vtkImageData (TTK)
-        simple.SaveData(fname + ".vti", proxy=outp)
-        # Perseus Cubical Grid (Perseus, Gudhi)
-        simple.SaveData(fname + ".pers", proxy=outp)
-        # NetCDF3 (Diamorse)
-        vti2nc3.main(fname + ".vti")
 
 
 def read_file(input_file):
@@ -122,10 +111,6 @@ def pipeline(raw_file, raw_stem, dims, slice_type, out_dir):
     # trash input scalar field, save order field
     pa = simple.PassArrays(Input=cut)
     pa.PointDataArrays = ["ImageFile"]
-
-    # save implicit mesh
-    if slice_type != SliceType.LINE:
-        write_output(pa, raw_stem + "_order_impl", out_dir, False)
 
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=pa)
