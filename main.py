@@ -277,18 +277,11 @@ def parallel_decorator(func):
     return wrapper
 
 
-@parallel_decorator
 def compute_ttk(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
     bs = backend.value.replace("/", "-")
     outp = f"diagrams/{dataset}_{bs}.vtu"
-    cmd = (
-        ["ttkPersistenceDiagramCmd"]
-        + ["-i", fname]
-        + ["-d", "4"]
-        + ["-a", "ImageFile_Order"]
-        + ["-t", str(num_threads)]
-    )
+    cmd = ["ttkPersistenceDiagramCmd"] + ["-i", fname] + ["-d", "4"]
 
     if backend == SoftBackend.TTK_FTM:
         cmd += ["-B", "0"]
