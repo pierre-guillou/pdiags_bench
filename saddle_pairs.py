@@ -1,44 +1,63 @@
 import subprocess
+import sys
 
-from paraview import simple
+import numpy as np
+from paraview import servermanager, simple
+from paraview.vtk.numpy_interface import dataset_adapter as dsa
 
 import compare_diags
 
-fug = simple.FastUniformGrid()
-fug.WholeExtent = [0, 64, 0, 64, 0, 64]
 
-tetrah = simple.Tetrahedralize(Input=fug)
+def main(seed):
 
-ra = simple.RandomAttributes(Input=tetrah)
-ra.DataType = "Int"
-ra.GeneratePointScalars = 1
-ra.GenerateCellVectors = 0
+    fug = simple.FastUniformGrid()
+    fug.WholeExtent = [0, 64, 0, 64, 0, 64]
 
-smoo = simple.TTKScalarFieldSmoother(Input=ra)
-smoo.ScalarField = ["POINTS", "RandomPointScalars"]
-smoo.IterationNumber = 44
+    tetrah = simple.Tetrahedralize(Input=fug)
 
-simp = simple.TTKTopologicalSimplificationByPersistence(Input=smoo)
-simp.InputArray = ["POINTS", "RandomPointScalars"]
-simp.PersistenceThreshold = 200
+    ra = simple.RandomAttributes(Input=tetrah)
+    ra.DataType = "Int"
+    ra.GeneratePointScalars = 1
+    ra.GenerateCellVectors = 0
 
-pa = simple.PassArrays(Input=simp)
-pa.PointDataArrays = ["RandomPointScalars_Order"]
+    vtk_ra = servermanager.Fetch(ra)
+    data = dsa.WrapDataObject(vtk_ra)
+    array = data.PointData["RandomPointScalars"]
+    gen = np.random.default_rng(seed)
+    gen.shuffle(array)
 
-rgi = simple.RemoveGhostInformation(Input=pa)
+    smoo = simple.TTKScalarFieldSmoother(Input=ra)
+    smoo.ScalarField = ["POINTS", "RandomPointScalars"]
+    smoo.IterationNumber = 55
+    simp = simple.TTKTopologicalSimplificationByPersistence(Input=smoo)
+    simp.InputArray = ["POINTS", "RandomPointScalars"]
+    simp.PersistenceThreshold = 200
 
-simple.SaveData("test.dipha", Input=rgi)
-simple.SaveData("test.vtu", Input=rgi)
+    pa = simple.PassArrays(Input=simp)
+    pa.PointDataArrays = ["RandomPointScalars_Order"]
 
-pdiag = simple.TTKPersistenceDiagram(Input=rgi)
-pdiag.ScalarField = ["POINTS", "RandomPointScalars_Order"]
-pdiag.Backend = "DMT Pairs"
-pdiag.IgnoreBoundary = False
-pdiag.DebugLevel = 4
+    rgi = simple.RemoveGhostInformation(Input=pa)
 
-simple.SaveData("out.vtu", Input=pdiag)
+    simple.SaveData("test.dipha", Input=rgi)
+    simple.SaveData("test.vtu", Input=rgi)
 
-print("Calling Dipha...")
-subprocess.check_call(["build_dipha/dipha", "test.dipha", "out.dipha"])
+    pdiag = simple.TTKPersistenceDiagram(Input=rgi)
+    pdiag.ScalarField = ["POINTS", "RandomPointScalars_Order"]
+    pdiag.Backend = "DMT Pairs"
+    pdiag.IgnoreBoundary = False
+    pdiag.DebugLevel = 4
 
-compare_diags.main("out.dipha", "out.vtu", True, False)
+    simple.SaveData("out.vtu", Input=pdiag)
+
+    print("Calling Dipha...")
+    subprocess.check_call(["build_dipha/dipha", "test.dipha", "out.dipha"])
+
+    res = compare_diags.main("out.dipha", "out.vtu", True, False)
+    if any(v != 0.0 for v in res.values()):
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    for s in range(500):
+        print(f"Seed {s}")
+        main(s)
