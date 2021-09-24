@@ -120,14 +120,9 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
             except KeyError:
                 wass_dist = dists["min-sad"]
 
-        except ImportError:
-            print("Fallback to Wassertein overapproximation")
-            # compute an overapproximation of the Wasserstein distance
-            res = 0.0
-            for (ba, da), (bb, db) in itertools.zip_longest(rem0, rem1, fillvalue=(0.0, 0.0)):
-                res += (bb - ba) ** 2 + (db - da) ** 2
-
-            wass_dist = math.sqrt(res)
+        except (ImportError, TypeError):
+            print("Could not compute the Wassertein distance")
+            return -1.0
 
     # compute the distance from pairs0 to the empty diagram
     ref_dist = dist_to_empty(pairs0)
@@ -136,7 +131,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
         f"> Differences in {ptype} pairs "
         f"(Wasserstein approx: {wass_dist:.8g}, {wass_dist/ref_dist:.3%} from empty diagram)"
     )
-    return wass_dist
+    return wass_dist / ref_dist
 
 
 def main(diag0, diag1, show_diff=True, filter_inf=False):
