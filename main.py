@@ -16,7 +16,6 @@ import convert_datasets
 import diagram_distance
 import download_datasets
 import gen_random
-import gudhi_diag_inf
 import pers2gudhi
 from convert_datasets import SliceType
 
@@ -686,8 +685,6 @@ def compute_diagrams(args):
         with open(result_fname, "w") as dst:
             json.dump(times, dst, indent=4)
 
-    # post-process generated Gudhi diagrams
-    gudhi_diag_inf.main()
     return times
 
 
