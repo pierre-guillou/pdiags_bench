@@ -129,7 +129,7 @@ class Gudhi_SimplexTree:
     def write_diag(self, output):
         with open(output, "w") as dst:
             for dim, (birth, death) in self.pairs:
-                dst.write(f"{dim} {birth:.3f} {death:.3f}\n")
+                dst.write(f"{dim} {birth} {death}\n")
 
 
 def compute_persistence(wrapper, dims, values, cpx, output):
