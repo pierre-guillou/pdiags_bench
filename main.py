@@ -216,7 +216,7 @@ class FileType(enum.Enum):
         # get file type variant according to file extension and complex type
         ext = fname.split(".")[-1]
 
-        if ext in ("vtu", "vti"):
+        if ext in ("vtu"):
             return cls.VTI_VTU
         if ext == "dipha":
             if complex_type == Complex.CUBICAL:
@@ -241,34 +241,11 @@ class FileType(enum.Enum):
         # get backends list from file type variant and slice types
         if self == FileType.VTI_VTU:
             ret = [SoftBackend.TTK_SANDWICH]  # our algo
-            if slice_type == SliceType.SURF:
-                # FTM in 2D + our algo
-                return [SoftBackend.TTK_FTM] + ret
-            if slice_type == SliceType.VOL:
-                # our algo
-                # TTK-Dipha: offload Morse-Smale complex to Dipha
-                # TTK-Dipha/Sandwich: offload saddle connectors to Dipha
-                return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
             return ret  # 1D lines
-        if self == FileType.DIPHA_CUB:
-            return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
         if self == FileType.DIPHA_TRI:
-            return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI]
-        if self == FileType.PERS_CUB:
-            return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS_CUB]
-        if self == FileType.PERS_TRI:
-            return []  # disable Perseus for simplicial complexes
-            # return [SoftBackend.PERSEUS_SIM]
+            return [SoftBackend.DIPHA_MPI]
         if self == FileType.TSC:
-            ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
-            if slice_type in (SliceType.SURF, SliceType.LINE):
-                return ret + [SoftBackend.RIPSER]  # Ripser only in 2D
-            if slice_type == SliceType.VOL:
-                return ret
-        if self == FileType.NETCDF:
-            return [SoftBackend.DIAMORSE]
-        if self == FileType.EIRENE_CSV:
-            return [SoftBackend.EIRENE]
+            return [SoftBackend.GUDHI]
 
         return []
 
