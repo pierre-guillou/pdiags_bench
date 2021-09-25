@@ -106,7 +106,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
         sq_dist = sum((d - b) ** 2 for (b, d) in pairs) / 2.0
         return math.sqrt(sq_dist)
 
-    print(f"Comparing {len(rem0)} and {len(rem1)} different {ptype} pair")
+    print(f"  Comparing {len(rem0)} and {len(rem1)} different {ptype} pair...")
 
     if len(rem0) == 0:
         # compute distance between rem1 and empty diagram
@@ -133,7 +133,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
 
 
 def main(diag0, diag1, show_diff=True, filter_inf=False):
-    print(f"Comparing {diag0} and {diag1}...")
+    print(f"\nComparing {diag0} and {diag1}...")
     pairs0 = read_diag(diag0, filter_inf)
     pairs1 = read_diag(diag1, filter_inf)
     if len(pairs0[1]) == 0:
