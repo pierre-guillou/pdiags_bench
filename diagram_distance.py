@@ -12,7 +12,8 @@ from paraview import simple
 
 import compare_diags as cd
 
-logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
+LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
+logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=LOGLEVEL)
 
 
 def load_diagram(diag):
