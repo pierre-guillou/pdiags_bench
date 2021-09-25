@@ -2,11 +2,11 @@
 
 import argparse
 import difflib
-import itertools
 import math
 
 import topologytoolkit as ttk
 import vtk
+
 
 
 def read_file(fname):
@@ -32,7 +32,7 @@ def read_diag(diag, filter_inf=False):
     if pts is None:
         return []
     assert 2 * ptype.GetNumberOfTuples() - 2 == pts.GetNumberOfPoints()
-    pairs = [list() for i in range(3)]
+    pairs = [[] for i in range(3)]
     for i in range(ptype.GetNumberOfTuples()):
         j = int(ptype.GetTuple1(i))
         if j == -1 or (filter_inf and not bool(ifin.GetTuple1(i))):
@@ -59,10 +59,31 @@ def print_diff(pairs0, pairs1):
             print(d)
 
 
+def wasserstein_pairs(pairs0, pairs1, timeout=3600):
+    # store rem0 and rem1 in temporary files
+    with open("/tmp/diag0.gudhi", "w") as dst:
+        for b, d in pairs0:
+            dst.write(f"0 {b} {d}\n")
+    with open("/tmp/diag1.gudhi", "w") as dst:
+        for b, d in pairs1:
+            dst.write(f"0 {b} {d}\n")
+
+    # compute the distance with bottleneck
+    import diagram_distance as diagdist
+    dists = diagdist.get_diag_dist(
+        "/tmp/diag0.gudhi",
+        "/tmp/diag1.gudhi",
+        1.0,
+        diagdist.DistMethod.AUCTION,
+        timeout,
+    )
+
+    return dists["sad-max"]
+
+
 def compare_pairs(pairs0, pairs1, ptype, show_diff):
     sm = difflib.SequenceMatcher(isjunk=None, a=pairs0, b=pairs1)
-    diffrat = sm.ratio()
-    if math.isclose(diffrat, 1.0):
+    if math.isclose(sm.ratio(), 1.0):
         print(f"> Identical {ptype} pairs")
         return 0.0
 
@@ -70,8 +91,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
         print_diff(pairs0, pairs1)
 
     # discard common pairs between diagrams
-    rem0 = list()
-    rem1 = list()
+    rem0, rem1 = [], []
     for opc in sm.get_opcodes():
         if opc[0] in ["replace", "delete"]:
             sl = slice(opc[1], opc[2])
@@ -95,31 +115,9 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
         # compute distance between rem0 and empty diagram
         wass_dist = dist_to_empty(rem0)
     else:
-
         try:
-            import diagram_distance as diagdist
-
-            # store rem0 and rem1 in temporary files
-            with open("/tmp/diag0.gudhi", "w") as dst:
-                for b, d in rem0:
-                    dst.write(f"0 {b} {d}\n")
-            with open("/tmp/diag1.gudhi", "w") as dst:
-                for b, d in rem1:
-                    dst.write(f"0 {b} {d}\n")
-
-            # compute the distance with bottleneck
-            dists = diagdist.get_diag_dist(
-                "/tmp/diag0.gudhi",
-                "/tmp/diag1.gudhi",
-                1.0,
-                diagdist.DistMethod.AUCTION,
-                3600,
-            )
-            try:
-                wass_dist = dists["sad-max"]
-            except KeyError:
-                wass_dist = dists["min-sad"]
-
+            # compute wasserstein distance between rem0 and rem1
+            wass_dist = wasserstein_pairs(rem0, rem1)
         except (ImportError, TypeError):
             print("Could not compute the Wassertein distance")
             return -1.0
@@ -144,7 +142,7 @@ def main(diag0, diag1, show_diff=True, filter_inf=False):
         diag_type = ["min-saddle", "saddle-max"]
     else:
         diag_type = ["min-saddle", "saddle-saddle", "saddle-max"]
-    res = dict()
+    res = {}
     for p0, p1, t in zip(pairs0, pairs1, diag_type):
         res[t] = compare_pairs(p0, p1, t, show_diff)
     return res
