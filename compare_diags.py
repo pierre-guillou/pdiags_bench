@@ -27,14 +27,22 @@ def read_file(fname):
 
 def read_diag(diag, filter_inf=False):
     diag = dsa.WrapDataObject(read_file(diag))
-    props = np.array(list(zip(diag.CellData["PairType"], diag.CellData["IsFinite"])))
+    props = np.array(
+        list(
+            zip(
+                diag.CellData["PairType"],
+                diag.CellData["IsFinite"],
+                diag.CellData["Persistence"],
+            )
+        )
+    )
     pts = diag.Points
     if pts is None:
         return []
     assert 2 * len(props) - 2 == len(pts)
     pairs = [[] for i in range(3)]
-    for i, (dim, ifin) in enumerate(props):
-        if dim == -1 or (filter_inf and not bool(ifin)):
+    for i, (dim, ifin, pers) in enumerate(props):
+        if dim == -1 or (filter_inf and not bool(ifin)) or pers <= 1.0:
             continue
         pairs[dim].append(tuple(pts[2 * i + 1][0:2]))
     for pr in pairs:
