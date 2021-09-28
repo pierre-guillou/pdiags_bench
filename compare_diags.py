@@ -4,9 +4,10 @@ import argparse
 import difflib
 import math
 
+import numpy as np
 import topologytoolkit as ttk
 import vtk
-
+from vtk.numpy_interface import dataset_adapter as dsa
 
 
 def read_file(fname):
@@ -25,19 +26,17 @@ def read_file(fname):
 
 
 def read_diag(diag, filter_inf=False):
-    diag = read_file(diag)
-    ptype = diag.GetCellData().GetArray("PairType")
-    ifin = diag.GetCellData().GetArray("IsFinite")
-    pts = diag.GetPoints()
+    diag = dsa.WrapDataObject(read_file(diag))
+    props = np.array(list(zip(diag.CellData["PairType"], diag.CellData["IsFinite"])))
+    pts = diag.Points
     if pts is None:
         return []
-    assert 2 * ptype.GetNumberOfTuples() - 2 == pts.GetNumberOfPoints()
+    assert 2 * len(props) - 2 == len(pts)
     pairs = [[] for i in range(3)]
-    for i in range(ptype.GetNumberOfTuples()):
-        j = int(ptype.GetTuple1(i))
-        if j == -1 or (filter_inf and not bool(ifin.GetTuple1(i))):
+    for i, (dim, ifin) in enumerate(props):
+        if dim == -1 or (filter_inf and not bool(ifin)):
             continue
-        pairs[j].append(pts.GetPoint(2 * i + 1)[0:2])
+        pairs[dim].append(tuple(pts[2 * i + 1][0:2]))
     for pr in pairs:
         pr.sort()
     return pairs
@@ -70,6 +69,7 @@ def wasserstein_pairs(pairs0, pairs1, timeout=3600):
 
     # compute the distance with bottleneck
     import diagram_distance as diagdist
+
     dists = diagdist.get_diag_dist(
         "/tmp/diag0.gudhi",
         "/tmp/diag1.gudhi",
