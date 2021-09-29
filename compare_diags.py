@@ -4,7 +4,6 @@ import argparse
 import difflib
 import math
 
-import numpy as np
 import topologytoolkit as ttk
 import vtk
 from vtk.numpy_interface import dataset_adapter as dsa
@@ -21,32 +20,62 @@ def read_file(fname):
     else:
         return None
     reader.SetFileName(fname)
-    reader.Update()
-    return reader.GetOutput()
+
+    # filter out diagonal
+    thr = vtk.vtkThreshold()
+    thr.SetInputConnection(reader.GetOutputPort())
+    thr.SetInputArrayToProcess(
+        0, 0, 0, vtk.vtkDataObject.FIELD_ASSOCIATION_CELLS, "PairType"
+    )
+    thr.ThresholdBetween(0, 3)
+    thr.Update()
+
+    return thr.GetOutput()
 
 
 def read_diag(diag, filter_inf=False):
-    diag = dsa.WrapDataObject(read_file(diag))
-    props = np.array(
-        list(
-            zip(
-                diag.CellData["PairType"],
-                diag.CellData["IsFinite"],
-                diag.CellData["Persistence"],
-            )
+    diag = read_file(diag)
+
+    if filter_inf:
+        # filter infinite pairs?
+        thr = vtk.vtkThreshold()
+        thr.SetInputDataObject(diag)
+        thr.SetInputArrayToProcess(
+            0, 0, 0, vtk.vtkDataObject.FIELD_ASSOCIATION_CELLS, "IsFinite"
         )
+        thr.ThresholdBetween(1, 1)
+        thr.Update()
+        diag = thr.GetOutput()
+
+    # filter out pairs with small to no persistence?
+    thr2 = vtk.vtkThreshold()
+    thr2.SetInputDataObject(diag)
+    thr2.SetInputArrayToProcess(
+        0, 0, 0, vtk.vtkDataObject.FIELD_ASSOCIATION_CELLS, "Persistence"
     )
-    pts = diag.Points
-    if pts is None:
-        return []
-    assert 2 * len(props) - 2 == len(pts)
+    thr2.ThresholdBetween(0, 1)
+    thr2.SetInvert(True)
+
     pairs = [[] for i in range(3)]
-    for i, (dim, ifin, pers) in enumerate(props):
-        if dim == -1 or (filter_inf and not bool(ifin)) or pers <= 1.0:
-            continue
-        pairs[dim].append(tuple(pts[2 * i + 1][0:2]))
+    for i in range(3):
+        thr = vtk.vtkThreshold()
+        thr.SetInputConnection(thr2.GetOutputPort())
+        thr.SetInputArrayToProcess(
+            0, 0, 0, vtk.vtkDataObject.FIELD_ASSOCIATION_CELLS, "PairType"
+        )
+        thr.ThresholdBetween(i, i)
+        thr.Update()
+
+        diag = dsa.WrapDataObject(thr.GetOutput())
+        pts = diag.Points
+        for j, pt in enumerate(pts):
+            if j % 2 == 0:
+                continue
+            pairs[i].append((pt[0], pt[1]))
+
     for pr in pairs:
         pr.sort()
+
     return pairs
 
 
