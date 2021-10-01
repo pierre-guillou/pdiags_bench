@@ -1,5 +1,5 @@
+import os
 import subprocess
-import sys
 
 import numpy as np
 from paraview import servermanager, simple
@@ -7,9 +7,10 @@ from paraview.vtk.numpy_interface import dataset_adapter as dsa
 
 import compare_diags
 
+DIR = "rndsmoo"
 
-def main(seed):
 
+def gen_randoms(seed):
     fug = simple.FastUniformGrid()
     fug.WholeExtent = [0, 64, 0, 64, 0, 64]
 
@@ -38,26 +39,50 @@ def main(seed):
 
     rgi = simple.RemoveGhostInformation(Input=pa)
 
-    simple.SaveData("test.dipha", Input=rgi)
-    simple.SaveData("test.vtu", Input=rgi)
+    simple.SaveData(f"{DIR}/test{seed}.dipha", Input=rgi)
+    simple.SaveData(f"{DIR}/test{seed}.vtu", Input=rgi)
 
-    pdiag = simple.TTKPersistenceDiagram(Input=rgi)
+
+def compute_dipha_diag(seed):
+    print(f"Calling Dipha on {DIR}/test{seed}.dipha...")
+    subprocess.check_call(
+        ["build_dipha/dipha", f"{DIR}/test{seed}.dipha", f"{DIR}/out{seed}.dipha"]
+    )
+
+
+def compute_ttk_diag(seed):
+    reader = simple.XMLUnstructuredGridReader(FileName=f"{DIR}/test{seed}.vtu")
+
+    pdiag = simple.TTKPersistenceDiagram(Input=reader)
     pdiag.ScalarField = ["POINTS", "RandomPointScalars_Order"]
     pdiag.Backend = "DMT Pairs"
     pdiag.IgnoreBoundary = False
     pdiag.DebugLevel = 4
 
-    simple.SaveData("out.vtu", Input=pdiag)
+    simple.SaveData(f"{DIR}/out{seed}.vtu", Input=pdiag)
 
-    print("Calling Dipha...")
-    subprocess.check_call(["build_dipha/dipha", "test.dipha", "out.dipha"])
 
-    res = compare_diags.main("out.dipha", "out.vtu", True, False)
+def compare(seed):
+    res = compare_diags.main(
+        f"{DIR}/out{seed}.dipha", f"{DIR}/out{seed}.vtu", True, False
+    )
     if any(v != 0.0 for v in res.values()):
-        sys.exit(1)
+        print(f"Differences for seed {seed}")
+
+
+def main():
+    try:
+        os.mkdir(DIR)
+    except FileExistsError:
+        pass
+
+    for seed in range(500):
+        print(f"Seed {seed}")
+        gen_randoms(seed)
+        compute_dipha_diag(seed)
+        # compute_ttk_diag(seed)
+        # compare(seed)
 
 
 if __name__ == "__main__":
-    for s in range(500):
-        print(f"Seed {s}")
-        main(s)
+    main()
