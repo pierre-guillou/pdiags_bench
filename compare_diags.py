@@ -152,12 +152,7 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
         # compute distance between rem0 and empty diagram
         wass_dist = dist_to_empty(rem0)
     else:
-        try:
-            # compute wasserstein distance between rem0 and rem1
-            wass_dist = wasserstein_pairs(rem0, rem1)
-        except (ImportError, TypeError):
-            print("Could not compute the Wassertein distance")
-            return -1.0
+        return -1.0
 
     # compute the distance from pairs0 to the empty diagram
     ref_dist = dist_to_empty(pairs0)
