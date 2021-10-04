@@ -1,3 +1,4 @@
+import argparse
 import os
 import subprocess
 
@@ -72,25 +73,23 @@ def compare(seed):
     return True
 
 
-def main():
+def main(prepare=True, gen_dipha=False, gen_ttk=False, comp_diags=False):
     try:
         os.mkdir(DIR)
     except FileExistsError:
         pass
 
-    prepare = True
-    gen_ttk = False
-    comp = False
     diff = []
 
     for seed in range(500):
         print(f"Seed {seed}")
         if prepare:
             gen_randoms(seed)
+        if gen_dipha:
             compute_dipha_diag(seed)
         if gen_ttk:
             compute_ttk_diag(seed)
-        if comp:
+        if comp_diags:
             ident = compare(seed)
             if not ident:
                 diff.append(seed)
@@ -100,4 +99,30 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Generate & compare smoothed randoms")
+    parser.add_argument(
+        "-0",
+        "--prepare",
+        help="Generate VTUs & Dipha datasets",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-1",
+        "--compute_dipha",
+        help="Compute Dipha diagrams",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-2",
+        "--compute_ttk",
+        help="Compute TTK diagrams",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-3",
+        "--compare_diags",
+        help="Compare Dipha & TTK diagrams",
+        action="store_true",
+    )
+    args = parser.parse_args()
+    main(args.prepare, args.compute_dipha, args.compute_ttk, args.compare_diags)
