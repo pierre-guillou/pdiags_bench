@@ -68,6 +68,8 @@ def compare(seed):
     )
     if any(v != 0.0 for v in res.values()):
         print(f"Differences for seed {seed}")
+        return False
+    return True
 
 
 def main():
@@ -76,12 +78,25 @@ def main():
     except FileExistsError:
         pass
 
+    prepare = True
+    gen_ttk = False
+    comp = False
+    diff = []
+
     for seed in range(500):
         print(f"Seed {seed}")
-        gen_randoms(seed)
-        compute_dipha_diag(seed)
-        # compute_ttk_diag(seed)
-        # compare(seed)
+        if prepare:
+            gen_randoms(seed)
+            compute_dipha_diag(seed)
+        if gen_ttk:
+            compute_ttk_diag(seed)
+        if comp:
+            ident = compare(seed)
+            if not ident:
+                diff.append(seed)
+
+    if len(diff) > 0:
+        print(f"Differences for #{len(diff)} seeds: {diff}")
 
 
 if __name__ == "__main__":
