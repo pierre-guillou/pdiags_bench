@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import networkx as nx
-from paraview import simple
 
 
 def use_networkx():
@@ -60,6 +59,8 @@ def use_networkx():
 
 
 def use_mds():
+    from paraview import simple
+
     DistMat = simple.CSVReader(FileName=["saddle2_graph.csv"])
     DimRed = simple.TTKDimensionReduction(Input=DistMat)
     DimRed.SelectFieldswithaRegexp = 1
