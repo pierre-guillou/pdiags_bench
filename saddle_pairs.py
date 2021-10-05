@@ -1,4 +1,5 @@
 import argparse
+import multiprocessing
 import os
 import subprocess
 
@@ -47,7 +48,12 @@ def gen_randoms(seed):
 def compute_dipha_diag(seed):
     print(f"Calling Dipha on {DIR}/test{seed}.dipha...")
     subprocess.check_call(
-        ["build_dipha/dipha", f"{DIR}/test{seed}.dipha", f"{DIR}/out{seed}.dipha"]
+        [
+            "mpirun",
+            "build_dipha/dipha",
+            f"{DIR}/test{seed}.dipha",
+            f"{DIR}/out{seed}.dipha",
+        ]
     )
 
 
@@ -88,7 +94,9 @@ def main(prepare=True, gen_dipha=False, gen_ttk=False, comp_diags=False):
         if gen_dipha:
             compute_dipha_diag(seed)
         if gen_ttk:
-            compute_ttk_diag(seed)
+            p = multiprocessing.Process(target=compute_ttk_diag, args=(seed,))
+            p.start()
+            p.join()
         if comp_diags:
             ident = compare(seed)
             if not ident:
