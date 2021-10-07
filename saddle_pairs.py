@@ -41,8 +41,17 @@ def gen_randoms(seed):
 
     rgi = simple.RemoveGhostInformation(Input=pa)
 
-    simple.SaveData(f"{DIR}/test{seed}.dipha", Input=rgi)
     simple.SaveData(f"{DIR}/test{seed}.vtu", Input=rgi)
+
+
+def ds_dipha(seed):
+    vtu = simple.XMLUnstructuredGridReader(FileName=f"{DIR}/test{seed}.vtu")
+    simple.SaveData(f"{DIR}/test{seed}.dipha", Input=vtu)
+
+
+def ds_tsc(seed):
+    vtu = simple.XMLUnstructuredGridReader(FileName=f"{DIR}/test{seed}.vtu")
+    simple.SaveData(f"{DIR}/test{seed}.tsc", Input=vtu)
 
 
 def compute_dipha_diag(seed):
@@ -54,6 +63,17 @@ def compute_dipha_diag(seed):
             f"{DIR}/test{seed}.dipha",
             f"{DIR}/out{seed}.dipha",
         ]
+    )
+
+
+def compute_gudhi_diag(seed):
+    print(f"Calling Gudhi on {DIR}/test{seed}.gudhi...")
+    subprocess.check_call(
+        ["poetry", "run"]
+        + ["python", "dionysus_gudhi_persistence.py"]
+        + ["-b", "gudhi"]
+        + ["-i", f"{DIR}/test{seed}.tsc"]
+        + ["-o", f"{DIR}/out{seed}.gudhi"]
     )
 
 
@@ -71,7 +91,7 @@ def compute_ttk_diag(seed):
 
 def compare(seed):
     res = compare_diags.main(
-        f"{DIR}/out{seed}.dipha", f"{DIR}/out{seed}.vtu", True, False
+        f"{DIR}/out{seed}.dipha", f"{DIR}/out{seed}.vtu", True, True
     )
     if any(v != 0.0 for v in res.values()):
         print(f"Differences for seed {seed}")
@@ -91,8 +111,11 @@ def main(prepare=True, gen_dipha=False, gen_ttk=False, comp_diags=False):
         print(f"Seed {seed}")
         if prepare:
             gen_randoms(seed)
+            ds_dipha(seed)
+            ds_tsc(seed)
         if gen_dipha:
             compute_dipha_diag(seed)
+            compute_gudhi_diag(seed)
         if gen_ttk:
             p = multiprocessing.Process(target=compute_ttk_diag, args=(seed,))
             p.start()
