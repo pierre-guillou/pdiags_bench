@@ -2,8 +2,8 @@ import argparse
 import math
 import re
 import subprocess
-import time
 import sys
+import time
 
 import dionysus
 import numpy as np
@@ -80,6 +80,7 @@ class Ripser_SparseDM:
 
     def compute_pers(self):
         import ripser
+
         self.diag = ripser.ripser(
             self.dist_mat, distance_matrix=True, maxdim=self.maxdim
         )["dgms"]
@@ -113,11 +114,16 @@ class Dionysus_Filtration:
 
 
 class Gudhi_SimplexTree:
-    def __init__(self):
+    def __init__(self, cpx, vals):
         import gudhi
 
         self.st = gudhi.SimplexTree()
         self.pairs = list()
+        self.cpx = cpx
+        self.simp_vals = np.asarray(vals, dtype=np.int32)
+        self.vals_simp = np.zeros(shape=vals.shape, dtype=np.int32)
+        for i, v in enumerate(self.simp_vals):
+            self.vals_simp[v] = i
         print("Using the Gudhi Simplex Tree backend")
 
     def add(self, verts, val):
@@ -127,8 +133,45 @@ class Gudhi_SimplexTree:
         self.pairs = self.st.persistence()
 
     def write_diag(self, output):
+        edges, triangles, tetras = self.cpx
+        n_edges = len(edges) // 2
+        n_tri = len(triangles) // 3
+        n_tetra = len(tetras) // 4
+        n_verts = len(self.vals_simp) - n_edges - n_tri - n_tetra
+
+        def get_cell_val(i):
+            if i < n_verts:
+                return self.simp_vals[i]
+            if i < n_verts + n_edges:
+                o = i - n_verts
+                verts = [edges[2 * o + 0], edges[2 * o + 1]]
+                return max(map(lambda x: self.simp_vals[x], verts))
+            if i < n_verts + n_edges + n_tri:
+                o = i - n_verts - n_edges
+                verts = [
+                    triangles[3 * o + 0],
+                    triangles[3 * o + 1],
+                    triangles[3 * o + 2],
+                ]
+                return max(map(lambda x: self.simp_vals[x], verts))
+
+            o = i - n_verts - n_edges - n_tri
+            verts = [
+                tetras[4 * o + 0],
+                tetras[4 * o + 1],
+                tetras[4 * o + 2],
+                tetras[4 * o + 3],
+            ]
+            return max(map(lambda x: self.simp_vals[x], verts))
+
         with open(output, "w") as dst:
             for dim, (birth, death) in self.pairs:
+                if death != math.inf:
+                    birth_v = get_cell_val(self.vals_simp[int(birth)])
+                    death_v = get_cell_val(self.vals_simp[int(death)])
+                    if birth_v == death_v:
+                        print(f"{dim} {birth} {death} {death - birth}")
+                        continue
                 dst.write(f"{dim} {birth} {death}\n")
 
 
@@ -177,7 +220,9 @@ def run(dataset, output, backend="Gudhi", simplicial=True):
             "Gudhi": Gudhi_SimplexTree,
             "Ripser": Ripser_SparseDM,
         }
-        return compute_persistence(dispatch[backend](), dims, vals, cpx, output)
+        return compute_persistence(
+            dispatch[backend](cpx, vals), dims, vals, cpx, output
+        )
 
     if backend == "Gudhi":
         print("Use the Gudhi Cubical Complex backend")
