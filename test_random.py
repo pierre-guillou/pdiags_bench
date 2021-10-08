@@ -1,26 +1,37 @@
 import os
-import time
 import subprocess
+import time
 
 from paraview import simple
 
 import compare_diags
-import gen_random
 
 
-def generate_explicit(inp, out, rs):
-    # read random.vti
-    rand = simple.XMLImageDataReader(FileName=inp)
-    # compute order field
-    arrprec = simple.TTKArrayPreconditioning(Input=rand)
-    arrprec.PointDataArrays = ["ImageFile"]
+def generate_random(extent, out, rs):
+    # generate regular grid
+    fug = simple.FastUniformGrid()
+    fug.WholeExtent = [0, extent[0] - 1, 0, extent[1] - 1, 0, extent[2] - 1]
+
+    # generate scalar field
+    gid = simple.GenerateIds(Input=fug)
+    gid.PointIdsArrayName = "ImageFile"
+    gid.GenerateCellIds = False
+
+    # convert from vtkIdType to int
+    calc = simple.Calculator(Input=gid)
+    calc.Function = "ImageFile"
+    calc.ResultArrayType = "Int"
+    calc.ResultArrayName = "ImageFile_Order"
+
     # trash input scalar field, save order field
-    pa = simple.PassArrays(Input=arrprec)
+    pa = simple.PassArrays(Input=calc)
     pa.PointDataArrays = ["ImageFile_Order"]
-    # randomize scalar field?
+
+    # randomize scalar field
     ir = simple.TTKIdentifierRandomizer(Input=pa)
     ir.ScalarField = ["POINTS", "ImageFile_Order"]
     ir.RandomSeed = rs
+
     # tetrahedralize grid
     tetrah = simple.Tetrahedralize(Input=ir)
 
@@ -28,18 +39,15 @@ def generate_explicit(inp, out, rs):
     simple.SaveData(f"{out}.vtu", proxy=tetrah)
     # Dipha Explicit Complex (Dipha)
     simple.SaveData(f"{out}.dipha", proxy=tetrah)
-    # TTK Simplicial Complex (Gudhi, Dionysus, Ripser)
-    simple.SaveData(f"{out}.tsc", proxy=tetrah)
 
 
-def main(gen_rnd=False):
-    fname = "random_order_sfnorm_expl"
-    for i in range(0, 8):
-        ds = f"datasets/{fname}"
-        if gen_rnd:
-            print(i)
-            gen_random.main(4, "random", ".")
-            generate_explicit("random.vti", ds, i)
+def main():
+    ds = "rnd"
+    diag = f"{ds}_diag"
+    extent = (3, 4, 4)
+    for i in range(0, 100):
+        print(i)
+        generate_random(extent, ds, i)
         # call TTK
         subprocess.run(
             ["ttkPersistenceDiagramCmd"]
@@ -48,16 +56,15 @@ def main(gen_rnd=False):
             + ["-B", "2"],
             check=True,
         )
-        os.rename("output_port_0.vtu", "random_diag.vtu")
+        os.rename("output_port_0.vtu", f"{diag}.vtu")
         # call Dipha
         subprocess.run(
-            ["build_dipha/dipha", f"{ds}.dipha", "random_diag.dipha"],
+            ["build_dipha/dipha", f"{ds}.dipha", f"{diag}.dipha"],
             check=True,
         )
-        compare_diags.main("random_diag.vtu", "random_diag.dipha", True)
-        if not gen_rnd:
-            return
-        time.sleep(2)
+        res = compare_diags.main(f"{diag}.vtu", f"{diag}.dipha", True)
+        if 1.0 in res.values():
+            time.sleep(5)
 
 
 if __name__ == "__main__":
