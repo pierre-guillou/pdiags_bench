@@ -80,8 +80,8 @@ def read_diag(diag, filter_inf=False):
 
 
 def print_diff(pairs0, pairs1):
-    p0 = [str(a) + " " + str(b) for (a, b) in pairs0]
-    p1 = [str(a) + " " + str(b) for (a, b) in pairs1]
+    p0 = [str(int(a)) + " " + str(int(b)) for (a, b) in pairs0]
+    p1 = [str(int(a)) + " " + str(int(b)) for (a, b) in pairs1]
     diff = difflib.unified_diff(p0, p1)
     GREEN = "\033[92m"
     RED = "\033[91m"
