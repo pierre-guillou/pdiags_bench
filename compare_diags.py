@@ -74,7 +74,7 @@ def read_diag(diag, filter_inf=False):
             pairs[i].append((pt[0], pt[1]))
 
     for pr in pairs:
-        pr.sort()
+        pr.sort(key=lambda x: x[1])
 
     return pairs
 
