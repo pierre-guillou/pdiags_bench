@@ -107,14 +107,16 @@ def main(prepare=True, gen_dipha=False, gen_ttk=False, comp_diags=False):
 
     diff = []
 
+    # [71, 105, 201, 417, 470]
+
     for seed in range(500):
         print(f"Seed {seed}")
         if prepare:
             gen_randoms(seed)
-            ds_dipha(seed)
+            # ds_dipha(seed)
             ds_tsc(seed)
         if gen_dipha:
-            compute_dipha_diag(seed)
+            # compute_dipha_diag(seed)
             compute_gudhi_diag(seed)
         if gen_ttk:
             p = multiprocessing.Process(target=compute_ttk_diag, args=(seed,))
