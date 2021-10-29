@@ -9,12 +9,12 @@ from paraview.vtk.numpy_interface import dataset_adapter as dsa
 
 import compare_diags
 
-DIR = "rndsmoo"
+DIR = "rndsmoo_2D"
 
 
 def gen_randoms(seed):
     fug = simple.FastUniformGrid()
-    fug.WholeExtent = [0, 64, 0, 64, 0, 64]
+    fug.WholeExtent = [0, 64, 0, 64, 0, 0]
 
     tetrah = simple.Tetrahedralize(Input=fug)
 
@@ -31,10 +31,10 @@ def gen_randoms(seed):
 
     smoo = simple.TTKScalarFieldSmoother(Input=ra)
     smoo.ScalarField = ["POINTS", "RandomPointScalars"]
-    smoo.IterationNumber = 55
+    smoo.IterationNumber = 5
     simp = simple.TTKTopologicalSimplificationByPersistence(Input=smoo)
     simp.InputArray = ["POINTS", "RandomPointScalars"]
-    simp.PersistenceThreshold = 200
+    simp.PersistenceThreshold = 5
 
     pa = simple.PassArrays(Input=simp)
     pa.PointDataArrays = ["RandomPointScalars_Order"]
