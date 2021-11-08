@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import time
 
@@ -42,10 +43,16 @@ def generate_random(extent, out, rs):
 
 
 def main():
-    ds = "rnd"
+    DIR = "small_rnd"
+    try:
+        os.mkdir(DIR)
+    except FileExistsError:
+        pass
+    ds = f"{DIR}/rnd"
     diag = f"{ds}_diag"
-    extent = (3, 4, 4)
-    for i in range(0, 100):
+    extent = (5, 5, 5)
+    failing = []
+    for i in range(0, 500):
         print(i)
         generate_random(extent, ds, i)
         # call TTK
@@ -55,6 +62,7 @@ def main():
             + ["-a", "ImageFile_Order"]
             + ["-B", "2"],
             check=True,
+            stdout=subprocess.DEVNULL,
         )
         os.rename("output_port_0.vtu", f"{diag}.vtu")
         # call Dipha
@@ -62,9 +70,13 @@ def main():
             ["build_dipha/dipha", f"{ds}.dipha", f"{diag}.dipha"],
             check=True,
         )
-        res = compare_diags.main(f"{diag}.vtu", f"{diag}.dipha", True)
-        if 1.0 in res.values():
+        res = compare_diags.main(f"{diag}.dipha", f"{diag}.vtu", True)
+        if res.get("saddle-saddle", 0.0) != 0.0 or res.get("saddle-max", 0.0) != 0.0:
+            shutil.copyfile(f"{ds}.vtu", f"{ds}{i}.vtu")
             time.sleep(5)
+            failing.append(i)
+
+    print(failing)
 
 
 if __name__ == "__main__":
