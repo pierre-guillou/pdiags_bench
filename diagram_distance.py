@@ -109,6 +109,8 @@ def get_file_list(diag_file):
     l = sorted(p.parent.glob(f"{stem}*"))
     idx = next(i for i, v in enumerate(l) if "_Dipha" in str(v))
     l[0], l[idx] = l[idx], l[0]
+    # filter out FTM diagrams
+    l = [e for e in l if "-FTM" not in str(e)]
     return l, stem
 
 
