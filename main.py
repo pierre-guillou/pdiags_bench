@@ -163,8 +163,6 @@ def store_log(log, ds_name, app):
 class SoftBackend(enum.Enum):
     TTK_FTM = "TTK-FTM"
     TTK_SANDWICH = "TTK-Sandwich"
-    TTK_DIPHA = "TTK/Dipha"
-    TTK_DIPHAPP = "TTK-Sandwich/Dipha"
     DIPHA = "Dipha"
     DIPHA_MPI = "Dipha_MPI"
     CUBICALRIPSER = "CubicalRipser"
@@ -182,8 +180,6 @@ class SoftBackend(enum.Enum):
         dispatcher = {
             SoftBackend.TTK_FTM: compute_ttk,
             SoftBackend.TTK_SANDWICH: compute_ttk,
-            SoftBackend.TTK_DIPHA: compute_ttk,
-            SoftBackend.TTK_DIPHAPP: compute_ttk,
             SoftBackend.DIPHA: compute_dipha,
             SoftBackend.DIPHA_MPI: compute_dipha,
             SoftBackend.CUBICALRIPSER: compute_cubrips,
@@ -241,16 +237,13 @@ class FileType(enum.Enum):
     def get_backends(self, slice_type):
         # get backends list from file type variant and slice types
         if self == FileType.VTI_VTU:
-            ret = [SoftBackend.TTK_SANDWICH]  # our algo
             if slice_type == SliceType.SURF:
                 # FTM in 2D + our algo
-                return [SoftBackend.TTK_FTM] + ret
+                return [SoftBackend.TTK_FTM,SoftBackend.TTK_SANDWICH]
             if slice_type == SliceType.VOL:
                 # our algo
-                # TTK-Dipha: offload Morse-Smale complex to Dipha
-                # TTK-Dipha/Sandwich: offload saddle connectors to Dipha
-                return ret + [SoftBackend.TTK_DIPHA, SoftBackend.TTK_DIPHAPP]
-            return ret  # 1D lines
+                return [SoftBackend.TTK_SANDWICH]
+            return [SoftBackend.TTK_SANDWICH]  # 1D lines
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
         if self == FileType.DIPHA_TRI:
@@ -318,10 +311,6 @@ def compute_ttk(fname, times, backend, num_threads=1):
         cmd += ["-B", "0"]
     elif backend == SoftBackend.TTK_SANDWICH:
         cmd += ["-B", "2"]
-    elif backend == SoftBackend.TTK_DIPHA:
-        cmd += ["-B", "2", "-wd"]
-    elif backend == SoftBackend.TTK_DIPHAPP:
-        cmd += ["-B", "2", "-wd", "-dpp"]
 
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
