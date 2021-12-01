@@ -37,7 +37,7 @@ def prepare_datasets(args):
 
     # also generate a random and an elevation datasets
     for field in ["elevation", "random"]:
-        gen_random.main(64, field, "raws")
+        gen_random.main(192, field, "raws")
 
     create_dir("datasets")
     for dataset in sorted(glob.glob("raws/*.raw") + glob.glob("raws/*.vti")):
