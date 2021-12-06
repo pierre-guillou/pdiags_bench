@@ -237,12 +237,9 @@ class FileType(enum.Enum):
     def get_backends(self, slice_type):
         # get backends list from file type variant and slice types
         if self == FileType.VTI_VTU:
-            if slice_type == SliceType.SURF:
-                # FTM in 2D + our algo
-                return [SoftBackend.TTK_FTM,SoftBackend.TTK_SANDWICH]
-            if slice_type == SliceType.VOL:
-                # our algo
-                return [SoftBackend.TTK_SANDWICH]
+            if slice_type in [SliceType.SURF, SliceType.VOL]:
+                # FTM + our algo in 2D and 3D
+                return [SoftBackend.TTK_FTM, SoftBackend.TTK_SANDWICH]
             return [SoftBackend.TTK_SANDWICH]  # 1D lines
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
