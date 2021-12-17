@@ -1,7 +1,4 @@
 import argparse
-import math
-import re
-import subprocess
 import time
 import sys
 
@@ -117,7 +114,7 @@ class Gudhi_SimplexTree:
         import gudhi
 
         self.st = gudhi.SimplexTree()
-        self.pairs = list()
+        self.pairs = []
         print("Using the Gudhi Simplex Tree backend")
 
     def add(self, verts, val):

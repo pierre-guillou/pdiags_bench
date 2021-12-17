@@ -343,7 +343,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
     }
     os.rename("output_port_0.vtu", outp)
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault(backend.value, dict()).update(
+    times[dataset].setdefault(backend.value, {}).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
 
@@ -393,7 +393,7 @@ def compute_dipha(fname, times, backend):
         "#threads": num_threads,
     }
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault(b, dict()).update(
+    times[dataset].setdefault(b, {}).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
     store_log(out, dataset, "dipha")
@@ -488,7 +488,7 @@ def compute_oineus(fname, times, backend, num_threads=1):
         "#threads": num_threads,
     }
     res.update(get_pairs_number(outp))
-    times[dataset].setdefault(backend.value, dict()).update(
+    times[dataset].setdefault(backend.value, {}).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
 
@@ -500,7 +500,7 @@ def compute_diamorse(fname, times, backend):
     outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     cmd = ["python2", "diamorse/python/persistence.py", fname, "-r", "-o", outp]
 
-    _, err = launch_process(cmd, env=dict())  # reset environment for Python2
+    _, err = launch_process(cmd, env={})  # reset environment for Python2
     elapsed, mem = get_time_mem(err)
     res = {
         "prec": 0.0,
@@ -617,12 +617,12 @@ def dispatch(fname, times):
             bv = b.value
             if "Perseus" in bv:
                 bv = "Perseus"
-            times[dsname].setdefault(bv.replace("_", "/"), dict()).update(
+            times[dsname].setdefault(bv.replace("_", "/"), {}).update(
                 {"timeout": TIMEOUT_S}
             )
         except subprocess.CalledProcessError:
             logging.error("  Process aborted")
-            times[dsname].setdefault(b.value, dict()).update({"error": "abort"})
+            times[dsname].setdefault(b.value, {}).update({"error": "abort"})
 
 
 def compute_diagrams(args):
@@ -633,7 +633,7 @@ def compute_diagrams(args):
     create_dir("logs")
 
     # store computation times
-    times = dict()
+    times = {}
 
     # pylint: disable=W0603
     global TIMEOUT_S
@@ -685,7 +685,7 @@ def compute_distances(args):
     elif args.method == "lexico":
         distmeth = diagram_distance.DistMethod.LEXICO
 
-    res = dict()
+    res = {}
     for ds in sorted(glob.glob("diagrams/*_expl_Dipha.dipha")):
         res[ds.split("/")[-1]] = diagram_distance.main(
             ds, args.pers_threshold, distmeth, args.timeout, False

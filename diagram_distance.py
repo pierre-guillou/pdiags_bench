@@ -118,7 +118,7 @@ def main(diag_file, threshold, method, timeout, write_to_file=True):
     diags, stem = get_file_list(diag_file)
 
     dipha_diag = str(diags[0])
-    res = dict()
+    res = {}
     for diag in diags[1:]:
         if method == DistMethod.LEXICO:
             res[str(diag.name)] = cd.main(dipha_diag, str(diag), False)
