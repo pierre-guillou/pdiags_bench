@@ -326,7 +326,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
 
     def ttk_overhead_time(ttk_output):
         time_re = (
-            r"\[DiscreteGradient\] Wrote Dipha explicit complex.*\[(\d+\.\d+|\d+)s"
+            r"\[DiscreteGradient\] Memory allocations.*\[(\d+\.\d+|\d+)s"
         )
         try:
             return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
