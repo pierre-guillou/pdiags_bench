@@ -244,6 +244,8 @@ class FileType(enum.Enum):
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
         if self == FileType.DIPHA_TRI:
+            if slice_type == SliceType.LINE:
+                return [SoftBackend.DIPHA]
             return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI]
         if self == FileType.PERS_CUB:
             return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS_CUB]
