@@ -5,8 +5,6 @@ import time
 
 from paraview import simple
 
-import vti2nc3
-
 RESAMPL_3D = 192
 RESAMPL_2D = 768
 RESAMPL_1D = 1024 ** 2
@@ -23,8 +21,6 @@ def write_output(outp, fname, out_dir, explicit):
     if explicit:
         # vtkUnstructuredGrid (TTK)
         simple.SaveData(fname + ".vtu", proxy=outp)
-        # TTK Simplicial Complex (Gudhi, Dionysus, Ripser)
-        simple.SaveData(fname + ".tsc", proxy=outp)
 
 
 def read_file(input_file):
