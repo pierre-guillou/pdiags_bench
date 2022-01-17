@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=128
-#PBS -l walltime=00:50:00
+#PBS -l walltime=01:30:00
 #PBS -N dipha_bench
 #PBS -j oe
 
@@ -35,19 +35,18 @@ cd $SCRATCH || exit 1
 # prepare datasets
 mkdir datasets
 
+out=$WD/log/${PBS_JOBID}.out
+err=$WD/log/${PBS_JOBID}.err
+
 for raw in raws/*.raw; do
-    raw_stem=${raw#raws/}
-    out=$WD/log/${raw_stem}_${PBS_JOBID}.out
-    err=$WD/log/${raw_stem}_${PBS_JOBID}.err
+    echo "Converting $raw..." 1>> $out 2>> $err
+    python3 $WD/convert_datasets.py -d datasets $raw 1> /dev/null 2>> $out
 
-    echo "Converting $raw..." 1> $out 2> $err
-    python3 $WD/convert_datasets.py -d datasets $raw 1> $out 2> $out
-
-    for nt in 1 32 64 128; do
+    for nt in 32 64 96 128; do
         for vtu in datasets/*.vtu; do
             echo "Processing $vtu with TTK with $nt threads..." >> $out
             omplace -nt $nt \
-                 ttkPersistenceDiagramCmd -B 2 -d 4 -i $vtu -t $nt \
+                 ttkPersistenceDiagramCmd -B 2 -d 4 -i $vtu -t $nt | grep Complete \
                  1>> $out 2>> $err
         done
 
@@ -56,7 +55,7 @@ for raw in raws/*.raw; do
         for dph in datasets/*.dipha; do
             echo "Processing $dph with Dipha with $nt processes..." >> $out
             mpirun -np $nt --oversubscribe \
-                 dipha --benchmark $dph out.dipha \
+                 dipha $dph out.dipha \
                  1>> $out 2>> $err
         done
 
