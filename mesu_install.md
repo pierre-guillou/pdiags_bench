@@ -71,3 +71,12 @@ make install
 python3.9 -c "import vtk, topologytoolkit"
 python3.9 -c "from paraview import simple;simple.TTKPersistenceDiagram"
 ```
+
+## DIPHA
+
+```sh
+module load cmake/3.19 gcc/11.2 openMPI/4.1.2-gcc112
+mkdir build && cd build
+CC=gcc CXX=g++ MPI_HOME=/opt/dev/libs/OpenMPI-4.1.2-intel cmake ..
+make
+```
