@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=128
-#PBS -l walltime=01:30:00
+#PBS -l walltime=01:50:00
 #PBS -N dipha_bench
 #PBS -j oe
 
@@ -46,7 +46,8 @@ for raw in raws/*.raw; do
         for vtu in datasets/*.vtu; do
             echo "Processing $vtu with TTK with $nt threads..." >> $out
             omplace -nt $nt \
-                 ttkPersistenceDiagramCmd -B 2 -d 4 -i $vtu -t $nt | grep Complete \
+                    ttkPersistenceDiagramCmd -B 2 -i $vtu -t $nt \
+                    | grep "discrete\|Morse\|Complete" \
                  1>> $out 2>> $err
         done
 
@@ -55,7 +56,7 @@ for raw in raws/*.raw; do
         for dph in datasets/*.dipha; do
             echo "Processing $dph with Dipha with $nt processes..." >> $out
             mpirun -np $nt --oversubscribe \
-                 dipha $dph out.dipha \
+                 dipha --benchmark $dph out.dipha \
                  1>> $out 2>> $err
         done
 
