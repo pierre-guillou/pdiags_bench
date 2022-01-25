@@ -17,8 +17,10 @@ export PV_PLUGIN_PATH=$PREFIX/bin/plugins/TopologyToolKit
 export MAKEFLAGS="-j4"
 
 # load modules at login
-module load python/3.9 cmake/3.19 gcc
+module load python/3.9 cmake/3.19 gcc/8.2
 ```
+
+(no gcc/11.2 since GMP (<limits>) is incompatible with TTK)
 
 Then
 
@@ -75,8 +77,8 @@ python3.9 -c "from paraview import simple;simple.TTKPersistenceDiagram"
 ## DIPHA
 
 ```sh
-module load cmake/3.19 gcc/11.2 openMPI/4.1.2-gcc112
+module load cmake/3.19 gcc/8.2 openMPI/4.1.2-gcc82
 mkdir build && cd build
-CC=gcc CXX=g++ MPI_HOME=/opt/dev/libs/OpenMPI-4.1.2-intel cmake ..
+CC=gcc CXX=g++ MPI_HOME=/opt/dev/libs/OpenMPI-4.1.2-gcc82 cmake ..
 make
 ```

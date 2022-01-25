@@ -9,7 +9,7 @@
 # load appropriate modules
 module purge
 # mpt must be loaded before openMPI to avoid mixing MPI implementations
-module load mpt openMPI/4.1.2-gcc112 gcc/11.2 python/3.9
+module load mpt openMPI/4.1.2-gcc82 gcc/8.2 python/3.9
 
 # move to PBS_O_WORKDIR
 cd $PBS_O_WORKDIR
