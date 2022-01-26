@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=128
-#PBS -l walltime=01:50:00
+#PBS -l walltime=06:00:00
 #PBS -N dipha_bench
 #PBS -j oe
 
@@ -46,7 +46,7 @@ for raw in raws/*.raw; do
         for vtu in datasets/*.vtu; do
             echo "Processing $vtu with TTK with $nt threads..." >> $out
             omplace -nt $nt \
-                    ttkPersistenceDiagramCmd -B 2 -i $vtu -t $nt \
+                    ttkPersistenceDiagramCmd -B 2 -i $vtu -t $nt -d 4 \
                     | grep "discrete\|Morse\|Complete" \
                  1>> $out 2>> $err
         done
