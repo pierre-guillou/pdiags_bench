@@ -46,7 +46,7 @@ class Ripser_SparseDM:
         self.dist_mat = None
         self.diag = None
         self.maxdim = 0
-        print("Using the Ripser.py backend")
+        print("Using the ripserplusplus backend")
 
     def fill_dist_mat(self, dims, vals, edges):
         edges = edges.reshape(-1, 2)
@@ -76,14 +76,13 @@ class Ripser_SparseDM:
         self.dist_mat = scipy.sparse.coo_matrix((V, (I, J)), shape=(dims[0], dims[0]))
 
     def compute_pers(self):
-        import ripser
-        self.diag = ripser.ripser(
-            self.dist_mat, distance_matrix=True, maxdim=self.maxdim
-        )["dgms"]
+        import ripserplusplus
+
+        self.diag = ripserplusplus.run("--format sparse --dim 3", self.dist_mat)
 
     def write_diag(self, output):
         with open(output, "w") as dst:
-            for dim, pairs in enumerate(self.diag):
+            for dim, pairs in self.diag.items():
                 for birth, death in pairs:
                     dst.write(f"{dim} {birth} {death}\n")
 
