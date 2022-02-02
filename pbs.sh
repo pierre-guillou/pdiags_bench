@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=128
-#PBS -l walltime=06:00:00
+#PBS -l walltime=20:00:00
 #PBS -N dipha_bench
 #PBS -j oe
 
@@ -18,6 +18,7 @@ cd $PBS_O_WORKDIR
 PROJECT=dipha
 SCRATCH=/scratchalpha/$USER/$PROJECT
 mkdir -p $SCRATCH
+rm -rf $SCRATCH/*
 
 # working directory
 WD=$HOME/pdiags_bench
@@ -47,7 +48,6 @@ for raw in raws/*.raw; do
             echo "Processing $vtu with TTK with $nt threads..." >> $out
             omplace -nt $nt \
                     ttkPersistenceDiagramCmd -B 2 -i $vtu -t $nt -d 4 \
-                    | grep "discrete\|Morse\|Complete" \
                  1>> $out 2>> $err
         done
 
