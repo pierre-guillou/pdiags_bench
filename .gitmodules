@@ -16,3 +16,6 @@
 [submodule "gudhi-devel"]
 	path = gudhi
 	url = https://github.com/GUDHI/gudhi-devel
+[submodule "phat"]
+	path = phat
+	url = https://bitbucket.org/phat-code/phat.git

@@ -56,6 +56,7 @@ def main():
         "oineus",
         "perseus",
         "JavaPlex",
+        "phat",
     ]
 
     # 1. Fetch submodules
