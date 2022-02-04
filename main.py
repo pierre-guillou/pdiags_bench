@@ -10,6 +10,7 @@ import multiprocessing
 import os
 import re
 import subprocess
+import sys
 
 import compare_diags
 import convert_datasets
@@ -175,6 +176,7 @@ class SoftBackend(enum.Enum):
     DIAMORSE = "Diamorse"
     EIRENE = "Eirene.jl"
     JAVAPLEX = "JavaPlex"
+    PHAT = "PHAT"
 
     def get_compute_function(self):
         dispatcher = {
@@ -192,6 +194,7 @@ class SoftBackend(enum.Enum):
             SoftBackend.DIAMORSE: compute_diamorse,
             SoftBackend.EIRENE: compute_eirene,
             SoftBackend.JAVAPLEX: compute_javaplex,
+            SoftBackend.PHAT: compute_phat,
         }
         return dispatcher[self]
 
@@ -205,6 +208,7 @@ class FileType(enum.Enum):
     TSC = enum.auto()
     NETCDF = enum.auto()
     EIRENE_CSV = enum.auto()
+    PHAT_ASCII = enum.auto()
     UNDEFINED = enum.auto()
 
     # pylint: disable=R0911
@@ -231,6 +235,8 @@ class FileType(enum.Enum):
             return cls.NETCDF
         if ext == "eirene":
             return cls.EIRENE_CSV
+        if ext == "phat":
+            return cls.PHAT_ASCII
 
         return cls.UNDEFINED
 
@@ -262,6 +268,8 @@ class FileType(enum.Enum):
             return [SoftBackend.DIAMORSE]
         if self == FileType.EIRENE_CSV:
             return [SoftBackend.EIRENE]
+        if self == FileType.PHAT_ASCII:
+            return [SoftBackend.PHAT]
 
         return []
 
@@ -590,6 +598,33 @@ def compute_javaplex(fname, times, backend):
 
     res.update(get_pairs_number(outp))
     times[dataset][backend.value] = {"para": res}
+    return elapsed
+
+
+def compute_phat(fname, times, backend):
+    dataset = dataset_name(fname)
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
+    cmd = [sys.executable, "phat2gudhi.py", "-o", outp, fname]
+
+    out, err = launch_process(cmd)
+
+    def compute_pers_time(output):
+        pers_pat = r"Computing persistence pairs took (\d+.\d+|\d+)s"
+        pers = re.search(pers_pat, output, re.MULTILINE).group(1)
+        pers = round(float(pers), 3)
+        return pers
+
+    elapsed, mem = get_time_mem(err)
+    pers = compute_pers_time(out)
+    res = {
+        "prec": round(elapsed - pers, 3),
+        "pers": pers,
+        "mem": mem,
+        "#threads": 1,
+    }
+
+    res.update(get_pairs_number(outp))
+    times[dataset][backend.value] = {"seq": res}
     return elapsed
 
 
