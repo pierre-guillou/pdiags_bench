@@ -29,6 +29,8 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".pers", proxy=outp)
         # Eirene.jl Sparse Column Format CSV
         simple.SaveData(fname + ".eirene", proxy=outp)
+        # PHAT ASCII boundary_matrix file format
+        simple.SaveData(fname + ".phat", proxy=outp)
     else:
         # vtkImageData (TTK)
         simple.SaveData(fname + ".vti", proxy=outp)
