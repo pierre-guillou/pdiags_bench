@@ -1,10 +1,12 @@
 import argparse
-import time
+import os
+import re
+import subprocess
 import sys
+import time
 
 import dionysus
 import numpy as np
-import scipy.sparse
 
 
 def read_simplicial_complex(dataset):
@@ -46,7 +48,7 @@ class Ripser_SparseDM:
         self.dist_mat = None
         self.diag = None
         self.maxdim = 0
-        print("Using the Ripser.py backend")
+        print("Using the Ripser backend")
 
     def fill_dist_mat(self, dims, vals, edges):
         edges = edges.reshape(-1, 2)
@@ -73,13 +75,33 @@ class Ripser_SparseDM:
             V[o + 0] = vals[dims[0] + i]
             V[o + 1] = vals[dims[0] + i]
 
-        self.dist_mat = scipy.sparse.coo_matrix((V, (I, J)), shape=(dims[0], dims[0]))
+        with open("dist_mat", "w") as dst:
+            for i, j, v in zip(I, J, V):
+                if i < j:
+                    dst.write(f"{i} {j} {v}\n")
 
     def compute_pers(self):
-        import ripser
-        self.diag = ripser.ripser(
-            self.dist_mat, distance_matrix=True, maxdim=self.maxdim
-        )["dgms"]
+        with subprocess.Popen(
+            ["ripser/ripser"]
+            + ["--format", "sparse"]
+            + ["--dim", "2"]
+            + ["dist_mat"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        ) as proc:
+            self.diag = [[], [], []]
+            if proc.returncode != 0:
+                print(proc.stderr.read())
+                return
+            for line in proc.stdout.readlines():
+                if "intervals" in line:
+                    dim = int(line.strip()[-2])
+                line = line.strip()
+                m = re.search(r"\[(\d+|\d+.\d+),(\d+|\d+.\d+)?\)", line)
+                if m is not None:
+                    self.diag[dim].append((m.groups()[0], m.groups()[1]))
+            os.remove("dist_mat")
 
     def write_diag(self, output):
         with open(output, "w") as dst:
