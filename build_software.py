@@ -46,6 +46,38 @@ def download_javaplex(jplex_url=JAVAPLEX_URL):
     os.remove(jplex_zip)
 
 
+def clean_env():
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env.pop("LD_LIBRARY_PATH", None)
+    env.pop("PV_PLUGIN_PATH", None)
+    env["CMAKE_PREFIX_PATH"] = ""
+    return env
+
+
+def build_paraview(vers, opts):
+    pv = "paraview-ttk"
+    builddir = f"build_dirs/build_{pv}_{vers}"
+    create_dir(builddir)
+    subprocess.run(["git", "checkout", vers], cwd=pv, check=True)
+    subprocess.check_call(
+        [
+            "cmake",
+            "-S",
+            pv,
+            "-B",
+            builddir,
+            "-DCMAKE_BUILD_TYPE=Release",
+            f"-DCMAKE_INSTALL_PREFIX={builddir}/../install_{vers}",
+        ]
+        + opts,
+        env=clean_env(),
+    )
+    # double configure needed here to prevent undefined reference errors
+    subprocess.check_call(["cmake", builddir])
+    subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
+
+
 def main():
 
     softs = [
@@ -59,6 +91,7 @@ def main():
         "perseus",
         "JavaPlex",
         "phat",
+        "PersistenceCycles",
     ]
 
     # 1. Fetch submodules
@@ -116,6 +149,41 @@ def main():
                 + ["-B", builddir]
             )
             subprocess.check_call(["cmake", "--build", builddir])
+        elif soft == "PersistenceCycles":
+            # first build ParaView 5.6.1
+            pv_ver = "v5.6.1"
+            build_paraview(
+                pv_ver,
+                ["-DPARAVIEW_BUILD_QT_GUI=OFF", "-DVTK_Group_ParaViewRendering=OFF"],
+            )
+            # apply patch (to prevent segfaults)
+            subprocess.run(["git", "checkout", "."], cwd=soft, check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "apply",
+                    "../patches/PersistenceCycles_0001-Fix-Wreturn-type.patch",
+                ],
+                cwd=soft,
+                check=True,
+            )
+            create_dir(builddir)
+            env = clean_env()
+            env["CMAKE_PREFIX_PATH"] = f"build_dirs/install_{pv_ver}"
+            subprocess.check_call(
+                [
+                    "cmake",
+                    "-S",
+                    f"{soft}/ttk-0.9.7",
+                    "-B",
+                    builddir,
+                    f"-DVTK_DIR={os.getcwd()}/build_dirs/install_{pv_ver}/lib/cmake/paraview-5.6",
+                    "-DCMAKE_BUILD_TYPE=Release",
+                    f"-DCMAKE_INSTALL_PREFIX={builddir}/../install_{pv_ver}",
+                ],
+                env=env,
+            )
+            subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
         else:
             create_dir(builddir)
             subprocess.check_call(["cmake", "-S", soft, "-B", builddir])
