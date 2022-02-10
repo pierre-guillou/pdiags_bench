@@ -19,3 +19,9 @@
 [submodule "phat"]
 	path = phat
 	url = https://bitbucket.org/phat-code/phat.git
+[submodule "PersistenceCycles"]
+	path = PersistenceCycles
+	url = https://github.com/IuricichF/PersistenceCycles
+[submodule "paraview-ttk"]
+	path = paraview-ttk
+	url = https://github.com/pierre-guillou/paraview-ttk

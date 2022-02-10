@@ -1,0 +1,34 @@
+From 201f6f42b39affa8efe884a18bf035565178cee4 Mon Sep 17 00:00:00 2001
+From: Pierre Guillou <pierre.guillou@lip6.fr>
+Date: Thu, 10 Feb 2022 16:46:03 +0100
+Subject: [PATCH] Fix -Wreturn-type
+
+---
+ ttk-0.9.7/core/base/formanGradient/FormanGradient.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ttk-0.9.7/core/base/formanGradient/FormanGradient.cpp b/ttk-0.9.7/core/base/formanGradient/FormanGradient.cpp
+index 47d52d1..55dcf24 100644
+--- a/ttk-0.9.7/core/base/formanGradient/FormanGradient.cpp
++++ b/ttk-0.9.7/core/base/formanGradient/FormanGradient.cpp
+@@ -292,7 +292,7 @@ int FormanGradient::homotopyExpansion(int v){
+     }
+ 
+     order.clear();
+-
++    return 0;
+ }
+ 
+ 
+@@ -367,7 +367,7 @@ int FormanGradient::sizeCofacets(const Simplex& simpl, int dimension_cb){
+         case 3:
+             return 0;
+     }
+-
++    return 0;
+ }
+ 
+ int FormanGradient::extractCoboundary(const Simplex& simpl, int dimension_cb, int index_cb){
+-- 
+2.35.1
+
