@@ -65,10 +65,11 @@ def main():
     subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
 
     # 2. Build each library
+    create_dir("build_dirs")
     for soft in softs:
         print(f"Building {soft}...")
         start = time.time()
-        builddir = f"build_{soft}"
+        builddir = f"build_dirs/build_{soft}"
         if "CubicalRipser" in soft:
             # build CubicalRipser
             subprocess.run(["make"], cwd=soft, check=True)

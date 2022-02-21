@@ -55,7 +55,7 @@ if __name__ == "__main__":
         "--oineus_path",
         type=str,
         help="Path to Oineus Python module",
-        default="build_oineus/bindings/python",
+        default="build_dirs/build_oineus/bindings/python",
     )
     parser.add_argument(
         "-t",

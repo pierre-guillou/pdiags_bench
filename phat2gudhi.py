@@ -67,7 +67,7 @@ if __name__ == "__main__":
         "--phat_exec",
         type=str,
         help="Path to PHAT executable",
-        default="build_phat/phat",
+        default="build_dirs/build_phat/phat",
     )
 
     args = parser.parse_args()
