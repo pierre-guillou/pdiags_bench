@@ -1,0 +1,4 @@
+CXXFLAGS=-O3 -fpermissive -std=c++11
+
+perseus: Pers
+	cp Pers perseus

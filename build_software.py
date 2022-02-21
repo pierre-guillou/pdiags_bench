@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import zipfile
 
@@ -72,13 +73,10 @@ def main():
             download_perseus()
             # build perseus
             try:
-                subprocess.run(
-                    ["g++", "Pers.cpp", "-O3", "-fpermissive", "-o", "perseus"],
-                    cwd=soft,
-                    check=True,
-                )
-            except subprocess.CalledProcessError:
-                print("Perseus needs GCC<11 to be built")
+                shutil.copy2("patches/Makefile.perseus", f"{soft}/Makefile")
+            except shutil.SameFileError:
+                pass
+            subprocess.run(["make"], cwd=soft, check=True)
         elif soft == "diamorse":
             # build diamorse
             try:
