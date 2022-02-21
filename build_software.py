@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import time
 import zipfile
 
 from download_datasets import download_file
@@ -65,6 +66,9 @@ def main():
 
     # 2. Build each library
     for soft in softs:
+        print(f"Building {soft}...")
+        start = time.time()
+        builddir = f"build_{soft}"
         if "CubicalRipser" in soft:
             # build CubicalRipser
             subprocess.run(["make"], cwd=soft, check=True)
@@ -102,7 +106,6 @@ def main():
                 check=True,
             )
         elif soft == "gudhi":
-            builddir = "build_" + soft
             create_dir(builddir)
             subprocess.check_call(
                 ["cmake"]
@@ -112,10 +115,12 @@ def main():
             )
             subprocess.check_call(["cmake", "--build", builddir])
         else:
-            builddir = "build_" + soft
             create_dir(builddir)
             subprocess.check_call(["cmake", "-S", soft, "-B", builddir])
             subprocess.check_call(["cmake", "--build", builddir])
+
+        end = time.time()
+        print(f"Built {soft} in {end - start:.3f}\n")
 
     # 3. Try poetry install
     try:
