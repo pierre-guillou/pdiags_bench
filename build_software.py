@@ -85,13 +85,14 @@ def main():
         elif soft == "diamorse":
             # build diamorse
             try:
+                subprocess.run(["git", "checkout", "."], cwd=soft, check=True)
                 subprocess.run(
-                    ["git", "checkout", "."],
-                    cwd=soft,
-                    check=True,
-                )
-                subprocess.run(
-                    ["git", "apply", "../patches/diamorse_*.patch"],
+                    [
+                        "git",
+                        "apply",
+                        "../patches/diamorse_0001-Makefile-Target-Python2.patch",
+                        "../patches/diamorse_0002-persistence.py-Add-Gudhi-format-output.patch",
+                    ],
                     cwd=soft,
                     check=True,
                 )
