@@ -21,7 +21,7 @@ Python dependencies.
 To run the benchmark, please use a computer/virtual machine with
 * Ubuntu 20.04 (preferred)
 * at least 64GB of RAM (it might even swap)
-* at least 700GB of free disk space for storing the converted input datasets
+* at least 900GB of free disk space for storing the converted input datasets
 * at least 100h of computing time
 
 If those requirements are too heavy, you can
@@ -31,9 +31,10 @@ If those requirements are too heavy, you can
 1. Installing the dependencies
 
 ```
-sudo apt install python-numpy pipx julia default-jdk libtbb-dev
+sudo apt install g++ cmake python-numpy pipx python3-dev python3-venv \
+    julia default-jdk libtbb-dev libboost-dev python2-dev openmpi-bin libgl1-mesa-dev
 /usr/bin/python3 -m pipx install poetry
-poetry install
+~/.local/bin/poetry install
 ```
 TODO: ParaView + TTK (via deb packages?)
 
@@ -41,14 +42,14 @@ TODO: ParaView + TTK (via deb packages?)
 2. Building the missing software libraries
 
 ```
-poetry run python build_software.py
+~/.local/bin/poetry run python build_software.py
 ```
 
 3. Fetching the OpenSciVis datasets (raw files) & converting them to
    supported input formats
 
 ```
-poetry run python main.py prepare_datasets -d
+~/.local/bin/poetry run python main.py prepare_datasets -d
 ```
 
 Use the `--max_dataset_size xxx` flag to change the number of downloaded
@@ -58,7 +59,7 @@ modify the resampled size (default 192 for a 192^3 grid)
 4. Launch the Persistence Diagram computation
 
 ```
-poetry run python main.py compute_diagrams
+~/.local/bin/poetry run python main.py compute_diagrams
 ```
 
 Use the `--sequential` key to request a sequential execution (parallel
@@ -68,5 +69,5 @@ for TTK, Dipha and Oineus by default).
 
 ```
 python -m json.tool results
-poetry run python res2tex results
+~/.local/bin/poetry run python res2tex results
 ```

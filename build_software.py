@@ -144,7 +144,11 @@ def main():
             create_dir(builddir)
             subprocess.check_call(
                 ["cmake"]
-                + ["-DWITH_GUDHI_TEST=OFF", "-DWITH_GUDHI_UTILITIES=OFF"]
+                + [
+                    "-DWITH_GUDHI_TEST=OFF",
+                    "-DWITH_GUDHI_UTILITIES=OFF",
+                    "-DCMAKE_BUILD_TYPE=Release",
+                ]
                 + ["-S", soft]
                 + ["-B", builddir]
             )
@@ -186,7 +190,9 @@ def main():
             subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
         else:
             create_dir(builddir)
-            subprocess.check_call(["cmake", "-S", soft, "-B", builddir])
+            subprocess.check_call(
+                ["cmake", "-S", soft, "-B", builddir, "-DCMAKE_BUILD_TYPE=Release"]
+            )
             subprocess.check_call(["cmake", "--build", builddir])
 
         end = time.time()
