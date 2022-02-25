@@ -198,15 +198,6 @@ def main():
         end = time.time()
         print(f"Built {soft} in {end - start:.3f}\n")
 
-    # 3. Try poetry install
-    try:
-        subprocess.run(["poetry", "install"], check=True)
-    except FileNotFoundError:
-        print(
-            "This software needs Poetry (https://python-poetry.org/)"
-            " to manage the Python dependencies"
-        )
-
 
 if __name__ == "__main__":
     main()
