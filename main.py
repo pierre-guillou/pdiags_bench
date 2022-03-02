@@ -177,6 +177,7 @@ class SoftBackend(enum.Enum):
     EIRENE = "Eirene.jl"
     JAVAPLEX = "JavaPlex"
     PHAT = "PHAT"
+    PERSCYCL = "PersistenceCycles"
 
     def get_compute_function(self):
         dispatcher = {
@@ -195,6 +196,7 @@ class SoftBackend(enum.Enum):
             SoftBackend.EIRENE: compute_eirene,
             SoftBackend.JAVAPLEX: compute_javaplex,
             SoftBackend.PHAT: compute_phat,
+            SoftBackend.PERSCYCL: compute_persistenceCycles,
         }
         return dispatcher[self]
 
@@ -245,7 +247,11 @@ class FileType(enum.Enum):
         if self == FileType.VTI_VTU:
             if slice_type in [SliceType.SURF, SliceType.VOL]:
                 # FTM + our algo in 2D and 3D
-                return [SoftBackend.TTK_FTM, SoftBackend.TTK_SANDWICH]
+                return [
+                    SoftBackend.TTK_FTM,
+                    SoftBackend.TTK_SANDWICH,
+                    SoftBackend.PERSCYCL,
+                ]
             return [SoftBackend.TTK_SANDWICH]  # 1D lines
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
@@ -625,6 +631,39 @@ def compute_phat(fname, times, backend):
 
     res.update(get_pairs_number(outp))
     times[dataset][backend.value] = {"para": res}
+    return elapsed
+
+
+@parallel_decorator
+def compute_persistenceCycles(fname, times, backend, num_threads=1):
+    dataset = dataset_name(fname)
+    outp = f"diagrams/{dataset}_{backend.value}.vtu"
+    cmd = [sys.executable, "persistentCycles.py", fname, "-o", outp]
+
+    out, err = launch_process(cmd)
+
+    def compute_pers_time(output):
+        grad_pat = r"Gradient computed in (\d+.\d+|\d+) seconds"
+        grad = re.search(grad_pat, output, re.MULTILINE).group(1)
+        grad = round(float(grad), 3)
+        pers_pat = r"Persistent homology computed in (\d+.\d+|\d+) seconds"
+        pers = re.search(pers_pat, output, re.MULTILINE).group(1)
+        pers = grad + round(float(pers), 3)
+        return pers
+
+    elapsed, mem = get_time_mem(err)
+    pers = compute_pers_time(out)
+    res = {
+        "prec": round(elapsed - pers, 3),
+        "pers": pers,
+        "mem": mem,
+        "#threads": num_threads,
+    }
+
+    res.update(get_pairs_number(outp))
+    times[dataset].setdefault(backend.value, {}).update(
+        {("seq" if num_threads == 1 else "para"): res}
+    )
     return elapsed
 
 
