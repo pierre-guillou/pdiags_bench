@@ -638,7 +638,15 @@ def compute_phat(fname, times, backend):
 def compute_persistenceCycles(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}_{backend.value}.vtu"
-    cmd = [sys.executable, "persistentCycles.py", fname, "-o", outp]
+    cmd = [
+        sys.executable,
+        "persistentCycles.py",
+        fname,
+        "-o",
+        outp,
+        "-t",
+        str(num_threads),
+    ]
 
     out, err = launch_process(cmd)
 
