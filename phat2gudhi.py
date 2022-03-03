@@ -7,7 +7,10 @@ import time
 def main(input_dataset, output_diagram, phat_exec):
     # call PHAT on input dataset
     phat_diag = "diagram.phat"
-    subprocess.check_call([phat_exec, "--verbose", "--ascii", input_dataset, phat_diag])
+    subprocess.check_call(
+        [phat_exec, "--verbose", "--ascii", "--spectral_sequence"]
+        + [input_dataset, phat_diag]
+    )
 
     start = time.time()
 

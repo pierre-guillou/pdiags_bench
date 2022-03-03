@@ -620,11 +620,11 @@ def compute_phat(fname, times, backend):
         "prec": round(elapsed - pers, 3),
         "pers": pers,
         "mem": mem,
-        "#threads": 1,
+        "#threads": multiprocessing.cpu_count(),
     }
 
     res.update(get_pairs_number(outp))
-    times[dataset][backend.value] = {"seq": res}
+    times[dataset][backend.value] = {"para": res}
     return elapsed
 
 
