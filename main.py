@@ -83,7 +83,10 @@ def prepare_datasets(args):
 
 
 def get_pairs_number(diag):
-    pairs = compare_diags.read_diag(diag)
+    if "PersistenceCycles" in diag:
+        pairs = [[], [], []]
+    else:
+        pairs = compare_diags.read_diag(diag)
     if "x1_" in diag:
         # 2D
         return {
