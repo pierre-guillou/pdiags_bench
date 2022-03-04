@@ -1,0 +1,32 @@
+From 510d462939bfda600a55f3028552af487a09e832 Mon Sep 17 00:00:00 2001
+From: Pierre Guillou <pierre.guillou@lip6.fr>
+Date: Mon, 7 Mar 2022 13:44:37 +0100
+Subject: [PATCH] Make Persistent Diagram VTU compatible with TTK
+
+---
+ .../ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp  | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp b/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp
+index b7b0b21..07f9402 100644
+--- a/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp
++++ b/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp
+@@ -184,8 +184,15 @@ void ttkFG_PersistentHomology::outPersistencePairs(vtkDataArray *inputScalarFiel
+     outputPersDiagrams->InsertNextCell(VTK_LINE, 2, line);
+ 
+ 
++    vtkNew<vtkUnsignedCharArray> isFin{};
++    isFin->SetName("IsFinite");
++    isFin->SetNumberOfTuples(outputPersDiagrams->GetNumberOfCells());
++    isFin->Fill(1);
++
+     outputPersDiagrams->SetPoints(pointsPD);
+     outputPersDiagrams->GetPointData()->AddArray(pairType);
++    outputPersDiagrams->GetCellData()->AddArray(filtration);
++    outputPersDiagrams->GetCellData()->AddArray(isFin);
+     outputPersDiagrams->GetPointData()->AddArray(filtrationPD);
+ 
+ }
+-- 
+2.35.1
+

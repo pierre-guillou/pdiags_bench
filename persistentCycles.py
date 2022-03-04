@@ -12,7 +12,7 @@ def main(input_dataset, output_diagram):
     ds = simple.XMLUnstructuredGridReader(FileName=[input_dataset])
     pd = simple.TTKFG_PersistentHomology(Input=ds)
     pd.ScalarField = "ImageFile_Order"
-    simple.SaveData(output_diagram, proxy=pd)
+    simple.SaveData(output_diagram, proxy=simple.OutputPort(pd, 1))
 
 
 def set_env_and_run(input_dataset, output_diagram, thread_number):

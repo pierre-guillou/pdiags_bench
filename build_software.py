@@ -167,6 +167,7 @@ def main():
                     "git",
                     "apply",
                     "../patches/PersistenceCycles_0001-Fix-Wreturn-type.patch",
+                    "../patches/PersistenceCycles_0002-Make-Persistent-Diagram-VTU-compatible-with-TTK.patch",
                 ],
                 cwd=soft,
                 check=True,

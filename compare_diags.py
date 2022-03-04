@@ -31,7 +31,7 @@ def read_diag(diag, filter_inf=False):
     pts = diag.GetPoints()
     if pts is None:
         return []
-    assert 2 * ptype.GetNumberOfTuples() - 2 == pts.GetNumberOfPoints()
+    # assert 2 * ptype.GetNumberOfTuples() - 2 == pts.GetNumberOfPoints()
     pairs = [list() for i in range(3)]
     for i in range(ptype.GetNumberOfTuples()):
         j = int(ptype.GetTuple1(i))
