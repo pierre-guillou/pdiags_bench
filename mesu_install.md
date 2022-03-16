@@ -82,3 +82,12 @@ mkdir build && cd build
 CC=gcc CXX=g++ MPI_HOME=/opt/dev/libs/OpenMPI-4.1.2-gcc82 cmake ..
 make
 ```
+
+## PHAT
+
+```sh
+module load cmake/3.19 gcc/8.2
+mkdir build && cd build
+CC=gcc CXX=g++ cmake ..
+make
+```
