@@ -17,6 +17,8 @@ def write_output(outp, fname, out_dir, explicit):
 
     # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
     simple.SaveData(fname + ".dipha", proxy=outp)
+    # PHAT ASCII boundary_matrix file format
+    simple.SaveData(fname + ".phat", proxy=outp)
 
     if explicit:
         # vtkUnstructuredGrid (TTK)

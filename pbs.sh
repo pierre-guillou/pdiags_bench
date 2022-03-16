@@ -61,6 +61,15 @@ for raw in raws/*.raw; do
         done
 
         sleep 5                 # flush?
+
+        for ph in datasets/*.phat; do
+            echo "Processing $ph with PHAT with $nt threads..." >> $out
+            omplace -nt $nt \
+                 phat --verbose --ascii $ph out.phat \
+                 1>> $out 2>> $err
+        done
+
+        sleep 5                 # flush?
     done
 
     rm datasets/*
