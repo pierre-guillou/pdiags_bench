@@ -64,7 +64,7 @@ for raw in raws/*.raw; do
 
         for ph in datasets/*.phat; do
             echo "Processing $ph with PHAT with $nt threads..." >> $out
-            omplace -nt $nt \
+            OMP_NUM_THREADS=$nt omplace -nt $nt \
                  phat --verbose --ascii $ph out.phat \
                  1>> $out 2>> $err
         done
