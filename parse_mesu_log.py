@@ -1,5 +1,5 @@
-import sys
 import re
+import sys
 
 
 def escape_ansi_chars(txt):
@@ -45,6 +45,13 @@ def dipha_compute_time(dipha_output):
     return prec, pers
 
 
+def phat_compute_time(output):
+    pers_pat = r"Computing persistence pairs took (\d+.\d+|\d+)s"
+    pers = re.search(pers_pat, output, re.MULTILINE).group(1)
+    pers = round(float(pers), 3)
+    return pers
+
+
 def main():
     lines = []
     with open(sys.argv[1]) as src:
@@ -60,13 +67,15 @@ def main():
             sections.append(re.search(pat, line).groups())
 
     delimiters.append(len(lines))
-    res = {sec[0]: {"TTK": {}, "Dipha": {}} for sec in sections}
+    res = {sec[0]: {"TTK": {}, "Dipha": {}, "PHAT": {}} for sec in sections}
     for i, sec in enumerate(sections):
         seclog = "".join(lines[slice(delimiters[i], delimiters[i + 1])])
         if sec[1] == "TTK":
             res[sec[0]][sec[1]][int(sec[2])] = ttk_compute_time(seclog)
         elif sec[1] == "Dipha":
             res[sec[0]][sec[1]][int(sec[2])] = dipha_compute_time(seclog)[1]
+        elif sec[1] == "PHAT":
+            res[sec[0]][sec[1]][int(sec[2])] = phat_compute_time(seclog)
 
     for k, v in res.items():
         print(k)
