@@ -70,17 +70,20 @@ def main():
     res = {sec[0]: {"TTK": {}, "Dipha": {}, "PHAT": {}} for sec in sections}
     for i, sec in enumerate(sections):
         seclog = "".join(lines[slice(delimiters[i], delimiters[i + 1])])
-        if sec[1] == "TTK":
-            res[sec[0]][sec[1]][int(sec[2])] = ttk_compute_time(seclog)
-        elif sec[1] == "Dipha":
-            res[sec[0]][sec[1]][int(sec[2])] = dipha_compute_time(seclog)[1]
-        elif sec[1] == "PHAT":
-            res[sec[0]][sec[1]][int(sec[2])] = phat_compute_time(seclog)
+        try:
+            if sec[1] == "TTK":
+                res[sec[0]][sec[1]][int(sec[2])] = ttk_compute_time(seclog)
+            elif sec[1] == "Dipha":
+                res[sec[0]][sec[1]][int(sec[2])] = dipha_compute_time(seclog)[1]
+            elif sec[1] == "PHAT":
+                res[sec[0]][sec[1]][int(sec[2])] = phat_compute_time(seclog)
+        except AttributeError:
+            break
 
-    for k, v in res.items():
+    for k, v in sorted(res.items()):
         print(k)
         for kk, vv in v.items():
-            print(" ", kk, vv)
+            print("  ({}, {})".format(kk, sorted(vv.items())))
 
 
 if __name__ == "__main__":
