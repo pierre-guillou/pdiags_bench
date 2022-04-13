@@ -92,6 +92,7 @@ def main():
         "JavaPlex",
         "phat",
         "PersistenceCycles",
+        "AlexanderSandwich",
     ]
 
     # 1. Fetch submodules
@@ -188,6 +189,31 @@ def main():
                 ],
                 env=env,
             )
+            subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
+        elif soft == "AlexanderSandwich":
+            # first build ParaView 5.10.1
+            pv_ver = "v5.10.1"
+            build_paraview(
+                pv_ver,
+                ["-DPARAVIEW_USE_QT=OFF", "-DVTK_Group_ENABLE_Rendering=NO"],
+            )
+            # prep env variable
+            create_dir(builddir)
+            env = clean_env()
+            env["CMAKE_PREFIX_PATH"] = f"build_dirs/install_{pv_ver}"
+            # configure TTK build directory
+            subprocess.check_call(
+                ["cmake"]
+                + ["-S", f"{soft}"]
+                + ["-B", builddir]
+                + [
+                    f"-DVTK_DIR={os.getcwd()}/build_dirs/install_{pv_ver}/lib/cmake/paraview-5.10",
+                    "-DCMAKE_BUILD_TYPE=Release",
+                    f"-DCMAKE_INSTALL_PREFIX={builddir}/../install_{pv_ver}",
+                ],
+                env=env,
+            )
+            # build & install TTK in ParaView install prefix
             subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
         else:
             create_dir(builddir)
