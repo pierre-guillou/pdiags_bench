@@ -379,7 +379,7 @@ def compute_dipha(fname, times, backend):
     dataset = dataset_name(fname)
     b = backend.value.split("_")[0]
     outp = f"diagrams/{dataset}_{b}.dipha"
-    cmd = ["build_dirs/build_dipha/dipha", "--benchmark", fname, outp]
+    cmd = ["build_dirs/dipha/dipha", "--benchmark", fname, outp]
     num_threads = 1
     if backend is SoftBackend.DIPHA_MPI:
         num_threads = multiprocessing.cpu_count()

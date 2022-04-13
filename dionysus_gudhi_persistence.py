@@ -244,7 +244,7 @@ def main():
         "--gudhi_path",
         type=str,
         help="Path to Gudhi Python module",
-        default="build_dirs/build_gudhi/src/python",
+        default="build_dirs/gudhi/src/python",
     )
     parser.add_argument(
         "-b", choices=["gudhi", "dionysus", "ripser"], default="gudhi", dest="backend"

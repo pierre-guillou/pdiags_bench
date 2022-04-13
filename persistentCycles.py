@@ -17,7 +17,7 @@ def main(input_dataset, output_diagram):
 
 def set_env_and_run(input_dataset, output_diagram, thread_number):
     env = dict(os.environ)
-    prefix = f"{os.getcwd()}/build_dirs/install_v5.6.1"
+    prefix = f"{os.getcwd()}/build_dirs/install_paraview_v5.6.1"
     env["PV_PLUGIN_PATH"] = f"{prefix}/lib/plugins"
     env["LD_LIBRARY_PATH"] = f"{prefix}/lib:" + os.environ.get("LD_LIBRARY_PATH", "")
     env["PYTHONPATH"] = ":".join(

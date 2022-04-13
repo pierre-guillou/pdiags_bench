@@ -55,21 +55,16 @@ def clean_env():
     return env
 
 
-def build_paraview(vers, opts):
+def build_paraview(prefix, vers, opts):
     pv = "paraview-ttk"
-    builddir = f"build_dirs/build_{pv}_{vers}"
+    builddir = f"build_dirs/paraview_{vers}"
     create_dir(builddir)
     subprocess.run(["git", "checkout", vers], cwd=pv, check=True)
     subprocess.check_call(
-        [
-            "cmake",
-            "-S",
-            pv,
-            "-B",
-            builddir,
-            "-DCMAKE_BUILD_TYPE=Release",
-            f"-DCMAKE_INSTALL_PREFIX={builddir}/../install_{vers}",
-        ]
+        ["cmake"]
+        + ["-S", pv]
+        + ["-B", builddir]
+        + ["-DCMAKE_BUILD_TYPE=Release", f"-DCMAKE_INSTALL_PREFIX={prefix}"]
         + opts,
         env=clean_env(),
     )
@@ -103,7 +98,7 @@ def main():
     for soft in softs:
         print(f"Building {soft}...")
         start = time.time()
-        builddir = f"build_dirs/build_{soft}"
+        builddir = f"build_dirs/{soft}"
         if "CubicalRipser" in soft:
             # build CubicalRipser
             subprocess.run(["make"], cwd=soft, check=True)
@@ -157,7 +152,9 @@ def main():
         elif soft == "PersistenceCycles":
             # first build ParaView 5.6.1
             pv_ver = "v5.6.1"
+            prefix = f"build_dirs/install_paraview_{pv_ver}"
             build_paraview(
+                prefix,
                 pv_ver,
                 ["-DPARAVIEW_BUILD_QT_GUI=OFF", "-DVTK_Group_ParaViewRendering=OFF"],
             )
@@ -175,7 +172,7 @@ def main():
             )
             create_dir(builddir)
             env = clean_env()
-            env["CMAKE_PREFIX_PATH"] = f"build_dirs/install_{pv_ver}"
+            env["CMAKE_PREFIX_PATH"] = prefix
             subprocess.check_call(
                 [
                     "cmake",
@@ -183,9 +180,9 @@ def main():
                     f"{soft}/ttk-0.9.7",
                     "-B",
                     builddir,
-                    f"-DVTK_DIR={os.getcwd()}/build_dirs/install_{pv_ver}/lib/cmake/paraview-5.6",
+                    f"-DVTK_DIR={os.getcwd()}/{prefix}/lib/cmake/paraview-5.6",
                     "-DCMAKE_BUILD_TYPE=Release",
-                    f"-DCMAKE_INSTALL_PREFIX={builddir}/../install_{pv_ver}",
+                    f"-DCMAKE_INSTALL_PREFIX={prefix}",
                 ],
                 env=env,
             )
@@ -193,23 +190,25 @@ def main():
         elif soft == "AlexanderSandwich":
             # first build ParaView 5.10.1
             pv_ver = "v5.10.1"
+            prefix = f"build_dirs/install_paraview_{pv_ver}"
             build_paraview(
+                prefix,
                 pv_ver,
                 ["-DPARAVIEW_USE_QT=OFF", "-DVTK_Group_ENABLE_Rendering=NO"],
             )
             # prep env variable
             create_dir(builddir)
             env = clean_env()
-            env["CMAKE_PREFIX_PATH"] = f"build_dirs/install_{pv_ver}"
+            env["CMAKE_PREFIX_PATH"] = prefix
             # configure TTK build directory
             subprocess.check_call(
                 ["cmake"]
                 + ["-S", f"{soft}"]
                 + ["-B", builddir]
                 + [
-                    f"-DVTK_DIR={os.getcwd()}/build_dirs/install_{pv_ver}/lib/cmake/paraview-5.10",
+                    f"-DVTK_DIR={os.getcwd()}/{prefix}/lib/cmake/paraview-5.10",
                     "-DCMAKE_BUILD_TYPE=Release",
-                    f"-DCMAKE_INSTALL_PREFIX={builddir}/../install_{pv_ver}",
+                    f"-DCMAKE_INSTALL_PREFIX={prefix}",
                 ],
                 env=env,
             )
