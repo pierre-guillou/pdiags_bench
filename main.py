@@ -313,7 +313,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
     bs = backend.value.replace("/", "-")
     outp = f"diagrams/{dataset}_{bs}.vtu"
     cmd = (
-        ["ttkPersistenceDiagramCmd"]
+        ["build_dirs/install_paraview_v5.10.1/bin/ttkPersistenceDiagramCmd"]
         + ["-i", fname]
         + ["-d", "4"]
         + ["-a", "ImageFile_Order"]
