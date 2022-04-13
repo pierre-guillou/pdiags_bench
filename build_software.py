@@ -222,7 +222,7 @@ def main():
             subprocess.check_call(["cmake", "--build", builddir])
 
         end = time.time()
-        print(f"Built {soft} in {end - start:.3f}\n")
+        print(f"Built {soft} in {int(end - start)} seconds\n")
 
 
 if __name__ == "__main__":
