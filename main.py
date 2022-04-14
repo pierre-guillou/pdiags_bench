@@ -12,14 +12,9 @@ import re
 import subprocess
 import sys
 
-import compare_diags
-import convert_datasets
-import diagram_distance
 import download_datasets
-import gen_random
 import gudhi_diag_inf
 import pers2gudhi
-from convert_datasets import SliceType
 
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
@@ -31,7 +26,14 @@ def create_dir(dirname):
         pass
 
 
+# pylint: disable=import-outside-toplevel
+
+
 def prepare_datasets(args):
+    import convert_datasets
+    import gen_random
+    from convert_datasets import SliceType
+
     create_dir("raws")
     if args.download:
         download_datasets.main(args.max_dataset_size)
@@ -83,6 +85,8 @@ def prepare_datasets(args):
 
 
 def get_pairs_number(diag):
+    import compare_diags
+
     pairs = compare_diags.read_diag(diag)
     if "x1_" in diag:
         # 2D
@@ -243,6 +247,8 @@ class FileType(enum.Enum):
         return cls.UNDEFINED
 
     def get_backends(self, slice_type):
+        from convert_datasets import SliceType
+
         # get backends list from file type variant and slice types
         if self == FileType.VTI_VTU:
             if slice_type in [SliceType.SURF, SliceType.VOL]:
@@ -676,6 +682,8 @@ def compute_persistenceCycles(fname, times, backend, num_threads=1):
 
 
 def dispatch(fname, times):
+    from convert_datasets import SliceType
+
     slice_type = SliceType.from_filename(fname)
     complex_type = Complex.from_filename(fname)
     file_type = FileType.from_filename(fname, complex_type)
@@ -763,6 +771,8 @@ def compute_diagrams(args):
 
 
 def compute_distances(args):
+    import diagram_distance
+
     if args.method == "auction":
         distmeth = diagram_distance.DistMethod.AUCTION
     elif args.method == "bottleneck":
