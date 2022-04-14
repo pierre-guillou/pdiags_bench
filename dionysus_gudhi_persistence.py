@@ -78,7 +78,7 @@ class Ripser_SparseDM:
 
     def compute_pers(self):
         with subprocess.Popen(
-            ["ripser/ripser"]
+            ["backends_src/ripser/ripser"]
             + ["--format", "sparse"]
             + ["--dim", "2"]
             + ["dist_mat"],

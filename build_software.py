@@ -83,6 +83,7 @@ def main():
         "Eirene.jl",
         "gudhi",
         "oineus",
+        "ripser",
         "perseus",
         "JavaPlex",
         "phat",
@@ -155,6 +156,8 @@ def main():
                 + ["-B", builddir]
             )
             subprocess.check_call(["cmake", "--build", builddir])
+        elif soft == "ripser":
+            subprocess.run(["make"], cwd=soft_src, check=True)
         elif soft == "PersistenceCycles":
             # first build ParaView 5.6.1
             pv_ver = "v5.6.1"
