@@ -913,5 +913,27 @@ def main():
         parser.parse_args(["--help"])
 
 
+def set_env_and_run():
+    import sysconfig
+
+    env = dict(os.environ)
+    prefix = f"{os.getcwd()}/build_dirs/install_paraview_v5.10.1"
+    env["PV_PLUGIN_PATH"] = f"{prefix}/bin/plugins"
+    env["LD_LIBRARY_PATH"] = f"{prefix}/lib:" + os.environ.get("LD_LIBRARY_PATH", "")
+    env["PYTHONPATH"] = ":".join(
+        [
+            f"{prefix}/lib/python{sysconfig.get_python_version()}/site-packages",
+            f"{prefix}/lib",
+        ]
+    )
+
+    subprocess.check_call([sys.executable] + sys.argv, env=env)
+
+
 if __name__ == "__main__":
-    main()
+    import psutil
+
+    if psutil.Process().parent().cmdline()[1:] == sys.argv:
+        main()
+    else:
+        set_env_and_run()
