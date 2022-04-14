@@ -29,3 +29,6 @@
 	path = backends_src/AlexanderSandwich
 	url = git@github.com:pierre-guillou/ttk-guillou
 	branch = dev
+[submodule "backends_src/ripser"]
+	path = backends_src/ripser
+	url = https://github.com/Ripser/ripser
