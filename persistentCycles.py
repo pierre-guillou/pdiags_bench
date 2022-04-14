@@ -11,7 +11,10 @@ import psutil
 def main(input_dataset, output_diagram):
     from paraview import simple
 
-    ds = simple.XMLUnstructuredGridReader(FileName=[input_dataset])
+    if "vtu" in input_dataset:
+        ds = simple.XMLUnstructuredGridReader(FileName=[input_dataset])
+    elif "vti" in input_dataset:
+        ds = simple.XMLImageDataReader(FileName=[input_dataset])
     pd = simple.TTKFG_PersistentHomology(Input=ds)
     pd.ScalarField = "ImageFile_Order"
     simple.SaveData(output_diagram, proxy=simple.OutputPort(pd, 1))
