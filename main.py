@@ -430,7 +430,12 @@ def compute_cubrips(fname, times, backend):
         binary = "CubicalRipser_2dim/CR2"
     else:
         binary = "CubicalRipser_3dim/CR3"
-    cmd = [binary, "--output", outp, "--method", "compute_pairs", fname]
+    cmd = (
+        [f"backends_src/{binary}"]
+        + ["--output", outp]
+        + ["--method", "compute_pairs"]
+        + [fname]
+    )
 
     _, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
@@ -540,7 +545,7 @@ def compute_perseus(fname, times, backend):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     subc = "simtop" if backend == SoftBackend.PERSEUS_SIM else "cubtop"
-    cmd = ["perseus/perseus", subc, fname]
+    cmd = ["backends_src/perseus/perseus", subc, fname]
 
     _, err = launch_process(cmd)
     elapsed, mem = get_time_mem(err)
@@ -588,7 +593,7 @@ def compute_javaplex(fname, times, backend):
     outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     cmd = (
         ["java", "-Xmx64G"]
-        + ["-classpath", ".:javaplex.jar"]
+        + ["-classpath", ".:backends_src/javaplex.jar"]
         + ["jplex_persistence", fname, outp]
     )
 
