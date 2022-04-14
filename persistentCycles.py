@@ -1,9 +1,11 @@
 import argparse
 import multiprocessing
 import os
-import sys
 import subprocess
+import sys
 import sysconfig
+
+import psutil
 
 
 def main(input_dataset, output_diagram):
@@ -15,7 +17,7 @@ def main(input_dataset, output_diagram):
     simple.SaveData(output_diagram, proxy=simple.OutputPort(pd, 1))
 
 
-def set_env_and_run(input_dataset, output_diagram, thread_number):
+def set_env_and_run(thread_number):
     env = dict(os.environ)
     prefix = f"{os.getcwd()}/build_dirs/install_paraview_v5.6.1"
     env["PV_PLUGIN_PATH"] = f"{prefix}/lib/plugins"
@@ -28,8 +30,7 @@ def set_env_and_run(input_dataset, output_diagram, thread_number):
     )
     env["OMP_NUM_THREADS"] = str(thread_number)
 
-    cmd = [sys.executable, __file__, input_dataset, "-o", output_diagram, "-n"]
-    subprocess.check_call(cmd, env=env)
+    subprocess.check_call([sys.executable] + sys.argv, env=env)
 
 
 if __name__ == "__main__":
@@ -47,12 +48,9 @@ if __name__ == "__main__":
         help="Number of threads",
         default=multiprocessing.cpu_count(),
     )
-    parser.add_argument(
-        "-n", "--no_set_environment", action="store_true", help="Don't set environment"
-    )
     args = parser.parse_args()
 
-    if args.no_set_environment:
+    if psutil.Process().parent().cmdline()[1:] == sys.argv:
         main(args.input_dataset, args.output_diagram)
     else:
-        set_env_and_run(args.input_dataset, args.output_diagram, args.thread_number)
+        set_env_and_run(args.thread_number)
