@@ -12,6 +12,8 @@ Benchmark suite for Persistence Diagrams Libraries
 * [Dionysus2](https://mrzv.org/software/dionysus2)
 * [Eirene.jl](https://github.com/Eetion/Eirene.jl)
 * [Ripser](https://github.com/Ripser/ripser)
+* [PersistentCycles](https://github.com/IuricichF/PersistenceCycles)
+* [PHAT](https://bitbucket.org/phat-code/phat)
 
 This project uses [Poetry](https://python-poetry.org/) to manage the
 Python dependencies.
