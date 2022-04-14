@@ -27,7 +27,7 @@ def download_perseus(perseus_url=PERSEUS_URL):
     download_file(perseus_url, perseus_zip)
     create_dir("perseus")
     with zipfile.ZipFile(perseus_zip, "r") as src:
-        src.extractall("perseus")
+        src.extractall("backends_src/perseus")
     # remove zip
     os.remove(perseus_zip)
 
@@ -40,7 +40,7 @@ def download_javaplex(jplex_url=JAVAPLEX_URL):
     with zipfile.ZipFile(jplex_zip, "r") as src:
         src.extract("javaplex/library/javaplex.jar")
     # move JAR to cwd
-    os.replace("javaplex/library/javaplex.jar", "javaplex.jar")
+    os.replace("javaplex/library/javaplex.jar", "backends_src/javaplex.jar")
     os.removedirs("javaplex/library")
     # remove zip
     os.remove(jplex_zip)
@@ -56,7 +56,7 @@ def clean_env():
 
 
 def build_paraview(prefix, vers, opts):
-    pv = "paraview-ttk"
+    pv = "backends_src/paraview-ttk"
     builddir = f"build_dirs/paraview_{vers}"
     create_dir(builddir)
     subprocess.run(["git", "checkout", vers], cwd=pv, check=True)
@@ -97,35 +97,36 @@ def main():
     create_dir("build_dirs")
     for soft in softs:
         print(f"Building {soft}...")
+        soft_src = f"backends_src/{soft}"
         start = time.time()
         builddir = f"build_dirs/{soft}"
         if "CubicalRipser" in soft:
             # build CubicalRipser
-            subprocess.run(["make"], cwd=soft, check=True)
+            subprocess.run(["make"], cwd=soft_src, check=True)
         elif soft == "perseus":
             # download Perseus
             download_perseus()
             # build perseus
             try:
-                shutil.copy2("patches/Makefile.perseus", f"{soft}/Makefile")
+                shutil.copy2("patches/Makefile.perseus", f"{soft_src}/Makefile")
             except shutil.SameFileError:
                 pass
-            subprocess.run(["make"], cwd=soft, check=True)
+            subprocess.run(["make"], cwd=soft_src, check=True)
         elif soft == "diamorse":
             # build diamorse
             try:
-                subprocess.run(["git", "checkout", "."], cwd=soft, check=True)
+                subprocess.run(["git", "checkout", "."], cwd=soft_src, check=True)
                 subprocess.run(
                     [
                         "git",
                         "apply",
-                        "../patches/diamorse_0001-Makefile-Target-Python2.patch",
-                        "../patches/diamorse_0002-persistence.py-Add-Gudhi-format-output.patch",
+                        "../../patches/diamorse_0001-Makefile-Target-Python2.patch",
+                        "../../patches/diamorse_0002-persistence.py-Add-Gudhi-format-output.patch",
                     ],
-                    cwd=soft,
+                    cwd=soft_src,
                     check=True,
                 )
-                subprocess.run(["make", "all"], cwd=soft, check=True)
+                subprocess.run(["make", "all"], cwd=soft_src, check=True)
             except subprocess.CalledProcessError:
                 print("Missing cython, python2-numpy to build diamorse")
         elif soft == "Eirene.jl":
@@ -133,7 +134,12 @@ def main():
         elif soft == "JavaPlex":
             download_javaplex()
             subprocess.run(
-                ["javac", "-classpath", "javaplex.jar", "jplex_persistence.java"],
+                [
+                    "javac",
+                    "-classpath",
+                    "backends_src/javaplex.jar",
+                    "jplex_persistence.java",
+                ],
                 check=True,
             )
         elif soft == "gudhi":
@@ -145,7 +151,7 @@ def main():
                     "-DWITH_GUDHI_UTILITIES=OFF",
                     "-DCMAKE_BUILD_TYPE=Release",
                 ]
-                + ["-S", soft]
+                + ["-S", soft_src]
                 + ["-B", builddir]
             )
             subprocess.check_call(["cmake", "--build", builddir])
@@ -159,27 +165,25 @@ def main():
                 ["-DPARAVIEW_BUILD_QT_GUI=OFF", "-DVTK_Group_ParaViewRendering=OFF"],
             )
             # apply patch (to prevent segfaults)
-            subprocess.run(["git", "checkout", "."], cwd=soft, check=True)
+            subprocess.run(["git", "checkout", "."], cwd=soft_src, check=True)
             subprocess.run(
                 [
                     "git",
                     "apply",
-                    "../patches/PersistenceCycles_0001-Fix-Wreturn-type.patch",
-                    "../patches/PersistenceCycles_0002-Make-Persistent-Diagram-VTU-compatible-with-TTK.patch",
+                    "../../patches/PersistenceCycles_0001-Fix-Wreturn-type.patch",
+                    "../../patches/PersistenceCycles_0002-Make-Persistent-Diagram-VTU-compatible-with-TTK.patch",
                 ],
-                cwd=soft,
+                cwd=soft_src,
                 check=True,
             )
             create_dir(builddir)
             env = clean_env()
             env["CMAKE_PREFIX_PATH"] = prefix
             subprocess.check_call(
-                [
-                    "cmake",
-                    "-S",
-                    f"{soft}/ttk-0.9.7",
-                    "-B",
-                    builddir,
+                ["cmake"]
+                + ["-S", f"{soft_src}/ttk-0.9.7"]
+                + ["-B", builddir]
+                + [
                     f"-DVTK_DIR={os.getcwd()}/{prefix}/lib/cmake/paraview-5.6",
                     "-DCMAKE_BUILD_TYPE=Release",
                     f"-DCMAKE_INSTALL_PREFIX={prefix}",
@@ -203,7 +207,7 @@ def main():
             # configure TTK build directory
             subprocess.check_call(
                 ["cmake"]
-                + ["-S", f"{soft}"]
+                + ["-S", f"{soft_src}"]
                 + ["-B", builddir]
                 + [
                     f"-DVTK_DIR={os.getcwd()}/{prefix}/lib/cmake/paraview-5.10",
@@ -217,7 +221,7 @@ def main():
         else:
             create_dir(builddir)
             subprocess.check_call(
-                ["cmake", "-S", soft, "-B", builddir, "-DCMAKE_BUILD_TYPE=Release"]
+                ["cmake", "-S", soft_src, "-B", builddir, "-DCMAKE_BUILD_TYPE=Release"]
             )
             subprocess.check_call(["cmake", "--build", builddir])
 
