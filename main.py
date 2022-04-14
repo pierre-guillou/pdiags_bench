@@ -88,6 +88,13 @@ def get_pairs_number(diag):
     import compare_diags
 
     pairs = compare_diags.read_diag(diag)
+    if len(pairs) == 0:
+        return {
+            "#Min-saddle": 0,
+            "#Saddle-saddle": 0,
+            "#Saddle-max": 0,
+            "#Total pairs": 0,
+        }
     if "x1_" in diag:
         # 2D
         return {
