@@ -1,31 +1,31 @@
 [submodule "dipha"]
-	path = dipha
+	path = backends_src/dipha
 	url = https://github.com/DIPHA/dipha
 [submodule "oineus"]
-	path = oineus
+	path = backends_src/oineus
 	url = https://github.com/grey-narn/oineus
 [submodule "diamorse"]
-	path = diamorse
+	path = backends_src/diamorse
 	url = https://github.com/AppliedMathematicsANU/diamorse
 [submodule "CubicalRipser_2dim"]
-	path = CubicalRipser_2dim
+	path = backends_src/CubicalRipser_2dim
 	url = https://github.com/CubicalRipser/CubicalRipser_2dim
 [submodule "CubicalRipser_3dim"]
-	path = CubicalRipser_3dim
+	path = backends_src/CubicalRipser_3dim
 	url = https://github.com/CubicalRipser/CubicalRipser_3dim
 [submodule "gudhi-devel"]
-	path = gudhi
+	path = backends_src/gudhi
 	url = https://github.com/GUDHI/gudhi-devel
 [submodule "phat"]
-	path = phat
+	path = backends_src/phat
 	url = https://bitbucket.org/phat-code/phat.git
 [submodule "PersistenceCycles"]
-	path = PersistenceCycles
+	path = backends_src/PersistenceCycles
 	url = https://github.com/IuricichF/PersistenceCycles
 [submodule "paraview-ttk"]
-	path = paraview-ttk
+	path = backends_src/paraview-ttk
 	url = https://github.com/pierre-guillou/paraview-ttk
 [submodule "AlexanderSandwich"]
-	path = AlexanderSandwich
+	path = backends_src/AlexanderSandwich
 	url = git@github.com:pierre-guillou/ttk-guillou
 	branch = dev
