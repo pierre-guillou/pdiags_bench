@@ -4,6 +4,6 @@
 /logs
 /build_*
 /__pycache__
-/perseus
-/javaplex.jar
+/backends_src/perseus
+/backends_src/javaplex.jar
 /*.class
