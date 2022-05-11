@@ -672,7 +672,7 @@ def compute_persistenceCycles(fname, times, backend, num_threads=1):
         grad_pat = r"Gradient computed in (\d+.\d+|\d+) seconds"
         grad = re.search(grad_pat, output, re.MULTILINE).group(1)
         grad = round(float(grad), 3)
-        pers_pat = r"Persistent homology computed in (\d+.\d+|\d+) seconds"
+        pers_pat = r"Persistent homology computed in [+-]?(\d+([.]\d*)?(e[+-]?\d+)?|[.]\d+(e[+-]?\d+)?) seconds"
         pers = re.search(pers_pat, output, re.MULTILINE).group(1)
         pers = grad + round(float(pers), 3)
         return pers
