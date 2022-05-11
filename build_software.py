@@ -88,7 +88,7 @@ def main():
         "JavaPlex",
         "phat",
         "PersistenceCycles",
-        "AlexanderSandwich",
+        "DiscreteMorseSandwich",
     ]
 
     # 1. Fetch submodules
@@ -194,7 +194,7 @@ def main():
                 env=env,
             )
             subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
-        elif soft == "AlexanderSandwich":
+        elif soft == "DiscreteMorseSandwich":
             # first build ParaView 5.10.1
             pv_ver = "v5.10.1"
             prefix = f"build_dirs/install_paraview_{pv_ver}"
