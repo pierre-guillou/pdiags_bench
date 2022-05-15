@@ -190,6 +190,7 @@ def main():
                     f"-DVTK_DIR={os.getcwd()}/{prefix}/lib/cmake/paraview-5.6",
                     "-DCMAKE_BUILD_TYPE=Release",
                     f"-DCMAKE_INSTALL_PREFIX={prefix}",
+                    "-DTTK_ENABLE_KAMIKAZE=ON",
                 ],
                 env=env,
             )
@@ -216,6 +217,7 @@ def main():
                     f"-DVTK_DIR={os.getcwd()}/{prefix}/lib/cmake/paraview-5.10",
                     "-DCMAKE_BUILD_TYPE=Release",
                     f"-DCMAKE_INSTALL_PREFIX={prefix}",
+                    "-DTTK_ENABLE_KAMIKAZE=ON",
                 ],
                 env=env,
             )
