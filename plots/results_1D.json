@@ -1,0 +1,3348 @@
+{
+    "aneurism_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.026,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.658,
+                "pers": 0.518,
+                "mem": 246,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.618,
+                "pers": 1.392,
+                "mem": 418,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 6.731,
+                "pers": 0.432,
+                "mem": 1525,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.374,
+                "pers": 3.063,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.165,
+                "pers": 0.077,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            },
+            "seq": {
+                "prec": 0.164,
+                "pers": 0.081,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        }
+    },
+    "backpack_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 146,
+                "#Saddle-max": 0,
+                "#Total pairs": 146
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.943,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 146,
+                "#Saddle-max": 0,
+                "#Total pairs": 146
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.666,
+                "pers": 0.871,
+                "mem": 246,
+                "#Min-saddle": 146,
+                "#Saddle-max": 0,
+                "#Total pairs": 146,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.769,
+                "pers": 2.11,
+                "mem": 418,
+                "#Min-saddle": 146,
+                "#Saddle-max": 0,
+                "#Total pairs": 146
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.14,
+                "pers": 0.556,
+                "mem": 1688,
+                "#threads": 16,
+                "#Min-saddle": 146,
+                "#Saddle-max": 0,
+                "#Total pairs": 146
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.321,
+                "pers": 2.963,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.167,
+                "pers": 0.04,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 146,
+                "#Saddle-max": 0,
+                "#Total pairs": 146
+            },
+            "seq": {
+                "prec": 0.16,
+                "pers": 0.089,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 146,
+                "#Saddle-max": 0,
+                "#Total pairs": 146
+            }
+        }
+    },
+    "bonsai_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.1,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 27,
+                "#Saddle-max": 0,
+                "#Total pairs": 27
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.984,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 27,
+                "#Saddle-max": 0,
+                "#Total pairs": 27
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.731,
+                "pers": 0.577,
+                "mem": 246,
+                "#Min-saddle": 27,
+                "#Saddle-max": 0,
+                "#Total pairs": 27,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.672,
+                "pers": 1.551,
+                "mem": 418,
+                "#Min-saddle": 27,
+                "#Saddle-max": 0,
+                "#Total pairs": 27
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 6.953,
+                "pers": 0.425,
+                "mem": 1576,
+                "#threads": 16,
+                "#Min-saddle": 27,
+                "#Saddle-max": 0,
+                "#Total pairs": 27
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.282,
+                "pers": 3.063,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.057,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 27,
+                "#Saddle-max": 0,
+                "#Total pairs": 27
+            },
+            "seq": {
+                "prec": 0.17,
+                "pers": 0.092,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 27,
+                "#Saddle-max": 0,
+                "#Total pairs": 27
+            }
+        }
+    },
+    "boston_teapot_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 55,
+                "#Saddle-max": 0,
+                "#Total pairs": 55
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 9.52,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 55,
+                "#Saddle-max": 0,
+                "#Total pairs": 55
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.554,
+                "pers": 0.657,
+                "mem": 246,
+                "#Min-saddle": 55,
+                "#Saddle-max": 0,
+                "#Total pairs": 55,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.627,
+                "pers": 1.667,
+                "mem": 418,
+                "#Min-saddle": 55,
+                "#Saddle-max": 0,
+                "#Total pairs": 55
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.587,
+                "pers": 0.528,
+                "mem": 1688,
+                "#threads": 16,
+                "#Min-saddle": 55,
+                "#Saddle-max": 0,
+                "#Total pairs": 55
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.304,
+                "pers": 3.199,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.06,
+                "mem": 189,
+                "#threads": 16,
+                "#Min-saddle": 55,
+                "#Saddle-max": 0,
+                "#Total pairs": 55
+            },
+            "seq": {
+                "prec": 0.158,
+                "pers": 0.091,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 55,
+                "#Saddle-max": 0,
+                "#Total pairs": 55
+            }
+        }
+    },
+    "bunny_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 219,
+                "#Saddle-max": 0,
+                "#Total pairs": 219
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 24.939,
+                "pers": 237.858,
+                "mem": 52891,
+                "#Min-saddle": 219,
+                "#Saddle-max": 0,
+                "#Total pairs": 219
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.885,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 218,
+                "#Saddle-max": 0,
+                "#Total pairs": 218
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.823,
+                "pers": 0.924,
+                "mem": 246,
+                "#Min-saddle": 219,
+                "#Saddle-max": 0,
+                "#Total pairs": 219,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.532,
+                "pers": 2.273,
+                "mem": 418,
+                "#Min-saddle": 219,
+                "#Saddle-max": 0,
+                "#Total pairs": 219
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.902,
+                "pers": 0.555,
+                "mem": 1717,
+                "#threads": 16,
+                "#Min-saddle": 219,
+                "#Saddle-max": 0,
+                "#Total pairs": 219
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.327,
+                "pers": 2.25,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.083,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 219,
+                "#Saddle-max": 0,
+                "#Total pairs": 219
+            },
+            "seq": {
+                "prec": 0.137,
+                "pers": 0.078,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 219,
+                "#Saddle-max": 0,
+                "#Total pairs": 219
+            }
+        }
+    },
+    "christmas_tree_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.4,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 22.154,
+                "pers": 247.857,
+                "mem": 54459,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.946,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.642,
+                "pers": 1.015,
+                "mem": 247,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.529,
+                "pers": 2.296,
+                "mem": 418,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.917,
+                "pers": 0.545,
+                "mem": 1723,
+                "#threads": 16,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.349,
+                "pers": 2.56,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.161,
+                "pers": 0.045,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.09,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 154,
+                "#Saddle-max": 0,
+                "#Total pairs": 154
+            }
+        }
+    },
+    "csafe_heptane_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 37,
+                "#Saddle-max": 0,
+                "#Total pairs": 37
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 7.768,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 37,
+                "#Saddle-max": 0,
+                "#Total pairs": 37
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.646,
+                "pers": 0.521,
+                "mem": 246,
+                "#Min-saddle": 37,
+                "#Saddle-max": 0,
+                "#Total pairs": 37,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.541,
+                "pers": 1.546,
+                "mem": 418,
+                "#Min-saddle": 37,
+                "#Saddle-max": 0,
+                "#Total pairs": 37
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.583,
+                "pers": 0.522,
+                "mem": 1695,
+                "#threads": 16,
+                "#Min-saddle": 37,
+                "#Saddle-max": 0,
+                "#Total pairs": 37
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.291,
+                "pers": 3.117,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.187,
+                "pers": 0.061,
+                "mem": 189,
+                "#threads": 16,
+                "#Min-saddle": 37,
+                "#Saddle-max": 0,
+                "#Total pairs": 37
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.097,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 37,
+                "#Saddle-max": 0,
+                "#Total pairs": 37
+            }
+        }
+    },
+    "elevation_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.4,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.897,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.574,
+                "pers": 0.515,
+                "mem": 246,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.61,
+                "pers": 1.466,
+                "mem": 418,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 6.149,
+                "pers": 0.392,
+                "mem": 1473,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.401,
+                "pers": 3.064,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.18,
+                "pers": 0.037,
+                "mem": 189,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            },
+            "seq": {
+                "prec": 0.163,
+                "pers": 0.064,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        }
+    },
+    "engine_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 108,
+                "#Saddle-max": 0,
+                "#Total pairs": 108
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.012,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 108,
+                "#Saddle-max": 0,
+                "#Total pairs": 108
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.536,
+                "pers": 0.76,
+                "mem": 246,
+                "#Min-saddle": 108,
+                "#Saddle-max": 0,
+                "#Total pairs": 108,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.745,
+                "pers": 2.13,
+                "mem": 417,
+                "#Min-saddle": 108,
+                "#Saddle-max": 0,
+                "#Total pairs": 108
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.727,
+                "pers": 0.528,
+                "mem": 1718,
+                "#threads": 16,
+                "#Min-saddle": 108,
+                "#Saddle-max": 0,
+                "#Total pairs": 108
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.387,
+                "pers": 2.776,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.194,
+                "pers": 0.047,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 108,
+                "#Saddle-max": 0,
+                "#Total pairs": 108
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.089,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 108,
+                "#Saddle-max": 0,
+                "#Total pairs": 108
+            }
+        }
+    },
+    "foot_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 52,
+                "#Saddle-max": 0,
+                "#Total pairs": 52
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.0,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 52,
+                "#Saddle-max": 0,
+                "#Total pairs": 52
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.576,
+                "pers": 0.67,
+                "mem": 246,
+                "#Min-saddle": 52,
+                "#Saddle-max": 0,
+                "#Total pairs": 52,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.621,
+                "pers": 1.843,
+                "mem": 418,
+                "#Min-saddle": 52,
+                "#Saddle-max": 0,
+                "#Total pairs": 52
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 6.976,
+                "pers": 0.456,
+                "mem": 1621,
+                "#threads": 16,
+                "#Min-saddle": 52,
+                "#Saddle-max": 0,
+                "#Total pairs": 52
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.395,
+                "pers": 2.703,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.194,
+                "pers": 0.057,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 52,
+                "#Saddle-max": 0,
+                "#Total pairs": 52
+            },
+            "seq": {
+                "prec": 0.16,
+                "pers": 0.088,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 52,
+                "#Saddle-max": 0,
+                "#Total pairs": 52
+            }
+        }
+    },
+    "fuel_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 11,
+                "#Saddle-max": 0,
+                "#Total pairs": 11
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.019,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 11,
+                "#Saddle-max": 0,
+                "#Total pairs": 11
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.62,
+                "pers": 0.602,
+                "mem": 246,
+                "#Min-saddle": 11,
+                "#Saddle-max": 0,
+                "#Total pairs": 11,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.637,
+                "pers": 1.581,
+                "mem": 418,
+                "#Min-saddle": 11,
+                "#Saddle-max": 0,
+                "#Total pairs": 11
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.459,
+                "pers": 0.5,
+                "mem": 1668,
+                "#threads": 16,
+                "#Min-saddle": 11,
+                "#Saddle-max": 0,
+                "#Total pairs": 11
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.347,
+                "pers": 2.523,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.053,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 11,
+                "#Saddle-max": 0,
+                "#Total pairs": 11
+            },
+            "seq": {
+                "prec": 0.17,
+                "pers": 0.095,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 11,
+                "#Saddle-max": 0,
+                "#Total pairs": 11
+            }
+        }
+    },
+    "hydrogen_atom_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.1,
+                "pers": 1.1,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 5,
+                "#Saddle-max": 0,
+                "#Total pairs": 5
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 8.724,
+                "pers": 0.3,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 5,
+                "#Saddle-max": 0,
+                "#Total pairs": 5
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.736,
+                "pers": 0.579,
+                "mem": 246,
+                "#Min-saddle": 5,
+                "#Saddle-max": 0,
+                "#Total pairs": 5,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.557,
+                "pers": 1.553,
+                "mem": 417,
+                "#Min-saddle": 5,
+                "#Saddle-max": 0,
+                "#Total pairs": 5
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.013,
+                "pers": 0.575,
+                "mem": 1728,
+                "#threads": 16,
+                "#Min-saddle": 5,
+                "#Saddle-max": 0,
+                "#Total pairs": 5
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.328,
+                "pers": 2.979,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.08,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 5,
+                "#Saddle-max": 0,
+                "#Total pairs": 5
+            },
+            "seq": {
+                "prec": 0.162,
+                "pers": 0.104,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 5,
+                "#Saddle-max": 0,
+                "#Total pairs": 5
+            }
+        }
+    },
+    "kingsnake_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 24.55,
+                "pers": 179.242,
+                "mem": 34683,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.901,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.564,
+                "pers": 0.946,
+                "mem": 246,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.784,
+                "pers": 2.234,
+                "mem": 418,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.969,
+                "pers": 0.56,
+                "mem": 1714,
+                "#threads": 16,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.304,
+                "pers": 2.268,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.037,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301
+            },
+            "seq": {
+                "prec": 0.159,
+                "pers": 0.089,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 301,
+                "#Saddle-max": 0,
+                "#Total pairs": 301
+            }
+        }
+    },
+    "lobster_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 107,
+                "#Saddle-max": 0,
+                "#Total pairs": 107
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.122,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 107,
+                "#Saddle-max": 0,
+                "#Total pairs": 107
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.751,
+                "pers": 0.718,
+                "mem": 246,
+                "#Min-saddle": 107,
+                "#Saddle-max": 0,
+                "#Total pairs": 107,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.6,
+                "pers": 1.898,
+                "mem": 418,
+                "#Min-saddle": 107,
+                "#Saddle-max": 0,
+                "#Total pairs": 107
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.462,
+                "pers": 0.605,
+                "mem": 1711,
+                "#threads": 16,
+                "#Min-saddle": 107,
+                "#Saddle-max": 0,
+                "#Total pairs": 107
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.281,
+                "pers": 2.59,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.182,
+                "pers": 0.048,
+                "mem": 189,
+                "#threads": 16,
+                "#Min-saddle": 107,
+                "#Saddle-max": 0,
+                "#Total pairs": 107
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.094,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 107,
+                "#Saddle-max": 0,
+                "#Total pairs": 107
+            }
+        }
+    },
+    "magnetic_reconnection_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 31.564,
+                "pers": 789.433,
+                "mem": 61351,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.062,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.529,
+                "pers": 0.931,
+                "mem": 246,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.632,
+                "pers": 2.393,
+                "mem": 418,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.584,
+                "pers": 0.607,
+                "mem": 1632,
+                "#threads": 16,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.255,
+                "pers": 2.767,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.052,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.094,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 136,
+                "#Saddle-max": 0,
+                "#Total pairs": 136
+            }
+        }
+    },
+    "marmoset_neurons_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.1,
+                "pers": 1.1,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 22.409,
+                "pers": 146.526,
+                "mem": 27723,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.909,
+                "pers": 0.1,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.621,
+                "pers": 0.817,
+                "mem": 246,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.623,
+                "pers": 1.955,
+                "mem": 418,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.511,
+                "pers": 0.532,
+                "mem": 1714,
+                "#threads": 16,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.295,
+                "pers": 2.086,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.158,
+                "pers": 0.035,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348
+            },
+            "seq": {
+                "prec": 0.133,
+                "pers": 0.075,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 348,
+                "#Saddle-max": 0,
+                "#Total pairs": 348
+            }
+        }
+    },
+    "marschner_lobb_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.2,
+                "mem": 272,
+                "#threads": 1,
+                "#Min-saddle": 13,
+                "#Saddle-max": 0,
+                "#Total pairs": 13
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.251,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 13,
+                "#Saddle-max": 0,
+                "#Total pairs": 13
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.744,
+                "pers": 0.839,
+                "mem": 246,
+                "#Min-saddle": 13,
+                "#Saddle-max": 0,
+                "#Total pairs": 13,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.653,
+                "pers": 2.064,
+                "mem": 418,
+                "#Min-saddle": 13,
+                "#Saddle-max": 0,
+                "#Total pairs": 13
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.518,
+                "pers": 0.604,
+                "mem": 1719,
+                "#threads": 16,
+                "#Min-saddle": 13,
+                "#Saddle-max": 0,
+                "#Total pairs": 13
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.263,
+                "pers": 2.704,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.064,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 13,
+                "#Saddle-max": 0,
+                "#Total pairs": 13
+            },
+            "seq": {
+                "prec": 0.158,
+                "pers": 0.093,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 13,
+                "#Saddle-max": 0,
+                "#Total pairs": 13
+            }
+        }
+    },
+    "mri_ventricles_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 25.896,
+                "pers": 277.915,
+                "mem": 58620,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.991,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 3.062,
+                "pers": 0.896,
+                "mem": 246,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.638,
+                "pers": 2.226,
+                "mem": 418,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.926,
+                "pers": 0.54,
+                "mem": 1696,
+                "#threads": 16,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.282,
+                "pers": 2.694,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.189,
+                "pers": 0.047,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114
+            },
+            "seq": {
+                "prec": 0.16,
+                "pers": 0.089,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 114,
+                "#Saddle-max": 0,
+                "#Total pairs": 114
+            }
+        }
+    },
+    "mrt_angio_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 22.636,
+                "pers": 191.697,
+                "mem": 38291,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.837,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.916,
+                "pers": 1.011,
+                "mem": 246,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.654,
+                "pers": 2.624,
+                "mem": 418,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.933,
+                "pers": 0.552,
+                "mem": 1731,
+                "#threads": 16,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.362,
+                "pers": 2.158,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.192,
+                "pers": 0.045,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190
+            },
+            "seq": {
+                "prec": 0.167,
+                "pers": 0.089,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 190,
+                "#Saddle-max": 0,
+                "#Total pairs": 190
+            }
+        }
+    },
+    "neghip_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.1,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.977,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.552,
+                "pers": 0.558,
+                "mem": 246,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.584,
+                "pers": 1.449,
+                "mem": 418,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 6.924,
+                "pers": 0.468,
+                "mem": 1601,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.31,
+                "pers": 2.526,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.187,
+                "pers": 0.071,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            },
+            "seq": {
+                "prec": 0.168,
+                "pers": 0.099,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        }
+    },
+    "neocortical_layer_1_axons_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 23.69,
+                "pers": 121.014,
+                "mem": 18992,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.913,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.579,
+                "pers": 1.238,
+                "mem": 247,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.564,
+                "pers": 2.447,
+                "mem": 418,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.898,
+                "pers": 0.539,
+                "mem": 1701,
+                "#threads": 16,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.329,
+                "pers": 2.444,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.158,
+                "pers": 0.034,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452
+            },
+            "seq": {
+                "prec": 0.168,
+                "pers": 0.094,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 452,
+                "#Saddle-max": 0,
+                "#Total pairs": 452
+            }
+        }
+    },
+    "nucleon_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 3,
+                "#Saddle-max": 0,
+                "#Total pairs": 3
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.214,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 3,
+                "#Saddle-max": 0,
+                "#Total pairs": 3
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.623,
+                "pers": 0.609,
+                "mem": 246,
+                "#Min-saddle": 3,
+                "#Saddle-max": 0,
+                "#Total pairs": 3,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.803,
+                "pers": 1.721,
+                "mem": 418,
+                "#Min-saddle": 3,
+                "#Saddle-max": 0,
+                "#Total pairs": 3
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.9,
+                "pers": 0.559,
+                "mem": 1712,
+                "#threads": 16,
+                "#Min-saddle": 3,
+                "#Saddle-max": 0,
+                "#Total pairs": 3
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.288,
+                "pers": 2.897,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.189,
+                "pers": 0.083,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 3,
+                "#Saddle-max": 0,
+                "#Total pairs": 3
+            },
+            "seq": {
+                "prec": 0.158,
+                "pers": 0.102,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 3,
+                "#Saddle-max": 0,
+                "#Total pairs": 3
+            }
+        }
+    },
+    "pancreas_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 95,
+                "#Saddle-max": 0,
+                "#Total pairs": 95
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 7.439,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 95,
+                "#Saddle-max": 0,
+                "#Total pairs": 95
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.656,
+                "pers": 0.765,
+                "mem": 246,
+                "#Min-saddle": 95,
+                "#Saddle-max": 0,
+                "#Total pairs": 95,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.755,
+                "pers": 1.84,
+                "mem": 418,
+                "#Min-saddle": 95,
+                "#Saddle-max": 0,
+                "#Total pairs": 95
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.781,
+                "pers": 0.526,
+                "mem": 1701,
+                "#threads": 16,
+                "#Min-saddle": 95,
+                "#Saddle-max": 0,
+                "#Total pairs": 95
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.295,
+                "pers": 3.1,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.19,
+                "pers": 0.048,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 95,
+                "#Saddle-max": 0,
+                "#Total pairs": 95
+            },
+            "seq": {
+                "prec": 0.17,
+                "pers": 0.092,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 95,
+                "#Saddle-max": 0,
+                "#Total pairs": 95
+            }
+        }
+    },
+    "present_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 24.644,
+                "pers": 187.881,
+                "mem": 37224,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.743,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.598,
+                "pers": 1.112,
+                "mem": 246,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.958,
+                "pers": 2.583,
+                "mem": 418,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.533,
+                "pers": 0.598,
+                "mem": 1855,
+                "#threads": 16,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.369,
+                "pers": 2.157,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.194,
+                "pers": 0.045,
+                "mem": 189,
+                "#threads": 16,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.092,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 226,
+                "#Saddle-max": 0,
+                "#Total pairs": 226
+            }
+        }
+    },
+    "prone_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217
+            }
+        },
+        "Eirene.jl": {
+            "seq": {
+                "prec": 21.758,
+                "pers": 241.851,
+                "mem": 54625,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217
+            }
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.801,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.605,
+                "pers": 0.95,
+                "mem": 247,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.643,
+                "pers": 2.252,
+                "mem": 418,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.38,
+                "pers": 0.601,
+                "mem": 1710,
+                "#threads": 16,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.354,
+                "pers": 2.132,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.158,
+                "pers": 0.036,
+                "mem": 189,
+                "#threads": 16,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217
+            },
+            "seq": {
+                "prec": 0.158,
+                "pers": 0.093,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 217,
+                "#Saddle-max": 0,
+                "#Total pairs": 217
+            }
+        }
+    },
+    "random_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.4,
+                "mem": 272,
+                "#threads": 1,
+                "#Min-saddle": 96,
+                "#Saddle-max": 0,
+                "#Total pairs": 96
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 11.092,
+                "pers": 0.4,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 96,
+                "#Saddle-max": 0,
+                "#Total pairs": 96
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.922,
+                "pers": 1.057,
+                "mem": 246,
+                "#Min-saddle": 96,
+                "#Saddle-max": 0,
+                "#Total pairs": 96,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.638,
+                "pers": 2.443,
+                "mem": 418,
+                "#Min-saddle": 96,
+                "#Saddle-max": 0,
+                "#Total pairs": 96
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 9.418,
+                "pers": 0.668,
+                "mem": 1734,
+                "#threads": 16,
+                "#Min-saddle": 96,
+                "#Saddle-max": 0,
+                "#Total pairs": 96
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.276,
+                "pers": 2.987,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.186,
+                "pers": 0.047,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 96,
+                "#Saddle-max": 0,
+                "#Total pairs": 96
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.093,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 96,
+                "#Saddle-max": 0,
+                "#Total pairs": 96
+            }
+        }
+    },
+    "shockwave_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.337,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.611,
+                "pers": 0.536,
+                "mem": 246,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.6,
+                "pers": 1.603,
+                "mem": 418,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.623,
+                "pers": 0.534,
+                "mem": 1642,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.248,
+                "pers": 2.805,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.185,
+                "pers": 0.076,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.101,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        }
+    },
+    "silicium_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.1,
+                "pers": 1.1,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.126,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.501,
+                "pers": 0.569,
+                "mem": 246,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.688,
+                "pers": 1.586,
+                "mem": 418,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.461,
+                "pers": 0.508,
+                "mem": 1681,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.337,
+                "pers": 3.04,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.191,
+                "pers": 0.05,
+                "mem": 189,
+                "#threads": 16,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            },
+            "seq": {
+                "prec": 0.164,
+                "pers": 0.09,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 7,
+                "#Saddle-max": 0,
+                "#Total pairs": 7
+            }
+        }
+    },
+    "skull_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.184,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.672,
+                "pers": 0.845,
+                "mem": 246,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.766,
+                "pers": 2.116,
+                "mem": 418,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.938,
+                "pers": 0.54,
+                "mem": 1695,
+                "#threads": 16,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.303,
+                "pers": 2.566,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.168,
+                "pers": 0.049,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            },
+            "seq": {
+                "prec": 0.167,
+                "pers": 0.089,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        }
+    },
+    "stag_beetle_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 8.736,
+                "pers": 0.1,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.664,
+                "pers": 0.657,
+                "mem": 246,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.591,
+                "pers": 1.572,
+                "mem": 418,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 6.988,
+                "pers": 0.454,
+                "mem": 1587,
+                "#threads": 16,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.31,
+                "pers": 2.633,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.187,
+                "pers": 0.07,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.091,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 99,
+                "#Saddle-max": 0,
+                "#Total pairs": 99
+            }
+        }
+    },
+    "statue_leg_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.1,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 5.986,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.982,
+                "pers": 0.558,
+                "mem": 246,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.641,
+                "pers": 1.555,
+                "mem": 418,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.435,
+                "pers": 0.499,
+                "mem": 1604,
+                "#threads": 16,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.33,
+                "pers": 2.83,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.191,
+                "pers": 0.061,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.095,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        }
+    },
+    "stent_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 151,
+                "#Saddle-max": 0,
+                "#Total pairs": 151
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 9.427,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 0,
+                "#Total pairs": 151
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.676,
+                "pers": 0.796,
+                "mem": 246,
+                "#Min-saddle": 151,
+                "#Saddle-max": 0,
+                "#Total pairs": 151,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.597,
+                "pers": 2.032,
+                "mem": 418,
+                "#Min-saddle": 151,
+                "#Saddle-max": 0,
+                "#Total pairs": 151
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.827,
+                "pers": 0.537,
+                "mem": 1688,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 0,
+                "#Total pairs": 151
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.282,
+                "pers": 2.774,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.189,
+                "pers": 0.047,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 0,
+                "#Total pairs": 151
+            },
+            "seq": {
+                "prec": 0.17,
+                "pers": 0.09,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 151,
+                "#Saddle-max": 0,
+                "#Total pairs": 151
+            }
+        }
+    },
+    "tacc_turbulence_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 1037,
+                "#Saddle-max": 0,
+                "#Total pairs": 1037
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 8.845,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 1037,
+                "#Saddle-max": 0,
+                "#Total pairs": 1037
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.762,
+                "pers": 0.775,
+                "mem": 246,
+                "#Min-saddle": 1037,
+                "#Saddle-max": 0,
+                "#Total pairs": 1037,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.636,
+                "pers": 2.104,
+                "mem": 417,
+                "#Min-saddle": 1037,
+                "#Saddle-max": 0,
+                "#Total pairs": 1037
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.986,
+                "pers": 0.55,
+                "mem": 1694,
+                "#threads": 16,
+                "#Min-saddle": 1037,
+                "#Saddle-max": 0,
+                "#Total pairs": 1037
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.277,
+                "pers": 2.763,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.187,
+                "pers": 0.063,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 1037,
+                "#Saddle-max": 0,
+                "#Total pairs": 1037
+            },
+            "seq": {
+                "prec": 0.158,
+                "pers": 0.09,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 1037,
+                "#Saddle-max": 0,
+                "#Total pairs": 1037
+            }
+        }
+    },
+    "tooth_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.2,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.486,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.531,
+                "pers": 0.665,
+                "mem": 246,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.663,
+                "pers": 1.775,
+                "mem": 418,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 8.236,
+                "pers": 0.569,
+                "mem": 1733,
+                "#threads": 16,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.313,
+                "pers": 3.073,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.184,
+                "pers": 0.052,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.094,
+                "mem": 189,
+                "#threads": 1,
+                "#Min-saddle": 33,
+                "#Saddle-max": 0,
+                "#Total pairs": 33
+            }
+        }
+    },
+    "vertebra_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 0.9,
+                "pers": 1.3,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 124,
+                "#Saddle-max": 0,
+                "#Total pairs": 124
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 12.962,
+                "pers": 0.3,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 124,
+                "#Saddle-max": 0,
+                "#Total pairs": 124
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.869,
+                "pers": 0.97,
+                "mem": 246,
+                "#Min-saddle": 124,
+                "#Saddle-max": 0,
+                "#Total pairs": 124,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.65,
+                "pers": 2.299,
+                "mem": 418,
+                "#Min-saddle": 124,
+                "#Saddle-max": 0,
+                "#Total pairs": 124
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.988,
+                "pers": 0.546,
+                "mem": 1706,
+                "#threads": 16,
+                "#Min-saddle": 124,
+                "#Saddle-max": 0,
+                "#Total pairs": 124
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.257,
+                "pers": 2.78,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.191,
+                "pers": 0.049,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 124,
+                "#Saddle-max": 0,
+                "#Total pairs": 124
+            },
+            "seq": {
+                "prec": 0.17,
+                "pers": 0.094,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 124,
+                "#Saddle-max": 0,
+                "#Total pairs": 124
+            }
+        }
+    },
+    "zeiss_1048576x1x1_order_expl": {
+        "#Vertices": "1048576x1x1",
+        "Dipha": {
+            "seq": {
+                "prec": 1.0,
+                "pers": 1.1,
+                "mem": 271,
+                "#threads": 1,
+                "#Min-saddle": 94,
+                "#Saddle-max": 0,
+                "#Total pairs": 94
+            }
+        },
+        "Eirene.jl": {
+            "timeout": 900
+        },
+        "PHAT": {
+            "para": {
+                "prec": 6.039,
+                "pers": 0.2,
+                "mem": 250,
+                "#threads": 16,
+                "#Min-saddle": 94,
+                "#Saddle-max": 0,
+                "#Total pairs": 94
+            }
+        },
+        "Gudhi": {
+            "para": {
+                "prec": 2.721,
+                "pers": 0.578,
+                "mem": 246,
+                "#Min-saddle": 94,
+                "#Saddle-max": 0,
+                "#Total pairs": 94,
+                "#threads": 16
+            }
+        },
+        "Dionysus": {
+            "seq": {
+                "prec": 4.628,
+                "pers": 1.583,
+                "mem": 418,
+                "#Min-saddle": 94,
+                "#Saddle-max": 0,
+                "#Total pairs": 94
+            }
+        },
+        "JavaPlex": {
+            "para": {
+                "prec": 7.754,
+                "pers": 0.553,
+                "mem": 1579,
+                "#threads": 16,
+                "#Min-saddle": 94,
+                "#Saddle-max": 0,
+                "#Total pairs": 94
+            }
+        },
+        "Ripser": {
+            "seq": {
+                "prec": 3.391,
+                "pers": 2.803,
+                "mem": 127,
+                "#Min-saddle": 0,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 0
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 0.191,
+                "pers": 0.072,
+                "mem": 188,
+                "#threads": 16,
+                "#Min-saddle": 94,
+                "#Saddle-max": 0,
+                "#Total pairs": 94
+            },
+            "seq": {
+                "prec": 0.169,
+                "pers": 0.095,
+                "mem": 188,
+                "#threads": 1,
+                "#Min-saddle": 94,
+                "#Saddle-max": 0,
+                "#Total pairs": 94
+            }
+        }
+    }
+}
