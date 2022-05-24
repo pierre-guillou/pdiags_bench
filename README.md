@@ -23,8 +23,8 @@ Python dependencies.
 To run the benchmark, please use a computer/virtual machine with
 * Ubuntu 20.04 (preferred)
 * at least 64GB of RAM (it might even swap)
-* at least 900GB of free disk space for storing the converted input datasets
-* at least 100h of computing time
+* at least 1500GB of free disk space for storing the converted input datasets
+* at least 150h of computing time
 
 If those requirements are too heavy, you can
 * reduce the number of downloaded datasets (default max size: 1024MB)
