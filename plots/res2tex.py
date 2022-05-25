@@ -6,7 +6,7 @@ import subprocess
 
 def add_standalone(fname, res, simpl_cpx):
     if not res:
-        res = list()
+        res = []
     res.append(r"\documentclass{standalone}")
     res.append("")
     res.append(r"\usepackage{booktabs}")
@@ -36,11 +36,11 @@ def sort_times(vals, cols):
 
 def gen_table(fname, res, simplicial=True):
     if not res:
-        res = list()
+        res = []
     with open(fname, "r") as src:
         data = json.load(src)
     # use dicts to get an ordered sets
-    lines = list()
+    lines = []
     cols = {}
     # only keep simplicial vs cubical results
     data = {
@@ -99,7 +99,7 @@ def gen_table(fname, res, simplicial=True):
 
 def main(fname, standalone=False, generate=False):
     for cpx in ["simplicial", "cubical"]:
-        res = list()
+        res = []
         if standalone or generate:
             res = add_standalone(fname, res, cpx == "simplicial")
         else:
