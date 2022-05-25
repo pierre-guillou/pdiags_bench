@@ -180,7 +180,7 @@ def store_log(log, ds_name, app):
 
 class SoftBackend(enum.Enum):
     TTK_FTM = "TTK-FTM"
-    TTK_SANDWICH = "TTK-Sandwich"
+    DISCRETE_MORSE_SANDWICH = "DiscreteMorseSandwich"
     DIPHA = "Dipha"
     DIPHA_MPI = "Dipha_MPI"
     CUBICALRIPSER = "CubicalRipser"
@@ -199,7 +199,7 @@ class SoftBackend(enum.Enum):
     def get_compute_function(self):
         dispatcher = {
             SoftBackend.TTK_FTM: compute_ttk,
-            SoftBackend.TTK_SANDWICH: compute_ttk,
+            SoftBackend.DISCRETE_MORSE_SANDWICH: compute_ttk,
             SoftBackend.DIPHA: compute_dipha,
             SoftBackend.DIPHA_MPI: compute_dipha,
             SoftBackend.CUBICALRIPSER: compute_cubrips,
@@ -268,10 +268,10 @@ class FileType(enum.Enum):
                 # FTM + our algo in 2D and 3D
                 return [
                     SoftBackend.TTK_FTM,
-                    SoftBackend.TTK_SANDWICH,
+                    SoftBackend.DISCRETE_MORSE_SANDWICH,
                     SoftBackend.PERSCYCL,
                 ]
-            return [SoftBackend.TTK_SANDWICH]  # 1D lines
+            return [SoftBackend.DISCRETE_MORSE_SANDWICH]  # 1D lines
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
         if self == FileType.DIPHA_TRI:
@@ -341,7 +341,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
 
     if backend == SoftBackend.TTK_FTM:
         cmd += ["-B", "0"]
-    elif backend == SoftBackend.TTK_SANDWICH:
+    elif backend == SoftBackend.DISCRETE_MORSE_SANDWICH:
         cmd += ["-B", "2"]
 
     def ttk_compute_time(ttk_output):
@@ -360,7 +360,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
         return prec_time
 
     def ttk_overhead_time(ttk_output, backend):
-        if backend == SoftBackend.TTK_SANDWICH:
+        if backend == SoftBackend.DISCRETE_MORSE_SANDWICH:
             time_re = r"\[DiscreteGradient\] Memory allocations.*\[(\d+\.\d+|\d+)s"
         elif backend == SoftBackend.TTK_FTM:
             time_re = r"\[FTMTree\] alloc.*\[(\d+\.\d+|\d+)s"
