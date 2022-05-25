@@ -195,10 +195,18 @@ class SoftBackend(enum.Enum):
     JAVAPLEX = "JavaPlex"
     PHAT = "PHAT"
     PERSCYCL = "PersistenceCycles"
+    PAIR_CELLS = "PairCells"
+    PAIR_CRITICAL_SIMPLICES = "PairCriticalSimplices"
+    PAIR_CRITICAL_SIMPLICES_BCACHING = "PairCriticalSimplices_BCaching"
+    PAIR_CRITICAL_SIMPLICES_SANDWICHING = "PairCriticalSimplices_Sandwiching"
 
     def get_compute_function(self):
         dispatcher = {
             SoftBackend.TTK_FTM: compute_ttk,
+            SoftBackend.PAIR_CELLS: compute_ttk,
+            SoftBackend.PAIR_CRITICAL_SIMPLICES: compute_ttk,
+            SoftBackend.PAIR_CRITICAL_SIMPLICES_BCACHING: compute_ttk,
+            SoftBackend.PAIR_CRITICAL_SIMPLICES_SANDWICHING: compute_ttk,
             SoftBackend.DISCRETE_MORSE_SANDWICH: compute_ttk,
             SoftBackend.DIPHA: compute_dipha,
             SoftBackend.DIPHA_MPI: compute_dipha,
@@ -262,42 +270,17 @@ class FileType(enum.Enum):
 
         return cls.UNDEFINED
 
-    def get_backends(self, slice_type):
-        from convert_datasets import SliceType
+    def get_backends(self):
 
         # get backends list from file type variant and slice types
-        if self in [FileType.VTI, FileType.VTU]:
-            if slice_type in [SliceType.SURF, SliceType.VOL]:
-                # FTM + our algo in 2D and 3D
-                return [
-                    SoftBackend.TTK_FTM,
-                    SoftBackend.DISCRETE_MORSE_SANDWICH,
-                    SoftBackend.PERSCYCL,
-                ]
-            return [SoftBackend.DISCRETE_MORSE_SANDWICH]  # 1D lines
-        if self == FileType.DIPHA_CUB:
-            return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
-        if self == FileType.DIPHA_TRI:
-            if slice_type == SliceType.LINE:
-                return [SoftBackend.DIPHA]
-            return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI]
-        if self == FileType.PERS_CUB:
-            return [SoftBackend.GUDHI, SoftBackend.OINEUS, SoftBackend.PERSEUS_CUB]
-        if self == FileType.PERS_TRI:
-            return []  # disable Perseus for simplicial complexes
-            # return [SoftBackend.PERSEUS_SIM]
-        if self == FileType.TSC:
-            ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
-            if slice_type in (SliceType.SURF, SliceType.LINE):
-                return ret + [SoftBackend.RIPSER]  # Ripser only in 2D
-            if slice_type == SliceType.VOL:
-                return ret
-        if self == FileType.NETCDF:
-            return [SoftBackend.DIAMORSE]
-        if self == FileType.EIRENE_CSV:
-            return [SoftBackend.EIRENE]
-        if self == FileType.PHAT_ASCII:
-            return [SoftBackend.PHAT]
+        if self == FileType.VTU:
+            return [
+                SoftBackend.PAIR_CELLS,
+                SoftBackend.PAIR_CRITICAL_SIMPLICES,
+                SoftBackend.PAIR_CRITICAL_SIMPLICES_BCACHING,
+                SoftBackend.PAIR_CRITICAL_SIMPLICES_SANDWICHING,
+                SoftBackend.DISCRETE_MORSE_SANDWICH,
+            ]
 
         return []
 
@@ -318,13 +301,9 @@ class Complex(enum.Enum):
 
 def parallel_decorator(func):
     def wrapper(*args, **kwargs):
-        if not SEQUENTIAL:
-            nt = multiprocessing.cpu_count()
-            logging.info("  Parallel implementation (%s threads)", nt)
-            el = func(*args, **kwargs, num_threads=nt)
-            logging.info("  Done in %.3fs", el)
-        logging.info("  Sequential implementation")
-        return func(*args, **kwargs, num_threads=1)
+        nt = multiprocessing.cpu_count()
+        logging.info("  Parallel implementation (%s threads)", nt)
+        return func(*args, **kwargs, num_threads=nt)
 
     return wrapper
 
@@ -346,6 +325,14 @@ def compute_ttk(fname, times, backend, num_threads=1):
         cmd += ["-B", "0"]
     elif backend == SoftBackend.DISCRETE_MORSE_SANDWICH:
         cmd += ["-B", "2"]
+    elif backend == SoftBackend.PAIR_CELLS:
+        cmd += ["-B", "4", "-V", "0"]
+    elif backend == SoftBackend.PAIR_CRITICAL_SIMPLICES:
+        cmd += ["-B", "4", "-V", "1"]
+    elif backend == SoftBackend.PAIR_CRITICAL_SIMPLICES_BCACHING:
+        cmd += ["-B", "4", "-V", "2"]
+    elif backend == SoftBackend.PAIR_CRITICAL_SIMPLICES_SANDWICHING:
+        cmd += ["-B", "4", "-V", "3"]
 
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
@@ -363,7 +350,13 @@ def compute_ttk(fname, times, backend, num_threads=1):
         return prec_time
 
     def ttk_overhead_time(ttk_output, backend):
-        if backend == SoftBackend.DISCRETE_MORSE_SANDWICH:
+        if backend in [
+            SoftBackend.DISCRETE_MORSE_SANDWICH,
+            SoftBackend.PAIR_CELLS,
+            SoftBackend.PAIR_CRITICAL_SIMPLICES,
+            SoftBackend.PAIR_CRITICAL_SIMPLICES_BCACHING,
+            SoftBackend.PAIR_CRITICAL_SIMPLICES_SANDWICHING,
+        ]:
             time_re = r"\[DiscreteGradient\] Memory allocations.*\[(\d+\.\d+|\d+)s"
         elif backend == SoftBackend.TTK_FTM:
             time_re = r"\[FTMTree\] alloc.*\[(\d+\.\d+|\d+)s"
@@ -720,12 +713,10 @@ def compute_persistenceCycles(fname, times, backend, num_threads=1):
 
 
 def dispatch(fname, times):
-    from convert_datasets import SliceType
 
-    slice_type = SliceType.from_filename(fname)
     complex_type = Complex.from_filename(fname)
     file_type = FileType.from_filename(fname, complex_type)
-    backends = file_type.get_backends(slice_type)
+    backends = file_type.get_backends()
 
     for b in backends:
         dsname = dataset_name(fname)

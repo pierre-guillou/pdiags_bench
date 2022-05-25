@@ -5,11 +5,9 @@ import time
 
 from paraview import simple
 
-import vti2nc3
-
 RESAMPL_3D = 192
 RESAMPL_2D = 4096
-RESAMPL_1D = 1024 ** 2
+RESAMPL_1D = 1024**2
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 
 
@@ -17,27 +15,9 @@ def write_output(outp, fname, out_dir, explicit):
     if out_dir:
         fname = out_dir + "/" + fname
 
-    # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
-    simple.SaveData(fname + ".dipha", proxy=outp)
-
     if explicit:
         # vtkUnstructuredGrid (TTK)
         simple.SaveData(fname + ".vtu", proxy=outp)
-        # TTK Simplicial Complex (Gudhi, Dionysus, Ripser)
-        simple.SaveData(fname + ".tsc", proxy=outp)
-        # Perseus Uniform Triangulation (Perseus)
-        simple.SaveData(fname + ".pers", proxy=outp)
-        # Eirene.jl Sparse Column Format CSV
-        simple.SaveData(fname + ".eirene", proxy=outp)
-        # PHAT ASCII boundary_matrix file format
-        simple.SaveData(fname + ".phat", proxy=outp)
-    else:
-        # vtkImageData (TTK)
-        simple.SaveData(fname + ".vti", proxy=outp)
-        # Perseus Cubical Grid (Perseus, Gudhi)
-        simple.SaveData(fname + ".pers", proxy=outp)
-        # NetCDF3 (Diamorse)
-        vti2nc3.main(fname + ".vti")
 
 
 def read_file(input_file):
