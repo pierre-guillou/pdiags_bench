@@ -25,7 +25,48 @@ def register_csv_gen(csv_gen):
     return _csv_gen_wrapped
 
 
-fname = "results_2D.json"
+def wrap_standalone(txt):
+    return (
+        [
+            r"\documentclass{standalone}",
+            "",
+            r"\usepackage{tikz}",
+            r"\usepackage{pgfplots}",
+            "",
+            r"\begin{document}",
+            "",
+        ]
+        + txt
+        + [
+            "",
+            r"\end{document}",
+        ]
+    )
+
+
+def wrap_pgfplots(txt):
+    return (
+        [
+            r"\begin{tikzpicture}",
+            r"\begin{axis}[legend style={font=\tiny, legend columns=2, at={(0.5,-0.1)},anchor=north}]",
+        ]
+        + txt
+        + [r"\end{axis}", r"\end{tikzpicture}"]
+    )
+
+
+def output_tex_file(standalone=False, toFile=False):
+    txt = []
+    if standalone:
+        wrap_standalone(txt)
+    if toFile:
+        with open("dest", "w") as dst:
+            dst.writelines(txt)
+    else:
+        sys.stdout.writelines(txt)
+
+
+fname = "results_3D.json"
 with open(fname, "r") as src:
     data = json.load(src)
 
@@ -53,17 +94,35 @@ for ds, res in data_vtu.items():
             continue
         n_pairs[dsname] = perfs["seq"].get("#Total pairs", 0)
 
-res = {}
+n_pairs_sorted = dict(sorted(n_pairs.items(), key=lambda item: item[1]))
 
-# exec times
+# exec times per dataset per backend
+backend_ds_res = {}
+
 for ds, res in data_vtu.items():
     dsname = "_".join(ds.split("_")[:-3])
     for backend, perfs in res.items():
         if "Vertices" in backend:
-            print(dsname, n_pairs[dsname])
+            # print(dsname, n_pairs[dsname])
             continue
         if "seq" in perfs:
             val = perfs["seq"]["pers"]
         elif "timeout" in perfs:
             val = perfs["timeout"]
-        print(dsname, backend, math.log(n_simplices[1] / val))
+        backend_ds_res.setdefault(backend, {}).update(
+            {dsname: math.log(n_simplices[1] / val)}
+        )
+
+plot = []
+
+for backend, res in backend_ds_res.items():
+    coords = [r"\addplot coordinates {"]
+    for dsname, n_pairs in n_pairs_sorted.items():
+        val = res[dsname]
+        coords.append(f"({n_pairs}, {val})")
+    coords.append("};")
+    plot.append(" ".join(coords))
+    plot.append(r"\addlegendentry{" + backend + "}")
+
+with open("dest.tex", "w") as dst:
+    dst.write("\n".join(wrap_standalone(wrap_pgfplots(plot))))
