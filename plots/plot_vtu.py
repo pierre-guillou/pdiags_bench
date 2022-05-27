@@ -51,6 +51,7 @@ def wrap_pgfplots(txt):
         [
             r"\begin{tikzpicture}",
             r"\begin{groupplot}[",
+            r"  group style={group size=2 by 2,},",
             r"  legend style={font=\tiny, legend columns=2, at={(0.5,-0.1)},anchor=north}",
             "]",
         ]
@@ -100,35 +101,51 @@ for ds, res in data_vtu.items():
 
 n_pairs_sorted = dict(sorted(n_pairs.items(), key=lambda item: item[1]))
 
-# exec times per dataset per backend
-backend_ds_res = {}
 
-for ds, res in data_vtu.items():
-    dsname = "_".join(ds.split("_")[:-3])
-    for backend, perfs in res.items():
-        if "Vertices" in backend:
-            # print(dsname, n_pairs[dsname])
-            continue
-        if "seq" in perfs:
-            val = perfs["seq"]["pers"]
-        elif "timeout" in perfs:
-            val = perfs["timeout"]
-        backend_ds_res.setdefault(backend, {}).update(
-            {dsname: math.log(n_simplices[1] / val)}
-        )
+def transpose_data(data_vtu, mode="seq"):
+    # exec times per dataset per backend
+    backend_ds_res = {}
 
-plot = []
+    for ds, res in data_vtu.items():
+        dsname = "_".join(ds.split("_")[:-3])
+        for backend, perfs in res.items():
+            if "Vertices" in backend or "FTM" in backend:
+                # print(dsname, n_pairs[dsname])
+                continue
+            if mode in perfs:
+                val = perfs[mode]["pers"]
+            elif "timeout" in perfs:
+                val = perfs["timeout"]
+            backend_ds_res.setdefault(backend, {}).update(
+                {dsname: math.log(n_simplices[2] / val)}
+            )
 
-for backend, res in backend_ds_res.items():
-    coords = [r"\nextgroupplot", r"\addplot coordinates {"]
-    for dsname, n_pairs in n_pairs_sorted.items():
-        val = res[dsname]
-        coords.append(f"({n_pairs}, {val})")
-    coords.append("};")
-    plot.append(" ".join(coords))
-    plot.append(r"\addlegendentry{" + backend + "}")
+    return backend_ds_res
+
+
+def generate_plot(backend_ds_res):
+    plot = [r"\nextgroupplot"]
+
+    for backend, res in backend_ds_res.items():
+        coords = [r"\addplot coordinates {"]
+        for dsname, n_pairs in n_pairs_sorted.items():
+            val = res[dsname]
+            coords.append(f"({n_pairs}, {val})")
+        coords.append("};")
+        plot.append(" ".join(coords))
+        plot.append(r"\addlegendentry{" + backend + "}")
+
+    return plot
+
+
+data_seq = transpose_data(data_vtu, "seq")
+data_par = transpose_data(data_vtu, "para")
+
+res = []
+res.extend(generate_plot(data_seq))
+res.extend(generate_plot(data_par))
 
 with open("dest.tex", "w") as dst:
-    dst.write("\n".join(wrap_standalone(wrap_pgfplots(plot))))
+    dst.write("\n".join(wrap_standalone(wrap_pgfplots(res))))
 
 subprocess.check_call(["tectonic", "dest.tex"])
