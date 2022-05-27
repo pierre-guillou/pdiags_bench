@@ -219,7 +219,8 @@ class SoftBackend(enum.Enum):
 
 
 class FileType(enum.Enum):
-    VTI_VTU = enum.auto()
+    VTI = enum.auto()
+    VTU = enum.auto()
     DIPHA_CUB = enum.auto()
     DIPHA_TRI = enum.auto()
     PERS_CUB = enum.auto()
@@ -236,8 +237,10 @@ class FileType(enum.Enum):
         # get file type variant according to file extension and complex type
         ext = fname.split(".")[-1]
 
-        if ext in ("vtu", "vti"):
-            return cls.VTI_VTU
+        if ext == "vti":
+            return cls.VTI
+        if ext == "vtu":
+            return cls.VTU
         if ext == "dipha":
             if complex_type == Complex.CUBICAL:
                 return cls.DIPHA_CUB
@@ -263,7 +266,7 @@ class FileType(enum.Enum):
         from convert_datasets import SliceType
 
         # get backends list from file type variant and slice types
-        if self == FileType.VTI_VTU:
+        if self in [FileType.VTI, FileType.VTU]:
             if slice_type in [SliceType.SURF, SliceType.VOL]:
                 # FTM + our algo in 2D and 3D
                 return [
