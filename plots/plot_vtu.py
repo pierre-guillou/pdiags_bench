@@ -1,6 +1,7 @@
 import functools
 import json
 import math
+import subprocess
 import sys
 
 # holds function pointers that generate CSV files
@@ -32,6 +33,7 @@ def wrap_standalone(txt):
             "",
             r"\usepackage{tikz}",
             r"\usepackage{pgfplots}",
+            r"\usepgfplotslibrary{groupplots}",
             "",
             r"\begin{document}",
             "",
@@ -48,10 +50,12 @@ def wrap_pgfplots(txt):
     return (
         [
             r"\begin{tikzpicture}",
-            r"\begin{axis}[legend style={font=\tiny, legend columns=2, at={(0.5,-0.1)},anchor=north}]",
+            r"\begin{groupplot}[",
+            r"  legend style={font=\tiny, legend columns=2, at={(0.5,-0.1)},anchor=north}",
+            "]",
         ]
         + txt
-        + [r"\end{axis}", r"\end{tikzpicture}"]
+        + [r"\end{groupplot}", r"\end{tikzpicture}"]
     )
 
 
@@ -116,7 +120,7 @@ for ds, res in data_vtu.items():
 plot = []
 
 for backend, res in backend_ds_res.items():
-    coords = [r"\addplot coordinates {"]
+    coords = [r"\nextgroupplot", r"\addplot coordinates {"]
     for dsname, n_pairs in n_pairs_sorted.items():
         val = res[dsname]
         coords.append(f"({n_pairs}, {val})")
@@ -126,3 +130,5 @@ for backend, res in backend_ds_res.items():
 
 with open("dest.tex", "w") as dst:
     dst.write("\n".join(wrap_standalone(wrap_pgfplots(plot))))
+
+subprocess.check_call(["tectonic", "dest.tex"])
