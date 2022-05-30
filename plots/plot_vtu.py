@@ -58,59 +58,70 @@ def wrap_pgfplots(txt):
         + txt
         + [
             r"\end{groupplot}",
-            r"\node at (plots c1r1.north east) [inner sep=0pt,anchor=north, yshift=10ex] {\ref{grouplegend}};",
+            r"\node at (plots c1r1.north east)"
+            + "[inner sep=0pt,anchor=north, yshift=10ex] {\ref{grouplegend}};",
             r"\end{tikzpicture}",
         ]
     )
 
 
-def output_tex_file(standalone=False, toFile=False):
-    txt = []
+def output_tex_file(lines, fname="dest", standalone=False, toFile=False, gen_pdf=False):
+    lines = wrap_pgfplots(lines)
     if standalone:
-        wrap_standalone(txt)
+        lines = wrap_standalone(lines)
+    txt = "\n".join(lines)
     if toFile:
-        with open("dest", "w") as dst:
-            dst.writelines(txt)
+        with open(f"{fname}.tex", "w") as dst:
+            dst.write(txt)
     else:
         sys.stdout.writelines(txt)
 
-
-fname = "results_3D.json"
-with open(fname, "r") as src:
-    data = json.load(src)
-
-simplices = {
-    "1D": {"v": 1048576, "e": 1048575},
-    "2D": {"v": 16777216, "e": 50315265, "t": 33538050},
-    "3D": {"v": 7077888, "e": 42136128, "t": 69897596, "T": 34839355},
-}
-
-# number of simplices per dimension
-n_simplices = [
-    functools.reduce(lambda a, b: a * b, d.values()) for d in simplices.values()
-]
-
-# only explicit data-sets
-data_vtu = {k: v for k, v in data.items() if "expl" in k}
-
-n_pairs = {}
-
-# sum of number of DiscreteMorseSandwich pairs
-for ds, res in data_vtu.items():
-    dsname = "_".join(ds.split("_")[:-3])
-    for backend, perfs in res.items():
-        if "DiscreteMorseSandwich" not in backend:
-            continue
-        n_pairs[dsname] = perfs["seq"].get("#Total pairs", 0)
-
-n_pairs_sorted = dict(sorted(n_pairs.items(), key=lambda item: item[1]))
+    if standalone and toFile and gen_pdf:
+        subprocess.check_call(["tectonic", f"{fname}.tex"])
 
 
-def transpose_data(data_vtu, mode="seq"):
+def load_data():
+    data = []
+    for fname in ["results_1D.json", "results_2D.json", "results_3D.json"]:
+        with open(fname, "r") as src:
+            data.append(json.load(src))
+    return data
+
+
+def compute_n_simplices():
+    simplices = {
+        "1D": {"v": 1048576, "e": 1048575},
+        "2D": {"v": 16777216, "e": 50315265, "t": 33538050},
+        "3D": {"v": 7077888, "e": 42136128, "t": 69897596, "T": 34839355},
+    }
+
+    # number of simplices per dimension
+    return [
+        functools.reduce(lambda a, b: a * b, d.values()) for d in simplices.values()
+    ]
+
+
+def sort_datasets_by_n_pairs(data):
+    n_pairs = {}
+
+    # sum of number of DiscreteMorseSandwich pairs
+    for ds, res in data.items():
+        dsname = "_".join(ds.split("_")[:-3])
+        for backend, perfs in res.items():
+            if "DiscreteMorseSandwich" not in backend:
+                continue
+            n_pairs[dsname] = perfs["seq"].get("#Total pairs", 0)
+
+    return dict(sorted(n_pairs.items(), key=lambda item: item[1]))
+
+
+def transpose_data(data, mode="seq"):
     # exec times per dataset per backend
     backend_ds_res = {}
 
-    for ds, res in data_vtu.items():
+    n_simplices = compute_n_simplices()
+
+    for ds, res in data.items():
         dsname = "_".join(ds.split("_")[:-3])
         for backend, perfs in res.items():
             if "Vertices" in backend or "FTM" in backend:
@@ -127,8 +138,10 @@ def transpose_data(data_vtu, mode="seq"):
     return backend_ds_res
 
 
-def generate_plot(backend_ds_res):
+def generate_plot(data, mode="seq"):
     plot = [r"\nextgroupplot[legend to name=grouplegend,legend columns=2]"]
+    n_pairs_sorted = sort_datasets_by_n_pairs(data)
+    backend_ds_res = transpose_data(data, mode)
 
     for backend, res in backend_ds_res.items():
         coords = [r"\addplot coordinates {"]
@@ -142,14 +155,19 @@ def generate_plot(backend_ds_res):
     return plot
 
 
-data_seq = transpose_data(data_vtu, "seq")
-data_par = transpose_data(data_vtu, "para")
+def main():
+    data = load_data()
 
-res = []
-res.extend(generate_plot(data_seq))
-res.extend(generate_plot(data_par))
+    # only explicit data-sets
+    data_vtu_3D = {k: v for k, v in data[2].items() if "expl" in k}
 
-with open("dest.tex", "w") as dst:
-    dst.write("\n".join(wrap_standalone(wrap_pgfplots(res))))
+    res = [
+        *generate_plot(data_vtu_3D, "seq"),
+        *generate_plot(data_vtu_3D, "para"),
+    ]
 
-subprocess.check_call(["tectonic", "dest.tex"])
+    output_tex_file(res, "dest", True, True, True)
+
+
+if __name__ == "__main__":
+    main()
