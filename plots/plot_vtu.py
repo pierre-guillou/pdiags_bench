@@ -66,8 +66,8 @@ def wrap_pgfplots(txt):
         + txt
         + [
             r"\end{groupplot}",
-            r"\node at (plots c2r1.north)"
-            + r"[inner sep=0pt,anchor=north, yshift=10ex] {\ref{grouplegend}};",
+            r"\node at (plots c2r1.south)"
+            + r"[inner sep=0pt, yshift=-12ex] {\ref{grouplegend}};",
             r"\end{tikzpicture}",
         ]
     )
@@ -130,8 +130,11 @@ def transpose_data(data, dim, mode="seq"):
     for ds, res in data.items():
         dsname = "_".join(ds.split("_")[:-3])
         for backend, perfs in res.items():
-            if "Vertices" in backend or "FTM" in backend:
+            if "Vertices" in backend:
                 # print(dsname, n_pairs[dsname])
+                continue
+            if dim + 1 == 3 and "FTM" in backend:
+                # no saddle-saddle pairs in FTM
                 continue
             if mode == "seq" and backend in ["PHAT", "JavaPlex", "Gudhi"]:
                 # parallel-only backends
@@ -160,7 +163,11 @@ def transpose_data(data, dim, mode="seq"):
 
 
 def generate_plot(data, backends, dim, mode="seq"):
-    plot = [r"\nextgroupplot[legend to name=grouplegend,legend columns=8]"]
+    plot = [
+        r"\nextgroupplot[legend to name=grouplegend, legend columns=5, title="
+        + str(dim + 1)
+        + "D datasets]"
+    ]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim, mode)
 
@@ -182,7 +189,7 @@ def generate_plot(data, backends, dim, mode="seq"):
     return plot
 
 
-def sort_backends(data):
+def sort_backends(data, cpx="expl"):
     backends = {
         "DiscreteMorseSandwich": None,
         "PHAT": None,
@@ -190,7 +197,9 @@ def sort_backends(data):
         "Gudhi": None,
     }
     for d in data:
-        for res in d.values():
+        for ds, res in d.items():
+            if cpx not in ds:
+                continue
             for backend in res.keys():
                 if backend == "#Vertices":
                     continue
@@ -216,13 +225,15 @@ def sort_backends(data):
 
 def main():
     data = load_data()
-    backends = sort_backends(data)
+    cpx = "expl"
+    mode = "para"
+    backends = sort_backends(data, cpx)
 
     res = []
     for i in range(3):
         res.extend(
             generate_plot(
-                {k: v for k, v in data[i].items() if "expl" in k}, backends, i, "seq"
+                {k: v for k, v in data[i].items() if cpx in k}, backends, i, mode
             )
         )
 
