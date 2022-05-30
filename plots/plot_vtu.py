@@ -60,6 +60,7 @@ def wrap_pgfplots(txt):
         [
             r"\begin{tikzpicture}",
             r"\begin{groupplot}[",
+            r"  width=.35\linewidth,",
             r"  group style={group size=4 by 1,group name=plots},",
             "]",
         ]
@@ -73,7 +74,7 @@ def wrap_pgfplots(txt):
     )
 
 
-def output_tex_file(lines, fname="dest", standalone=False, toFile=False, gen_pdf=False):
+def output_tex_file(lines, fname="dest", toFile=False, standalone=False, gen_pdf=False):
     lines = wrap_pgfplots(lines)
     if standalone:
         lines = wrap_standalone(lines)
@@ -237,7 +238,7 @@ def main():
             )
         )
 
-    output_tex_file(res, "dest", True, True, True)
+    output_tex_file(res, f"plot_{cpx}_{mode}", True, True, True)
 
 
 if __name__ == "__main__":
