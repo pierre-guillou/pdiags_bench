@@ -51,15 +51,15 @@ def wrap_pgfplots(txt):
         [
             r"\begin{tikzpicture}",
             r"\begin{groupplot}[",
-            r"  group style={group size=2 by 2,group name=plots},",
-            r"  legend style={font=\tiny, legend columns=2, at={(0.5,-0.1)},anchor=north}",
+            r"  group style={group size=4 by 1,group name=plots},",
+            r"  legend style={font=\tiny, legend columns=4, at={(0.5,-0.1)},anchor=north}",
             "]",
         ]
         + txt
         + [
             r"\end{groupplot}",
             r"\node at (plots c1r1.north east)"
-            + "[inner sep=0pt,anchor=north, yshift=10ex] {\ref{grouplegend}};",
+            + r"[inner sep=0pt,anchor=north, yshift=10ex] {\ref{grouplegend}};",
             r"\end{tikzpicture}",
         ]
     )
@@ -88,17 +88,15 @@ def load_data():
     return data
 
 
-def compute_n_simplices():
-    simplices = {
-        "1D": {"v": 1048576, "e": 1048575},
-        "2D": {"v": 16777216, "e": 50315265, "t": 33538050},
-        "3D": {"v": 7077888, "e": 42136128, "t": 69897596, "T": 34839355},
-    }
+def compute_n_simplices(dim):
+    simplices = [
+        {"v": 1048576, "e": 1048575},  # 1D
+        {"v": 16777216, "e": 50315265, "t": 33538050},  # 2D
+        {"v": 7077888, "e": 42136128, "t": 69897596, "T": 34839355},  # 3D
+    ]
 
     # number of simplices per dimension
-    return [
-        functools.reduce(lambda a, b: a * b, d.values()) for d in simplices.values()
-    ]
+    return functools.reduce(lambda a, b: a * b, simplices[dim].values())
 
 
 def sort_datasets_by_n_pairs(data):
@@ -115,11 +113,11 @@ def sort_datasets_by_n_pairs(data):
     return dict(sorted(n_pairs.items(), key=lambda item: item[1]))
 
 
-def transpose_data(data, mode="seq"):
+def transpose_data(data, dim, mode="seq"):
     # exec times per dataset per backend
     backend_ds_res = {}
 
-    n_simplices = compute_n_simplices()
+    n_simplices = compute_n_simplices(dim)
 
     for ds, res in data.items():
         dsname = "_".join(ds.split("_")[:-3])
@@ -131,17 +129,19 @@ def transpose_data(data, mode="seq"):
                 val = perfs[mode]["pers"]
             elif "timeout" in perfs:
                 val = perfs["timeout"]
+            else:
+                continue
             backend_ds_res.setdefault(backend, {}).update(
-                {dsname: math.log(n_simplices[2] / val)}
+                {dsname: math.log(n_simplices / val)}
             )
 
     return backend_ds_res
 
 
-def generate_plot(data, mode="seq"):
-    plot = [r"\nextgroupplot[legend to name=grouplegend,legend columns=2]"]
+def generate_plot(data, dim, mode="seq"):
+    plot = [r"\nextgroupplot[legend to name=grouplegend,legend columns=4]"]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
-    backend_ds_res = transpose_data(data, mode)
+    backend_ds_res = transpose_data(data, dim, mode)
 
     for backend, res in backend_ds_res.items():
         coords = [r"\addplot coordinates {"]
@@ -158,13 +158,11 @@ def generate_plot(data, mode="seq"):
 def main():
     data = load_data()
 
-    # only explicit data-sets
-    data_vtu_3D = {k: v for k, v in data[2].items() if "expl" in k}
-
-    res = [
-        *generate_plot(data_vtu_3D, "seq"),
-        *generate_plot(data_vtu_3D, "para"),
-    ]
+    res = []
+    for i in range(3):
+        res.extend(
+            generate_plot({k: v for k, v in data[i].items() if "expl" in k}, i, "seq")
+        )
 
     output_tex_file(res, "dest", True, True, True)
 
