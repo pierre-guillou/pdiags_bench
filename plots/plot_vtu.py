@@ -125,6 +125,19 @@ def transpose_data(data, dim, mode="seq"):
             if "Vertices" in backend or "FTM" in backend:
                 # print(dsname, n_pairs[dsname])
                 continue
+            if mode == "seq" and backend in ["PHAT", "JavaPlex", "Gudhi"]:
+                # parallel-only backends
+                continue
+            if mode == "para" and backend in [
+                "Eirene.jl",
+                "Perseus",
+                "Diamorse",
+                "Dionysus",
+                "CubicalRipser",
+            ]:
+                # sequential-only backends
+                continue
+
             if mode in perfs:
                 val = perfs[mode]["pers"]
             elif "timeout" in perfs:
