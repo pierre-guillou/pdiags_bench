@@ -35,6 +35,15 @@ def wrap_standalone(txt):
             r"\usepackage{pgfplots}",
             r"\usepgfplotslibrary{groupplots}",
             "",
+            r"\definecolor{col1}{RGB}{53, 110, 175}",
+            r"\definecolor{col2}{RGB}{204, 42, 42}",
+            r"\definecolor{col3}{RGB}{255, 175, 35}",
+            r"\definecolor{col4}{RGB}{79, 162, 46}",
+            r"\definecolor{col5}{RGB}{97, 97, 97}",
+            r"\definecolor{col6}{RGB}{103, 63, 153}",
+            r"\definecolor{col7}{RGB}{0, 0, 0}",
+            r"\definecolor{col8}{RGB}{123, 63, 0}",
+            "",
             r"\begin{document}",
             "",
         ]
@@ -52,13 +61,12 @@ def wrap_pgfplots(txt):
             r"\begin{tikzpicture}",
             r"\begin{groupplot}[",
             r"  group style={group size=4 by 1,group name=plots},",
-            r"  legend style={font=\tiny, legend columns=4, at={(0.5,-0.1)},anchor=north}",
             "]",
         ]
         + txt
         + [
             r"\end{groupplot}",
-            r"\node at (plots c1r1.north east)"
+            r"\node at (plots c2r1.north)"
             + r"[inner sep=0pt,anchor=north, yshift=10ex] {\ref{grouplegend}};",
             r"\end{tikzpicture}",
         ]
@@ -151,30 +159,71 @@ def transpose_data(data, dim, mode="seq"):
     return backend_ds_res
 
 
-def generate_plot(data, dim, mode="seq"):
-    plot = [r"\nextgroupplot[legend to name=grouplegend,legend columns=4]"]
+def generate_plot(data, backends, dim, mode="seq"):
+    plot = [r"\nextgroupplot[legend to name=grouplegend,legend columns=8]"]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim, mode)
 
-    for backend, res in backend_ds_res.items():
-        coords = [r"\addplot coordinates {"]
-        for dsname, n_pairs in n_pairs_sorted.items():
-            val = res[dsname]
-            coords.append(f"({n_pairs}, {val})")
-        coords.append("};")
-        plot.append(" ".join(coords))
+    for backend, legend in backends.items():
+        try:
+            coords = [r"\addplot[" + legend + "] coordinates {"]
+            res = backend_ds_res[backend]
+            for dsname, n_pairs in n_pairs_sorted.items():
+                val = res[dsname]
+                coords.append(f"({n_pairs}, {val})")
+            coords.append("};")
+            plot.append(" ".join(coords))
+
+        except KeyError:
+            plot.append(r"\addlegendimage{" + legend + "}")
+
         plot.append(r"\addlegendentry{" + backend + "}")
 
     return plot
 
 
+def sort_backends(data):
+    backends = {
+        "DiscreteMorseSandwich": None,
+        "PHAT": None,
+        "Dipha": None,
+        "Gudhi": None,
+    }
+    for d in data:
+        for res in d.values():
+            for backend in res.keys():
+                if backend == "#Vertices":
+                    continue
+                backends[backend] = None
+    legend = [
+        "col1, mark=*",
+        "col2, mark=square*",
+        "col4, mark=x",
+        "col3, mark=o",
+        "col5, mark=triangle*",
+        "col6, mark=diamond*",
+        "col7, mark=star",
+        "col8, mark=oplus*",
+        "red, mark=pentagon*",
+        "cyan, mark=asterisk",
+        "teal, mark=pentagon",
+        "lime, mark=star*",
+        "orange, mark=triangle",
+        "mark=o",
+    ]
+    return dict(zip(backends.keys(), legend))
+
+
 def main():
     data = load_data()
+    backends = sort_backends(data)
 
     res = []
     for i in range(3):
         res.extend(
-            generate_plot({k: v for k, v in data[i].items() if "expl" in k}, i, "seq")
+            generate_plot(
+                {k: v for k, v in data[i].items() if "expl" in k}, backends, i, "seq"
+            )
         )
 
     output_tex_file(res, "dest", True, True, True)
