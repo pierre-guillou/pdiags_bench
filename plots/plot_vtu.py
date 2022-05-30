@@ -51,12 +51,16 @@ def wrap_pgfplots(txt):
         [
             r"\begin{tikzpicture}",
             r"\begin{groupplot}[",
-            r"  group style={group size=2 by 2,},",
+            r"  group style={group size=2 by 2,group name=plots},",
             r"  legend style={font=\tiny, legend columns=2, at={(0.5,-0.1)},anchor=north}",
             "]",
         ]
         + txt
-        + [r"\end{groupplot}", r"\end{tikzpicture}"]
+        + [
+            r"\end{groupplot}",
+            r"\node at (plots c1r1.north east) [inner sep=0pt,anchor=north, yshift=10ex] {\ref{grouplegend}};",
+            r"\end{tikzpicture}",
+        ]
     )
 
 
@@ -124,7 +128,7 @@ def transpose_data(data_vtu, mode="seq"):
 
 
 def generate_plot(backend_ds_res):
-    plot = [r"\nextgroupplot"]
+    plot = [r"\nextgroupplot[legend to name=grouplegend,legend columns=2]"]
 
     for backend, res in backend_ds_res.items():
         coords = [r"\addplot coordinates {"]
