@@ -226,18 +226,17 @@ def sort_backends(data, cpx="expl"):
 def main():
     data = load_data()
     cpx = "expl"
-    mode = "para"
     backends = sort_backends(data, cpx)
 
-    res = []
-    for i in range(3):
-        res.extend(
-            generate_plot(
-                {k: v for k, v in data[i].items() if cpx in k}, backends, i, mode
+    for mode in ["seq", "para"]:
+        res = []
+        for i in range(3):
+            res.extend(
+                generate_plot(
+                    {k: v for k, v in data[i].items() if cpx in k}, backends, i, mode
+                )
             )
-        )
-
-    output_tex_file(res, f"plot_{cpx}_{mode}", True, True, True)
+        output_tex_file(res, f"plot_{cpx}_{mode}", True, True, True)
 
 
 if __name__ == "__main__":
