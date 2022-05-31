@@ -1,6 +1,5 @@
 import functools
 import json
-import math
 import subprocess
 import sys
 
@@ -156,9 +155,7 @@ def transpose_data(data, dim, mode="seq"):
                 val = perfs["timeout"]
             else:
                 continue
-            backend_ds_res.setdefault(backend, {}).update(
-                {dsname: math.log(n_simplices / val)}
-            )
+            backend_ds_res.setdefault(backend, {}).update({dsname: n_simplices / val})
 
     return backend_ds_res
 
@@ -167,7 +164,7 @@ def generate_plot(data, backends, dim, mode="seq"):
     plot = [
         r"\nextgroupplot[legend to name=grouplegend, legend columns=5, title="
         + str(dim + 1)
-        + "D datasets]"
+        + "D datasets, ymode=log]"
     ]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim, mode)
