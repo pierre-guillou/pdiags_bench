@@ -1,0 +1,1834 @@
+{
+    "aneurism_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.2,
+                "pers": 1589.221,
+                "mem": 13308,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.196,
+                "pers": 9.564,
+                "mem": 13898,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.184,
+                "pers": 10.09,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.204,
+                "pers": 9.995,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.189,
+                "pers": 1.022,
+                "mem": 5381,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
+            }
+        }
+    },
+    "backpack_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.155,
+                "pers": 26.431,
+                "mem": 18697,
+                "#threads": 16,
+                "#Min-saddle": 38854,
+                "#Saddle-max": 41192,
+                "#Total pairs": 80046
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.214,
+                "pers": 26.225,
+                "mem": 18698,
+                "#threads": 16,
+                "#Min-saddle": 38854,
+                "#Saddle-max": 41192,
+                "#Total pairs": 80046
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.161,
+                "pers": 1.145,
+                "mem": 5390,
+                "#threads": 16,
+                "#Min-saddle": 38854,
+                "#Saddle-max": 41192,
+                "#Total pairs": 80046
+            }
+        }
+    },
+    "bonsai_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.116,
+                "pers": 662.185,
+                "mem": 13308,
+                "#threads": 16,
+                "#Min-saddle": 3527,
+                "#Saddle-max": 4640,
+                "#Total pairs": 8167
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.173,
+                "pers": 89.331,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 3527,
+                "#Saddle-max": 4640,
+                "#Total pairs": 8167
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.185,
+                "pers": 12.21,
+                "mem": 18634,
+                "#threads": 16,
+                "#Min-saddle": 3527,
+                "#Saddle-max": 4640,
+                "#Total pairs": 8167
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.346,
+                "pers": 12.128,
+                "mem": 18633,
+                "#threads": 16,
+                "#Min-saddle": 3527,
+                "#Saddle-max": 4640,
+                "#Total pairs": 8167
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.184,
+                "pers": 1.052,
+                "mem": 5384,
+                "#threads": 16,
+                "#Min-saddle": 3527,
+                "#Saddle-max": 4640,
+                "#Total pairs": 8167
+            }
+        }
+    },
+    "boston_teapot_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.177,
+                "pers": 19.038,
+                "mem": 18639,
+                "#threads": 16,
+                "#Min-saddle": 5575,
+                "#Saddle-max": 6261,
+                "#Total pairs": 11836
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.155,
+                "pers": 19.144,
+                "mem": 18639,
+                "#threads": 16,
+                "#Min-saddle": 5575,
+                "#Saddle-max": 6261,
+                "#Total pairs": 11836
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.35,
+                "pers": 1.044,
+                "mem": 5385,
+                "#threads": 16,
+                "#Min-saddle": 5575,
+                "#Saddle-max": 6261,
+                "#Total pairs": 11836
+            }
+        }
+    },
+    "bunny_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.13,
+                "pers": 894.37,
+                "mem": 13313,
+                "#threads": 16,
+                "#Min-saddle": 65493,
+                "#Saddle-max": 64461,
+                "#Total pairs": 129954
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.187,
+                "pers": 95.975,
+                "mem": 13904,
+                "#threads": 16,
+                "#Min-saddle": 65493,
+                "#Saddle-max": 64461,
+                "#Total pairs": 129954
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.199,
+                "pers": 15.555,
+                "mem": 18735,
+                "#threads": 16,
+                "#Min-saddle": 65493,
+                "#Saddle-max": 64461,
+                "#Total pairs": 129954
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.183,
+                "pers": 15.29,
+                "mem": 18735,
+                "#threads": 16,
+                "#Min-saddle": 65493,
+                "#Saddle-max": 64461,
+                "#Total pairs": 129954
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.184,
+                "pers": 1.181,
+                "mem": 5397,
+                "#threads": 16,
+                "#Min-saddle": 65493,
+                "#Saddle-max": 64461,
+                "#Total pairs": 129954
+            }
+        }
+    },
+    "christmas_tree_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.132,
+                "pers": 579.938,
+                "mem": 13316,
+                "#threads": 16,
+                "#Min-saddle": 99366,
+                "#Saddle-max": 97877,
+                "#Total pairs": 197243
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.248,
+                "pers": 143.431,
+                "mem": 13908,
+                "#threads": 16,
+                "#Min-saddle": 99366,
+                "#Saddle-max": 97877,
+                "#Total pairs": 197243
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.174,
+                "pers": 19.713,
+                "mem": 18813,
+                "#threads": 16,
+                "#Min-saddle": 99366,
+                "#Saddle-max": 97877,
+                "#Total pairs": 197243
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.186,
+                "pers": 19.467,
+                "mem": 18812,
+                "#threads": 16,
+                "#Min-saddle": 99366,
+                "#Saddle-max": 97877,
+                "#Total pairs": 197243
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.213,
+                "pers": 1.268,
+                "mem": 5406,
+                "#threads": 16,
+                "#Min-saddle": 99366,
+                "#Saddle-max": 97877,
+                "#Total pairs": 197243
+            }
+        }
+    },
+    "csafe_heptane_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.18,
+                "pers": 1108.724,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 1027,
+                "#Saddle-max": 1180,
+                "#Total pairs": 2207
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.158,
+                "pers": 15.206,
+                "mem": 18623,
+                "#threads": 16,
+                "#Min-saddle": 1027,
+                "#Saddle-max": 1180,
+                "#Total pairs": 2207
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.202,
+                "pers": 15.223,
+                "mem": 18623,
+                "#threads": 16,
+                "#Min-saddle": 1027,
+                "#Saddle-max": 1180,
+                "#Total pairs": 2207
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.2,
+                "pers": 1.011,
+                "mem": 5383,
+                "#threads": 16,
+                "#Min-saddle": 1027,
+                "#Saddle-max": 1180,
+                "#Total pairs": 2207
+            }
+        }
+    },
+    "elevation_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.147,
+                "pers": 7.361,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.167,
+                "pers": 9.376,
+                "mem": 18617,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.177,
+                "pers": 9.311,
+                "mem": 18617,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.187,
+                "pers": 0.955,
+                "mem": 5382,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
+        }
+    },
+    "engine_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.192,
+                "pers": 20.467,
+                "mem": 18664,
+                "#threads": 16,
+                "#Min-saddle": 25357,
+                "#Saddle-max": 24208,
+                "#Total pairs": 49565
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.174,
+                "pers": 20.004,
+                "mem": 18665,
+                "#threads": 16,
+                "#Min-saddle": 25357,
+                "#Saddle-max": 24208,
+                "#Total pairs": 49565
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.206,
+                "pers": 1.057,
+                "mem": 5388,
+                "#threads": 16,
+                "#Min-saddle": 25357,
+                "#Saddle-max": 24208,
+                "#Total pairs": 49565
+            }
+        }
+    },
+    "foot_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.17,
+                "pers": 1065.914,
+                "mem": 13311,
+                "#threads": 16,
+                "#Min-saddle": 14383,
+                "#Saddle-max": 13761,
+                "#Total pairs": 28144
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.188,
+                "pers": 293.425,
+                "mem": 13901,
+                "#threads": 16,
+                "#Min-saddle": 14383,
+                "#Saddle-max": 13761,
+                "#Total pairs": 28144
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.212,
+                "pers": 13.692,
+                "mem": 18646,
+                "#threads": 16,
+                "#Min-saddle": 14383,
+                "#Saddle-max": 13761,
+                "#Total pairs": 28144
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.185,
+                "pers": 13.522,
+                "mem": 18646,
+                "#threads": 16,
+                "#Min-saddle": 14383,
+                "#Saddle-max": 13761,
+                "#Total pairs": 28144
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.2,
+                "pers": 1.106,
+                "mem": 5386,
+                "#threads": 16,
+                "#Min-saddle": 14383,
+                "#Saddle-max": 13761,
+                "#Total pairs": 28144
+            }
+        }
+    },
+    "fuel_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.138,
+                "pers": 1526.19,
+                "mem": 13310,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.19,
+                "pers": 26.994,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.172,
+                "pers": 11.192,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.186,
+                "pers": 11.152,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.178,
+                "pers": 0.974,
+                "mem": 5383,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
+            }
+        }
+    },
+    "hydrogen_atom_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.132,
+                "pers": 1266.997,
+                "mem": 13310,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.189,
+                "pers": 442.961,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.179,
+                "pers": 16.19,
+                "mem": 18620,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.174,
+                "pers": 16.144,
+                "mem": 18620,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.195,
+                "pers": 0.98,
+                "mem": 5383,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            }
+        }
+    },
+    "kingsnake_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.159,
+                "pers": 28.855,
+                "mem": 18775,
+                "#threads": 16,
+                "#Min-saddle": 55928,
+                "#Saddle-max": 55954,
+                "#Total pairs": 111882
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.187,
+                "pers": 33.725,
+                "mem": 18775,
+                "#threads": 16,
+                "#Min-saddle": 55928,
+                "#Saddle-max": 55954,
+                "#Total pairs": 111882
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.206,
+                "pers": 1.225,
+                "mem": 5395,
+                "#threads": 16,
+                "#Min-saddle": 55928,
+                "#Saddle-max": 55954,
+                "#Total pairs": 111882
+            }
+        }
+    },
+    "lobster_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.193,
+                "pers": 33.205,
+                "mem": 18711,
+                "#threads": 16,
+                "#Min-saddle": 34144,
+                "#Saddle-max": 34538,
+                "#Total pairs": 68682
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.202,
+                "pers": 33.052,
+                "mem": 18711,
+                "#threads": 16,
+                "#Min-saddle": 34144,
+                "#Saddle-max": 34538,
+                "#Total pairs": 68682
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.194,
+                "pers": 1.095,
+                "mem": 5392,
+                "#threads": 16,
+                "#Min-saddle": 34144,
+                "#Saddle-max": 34538,
+                "#Total pairs": 68682
+            }
+        }
+    },
+    "magnetic_reconnection_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.131,
+                "pers": 741.292,
+                "mem": 13315,
+                "#threads": 16,
+                "#Min-saddle": 42300,
+                "#Saddle-max": 40021,
+                "#Total pairs": 82321
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.189,
+                "pers": 289.637,
+                "mem": 13903,
+                "#threads": 16,
+                "#Min-saddle": 42300,
+                "#Saddle-max": 40021,
+                "#Total pairs": 82321
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.18,
+                "pers": 20.942,
+                "mem": 18685,
+                "#threads": 16,
+                "#Min-saddle": 42300,
+                "#Saddle-max": 40021,
+                "#Total pairs": 82321
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.165,
+                "pers": 20.568,
+                "mem": 18685,
+                "#threads": 16,
+                "#Min-saddle": 42300,
+                "#Saddle-max": 40021,
+                "#Total pairs": 82321
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.199,
+                "pers": 1.114,
+                "mem": 5393,
+                "#threads": 16,
+                "#Min-saddle": 42300,
+                "#Saddle-max": 40021,
+                "#Total pairs": 82321
+            }
+        }
+    },
+    "marmoset_neurons_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.18,
+                "pers": 28.316,
+                "mem": 18947,
+                "#threads": 16,
+                "#Min-saddle": 207893,
+                "#Saddle-max": 200684,
+                "#Total pairs": 408577
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.11,
+                "pers": 26.0,
+                "mem": 18948,
+                "#threads": 16,
+                "#Min-saddle": 207893,
+                "#Saddle-max": 200684,
+                "#Total pairs": 408577
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.182,
+                "pers": 1.424,
+                "mem": 5431,
+                "#threads": 16,
+                "#Min-saddle": 207893,
+                "#Saddle-max": 200684,
+                "#Total pairs": 408577
+            }
+        }
+    },
+    "marschner_lobb_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.137,
+                "pers": 763.203,
+                "mem": 13311,
+                "#threads": 16,
+                "#Min-saddle": 12190,
+                "#Saddle-max": 11247,
+                "#Total pairs": 23437
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.2,
+                "pers": 351.914,
+                "mem": 13901,
+                "#threads": 16,
+                "#Min-saddle": 12190,
+                "#Saddle-max": 11247,
+                "#Total pairs": 23437
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.212,
+                "pers": 18.272,
+                "mem": 18636,
+                "#threads": 16,
+                "#Min-saddle": 12190,
+                "#Saddle-max": 11247,
+                "#Total pairs": 23437
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.194,
+                "pers": 18.061,
+                "mem": 18636,
+                "#threads": 16,
+                "#Min-saddle": 12190,
+                "#Saddle-max": 11247,
+                "#Total pairs": 23437
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.078,
+                "pers": 1.071,
+                "mem": 5384,
+                "#threads": 16,
+                "#Min-saddle": 12190,
+                "#Saddle-max": 11247,
+                "#Total pairs": 23437
+            }
+        }
+    },
+    "mri_ventricles_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.194,
+                "pers": 21.573,
+                "mem": 18694,
+                "#threads": 16,
+                "#Min-saddle": 48091,
+                "#Saddle-max": 45238,
+                "#Total pairs": 93329
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.174,
+                "pers": 21.478,
+                "mem": 18694,
+                "#threads": 16,
+                "#Min-saddle": 48091,
+                "#Saddle-max": 45238,
+                "#Total pairs": 93329
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.172,
+                "pers": 1.109,
+                "mem": 5393,
+                "#threads": 16,
+                "#Min-saddle": 48091,
+                "#Saddle-max": 45238,
+                "#Total pairs": 93329
+            }
+        }
+    },
+    "mrt_angio_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.172,
+                "pers": 28.544,
+                "mem": 18834,
+                "#threads": 16,
+                "#Min-saddle": 92848,
+                "#Saddle-max": 88899,
+                "#Total pairs": 181747
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.214,
+                "pers": 30.832,
+                "mem": 18834,
+                "#threads": 16,
+                "#Min-saddle": 92848,
+                "#Saddle-max": 88899,
+                "#Total pairs": 181747
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.199,
+                "pers": 1.27,
+                "mem": 5404,
+                "#threads": 16,
+                "#Min-saddle": 92848,
+                "#Saddle-max": 88899,
+                "#Total pairs": 181747
+            }
+        }
+    },
+    "neghip_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.134,
+                "pers": 1243.064,
+                "mem": 13310,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.196,
+                "pers": 37.35,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.207,
+                "pers": 12.401,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.189,
+                "pers": 12.31,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.193,
+                "pers": 0.971,
+                "mem": 5383,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
+            }
+        }
+    },
+    "neocortical_layer_1_axons_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.055,
+                "pers": 1423.647,
+                "mem": 13933,
+                "#threads": 16,
+                "#Min-saddle": 505354,
+                "#Saddle-max": 394892,
+                "#Total pairs": 900246
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.33,
+                "pers": 38.246,
+                "mem": 19294,
+                "#threads": 16,
+                "#Min-saddle": 505354,
+                "#Saddle-max": 394892,
+                "#Total pairs": 900246
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.177,
+                "pers": 36.632,
+                "mem": 19295,
+                "#threads": 16,
+                "#Min-saddle": 505354,
+                "#Saddle-max": 394892,
+                "#Total pairs": 900246
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.138,
+                "pers": 1.976,
+                "mem": 5487,
+                "#threads": 16,
+                "#Min-saddle": 505354,
+                "#Saddle-max": 394892,
+                "#Total pairs": 900246
+            }
+        }
+    },
+    "nucleon_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.188,
+                "pers": 1045.83,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 426,
+                "#Saddle-max": 435,
+                "#Total pairs": 861
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.182,
+                "pers": 20.43,
+                "mem": 18619,
+                "#threads": 16,
+                "#Min-saddle": 426,
+                "#Saddle-max": 435,
+                "#Total pairs": 861
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.196,
+                "pers": 19.773,
+                "mem": 18619,
+                "#threads": 16,
+                "#Min-saddle": 426,
+                "#Saddle-max": 435,
+                "#Total pairs": 861
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.185,
+                "pers": 0.965,
+                "mem": 5383,
+                "#threads": 16,
+                "#Min-saddle": 426,
+                "#Saddle-max": 435,
+                "#Total pairs": 861
+            }
+        }
+    },
+    "pancreas_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.131,
+                "pers": 375.567,
+                "mem": 13312,
+                "#threads": 16,
+                "#Min-saddle": 29355,
+                "#Saddle-max": 28938,
+                "#Total pairs": 58293
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.203,
+                "pers": 153.227,
+                "mem": 13902,
+                "#threads": 16,
+                "#Min-saddle": 29355,
+                "#Saddle-max": 28938,
+                "#Total pairs": 58293
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.198,
+                "pers": 16.282,
+                "mem": 18687,
+                "#threads": 16,
+                "#Min-saddle": 29355,
+                "#Saddle-max": 28938,
+                "#Total pairs": 58293
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.215,
+                "pers": 16.821,
+                "mem": 18687,
+                "#threads": 16,
+                "#Min-saddle": 29355,
+                "#Saddle-max": 28938,
+                "#Total pairs": 58293
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.192,
+                "pers": 1.12,
+                "mem": 5389,
+                "#threads": 16,
+                "#Min-saddle": 29355,
+                "#Saddle-max": 28938,
+                "#Total pairs": 58293
+            }
+        }
+    },
+    "present_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.142,
+                "pers": 36.033,
+                "mem": 18827,
+                "#threads": 16,
+                "#Min-saddle": 108172,
+                "#Saddle-max": 87690,
+                "#Total pairs": 195862
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.188,
+                "pers": 41.206,
+                "mem": 18827,
+                "#threads": 16,
+                "#Min-saddle": 108172,
+                "#Saddle-max": 87690,
+                "#Total pairs": 195862
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.175,
+                "pers": 1.268,
+                "mem": 5405,
+                "#threads": 16,
+                "#Min-saddle": 108172,
+                "#Saddle-max": 87690,
+                "#Total pairs": 195862
+            }
+        }
+    },
+    "prone_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.77,
+                "pers": 1312.193,
+                "mem": 13904,
+                "#threads": 16,
+                "#Min-saddle": 54846,
+                "#Saddle-max": 53727,
+                "#Total pairs": 108573
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.137,
+                "pers": 22.256,
+                "mem": 18737,
+                "#threads": 16,
+                "#Min-saddle": 54846,
+                "#Saddle-max": 53727,
+                "#Total pairs": 108573
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.187,
+                "pers": 22.039,
+                "mem": 18737,
+                "#threads": 16,
+                "#Min-saddle": 54846,
+                "#Saddle-max": 53727,
+                "#Total pairs": 108573
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.188,
+                "pers": 1.15,
+                "mem": 5394,
+                "#threads": 16,
+                "#Min-saddle": 54846,
+                "#Saddle-max": 53727,
+                "#Total pairs": 108573
+            }
+        }
+    },
+    "random_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.129,
+                "pers": 19.525,
+                "mem": 18743,
+                "#threads": 16,
+                "#Min-saddle": 51460,
+                "#Saddle-max": 51322,
+                "#Total pairs": 102782
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.186,
+                "pers": 22.882,
+                "mem": 18743,
+                "#threads": 16,
+                "#Min-saddle": 51460,
+                "#Saddle-max": 51322,
+                "#Total pairs": 102782
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.158,
+                "pers": 1.19,
+                "mem": 5395,
+                "#threads": 16,
+                "#Min-saddle": 51460,
+                "#Saddle-max": 51322,
+                "#Total pairs": 102782
+            }
+        }
+    },
+    "shockwave_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.29,
+                "pers": 1333.241,
+                "mem": 13310,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.177,
+                "pers": 8.306,
+                "mem": 13900,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.181,
+                "pers": 11.935,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.181,
+                "pers": 11.917,
+                "mem": 18618,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.204,
+                "pers": 1.026,
+                "mem": 5384,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
+            }
+        }
+    },
+    "silicium_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.189,
+                "pers": 25.405,
+                "mem": 18622,
+                "#threads": 16,
+                "#Min-saddle": 632,
+                "#Saddle-max": 969,
+                "#Total pairs": 1601
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.086,
+                "pers": 23.423,
+                "mem": 18622,
+                "#threads": 16,
+                "#Min-saddle": 632,
+                "#Saddle-max": 969,
+                "#Total pairs": 1601
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.209,
+                "pers": 1.002,
+                "mem": 5384,
+                "#threads": 16,
+                "#Min-saddle": 632,
+                "#Saddle-max": 969,
+                "#Total pairs": 1601
+            }
+        }
+    },
+    "skull_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.136,
+                "pers": 948.437,
+                "mem": 13312,
+                "#threads": 16,
+                "#Min-saddle": 26918,
+                "#Saddle-max": 26855,
+                "#Total pairs": 53773
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.183,
+                "pers": 785.658,
+                "mem": 13902,
+                "#threads": 16,
+                "#Min-saddle": 26918,
+                "#Saddle-max": 26855,
+                "#Total pairs": 53773
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.163,
+                "pers": 20.783,
+                "mem": 18674,
+                "#threads": 16,
+                "#Min-saddle": 26918,
+                "#Saddle-max": 26855,
+                "#Total pairs": 53773
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.175,
+                "pers": 19.211,
+                "mem": 18673,
+                "#threads": 16,
+                "#Min-saddle": 26918,
+                "#Saddle-max": 26855,
+                "#Total pairs": 53773
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.169,
+                "pers": 1.082,
+                "mem": 5389,
+                "#threads": 16,
+                "#Min-saddle": 26918,
+                "#Saddle-max": 26855,
+                "#Total pairs": 53773
+            }
+        }
+    },
+    "stag_beetle_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.152,
+                "pers": 311.771,
+                "mem": 13901,
+                "#threads": 16,
+                "#Min-saddle": 9055,
+                "#Saddle-max": 8817,
+                "#Total pairs": 17872
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.163,
+                "pers": 14.487,
+                "mem": 18632,
+                "#threads": 16,
+                "#Min-saddle": 9055,
+                "#Saddle-max": 8817,
+                "#Total pairs": 17872
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.185,
+                "pers": 15.739,
+                "mem": 18632,
+                "#threads": 16,
+                "#Min-saddle": 9055,
+                "#Saddle-max": 8817,
+                "#Total pairs": 17872
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.176,
+                "pers": 1.069,
+                "mem": 5384,
+                "#threads": 16,
+                "#Min-saddle": 9055,
+                "#Saddle-max": 8817,
+                "#Total pairs": 17872
+            }
+        }
+    },
+    "statue_leg_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.13,
+                "pers": 591.816,
+                "mem": 13311,
+                "#threads": 16,
+                "#Min-saddle": 11617,
+                "#Saddle-max": 12492,
+                "#Total pairs": 24109
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.177,
+                "pers": 266.052,
+                "mem": 13901,
+                "#threads": 16,
+                "#Min-saddle": 11617,
+                "#Saddle-max": 12492,
+                "#Total pairs": 24109
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.175,
+                "pers": 18.52,
+                "mem": 18658,
+                "#threads": 16,
+                "#Min-saddle": 11617,
+                "#Saddle-max": 12492,
+                "#Total pairs": 24109
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.179,
+                "pers": 18.232,
+                "mem": 18658,
+                "#threads": 16,
+                "#Min-saddle": 11617,
+                "#Saddle-max": 12492,
+                "#Total pairs": 24109
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.177,
+                "pers": 1.061,
+                "mem": 5385,
+                "#threads": 16,
+                "#Min-saddle": 11617,
+                "#Saddle-max": 12492,
+                "#Total pairs": 24109
+            }
+        }
+    },
+    "stent_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.183,
+                "pers": 24.339,
+                "mem": 18676,
+                "#threads": 16,
+                "#Min-saddle": 28140,
+                "#Saddle-max": 29514,
+                "#Total pairs": 57654
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.18,
+                "pers": 24.502,
+                "mem": 18676,
+                "#threads": 16,
+                "#Min-saddle": 28140,
+                "#Saddle-max": 29514,
+                "#Total pairs": 57654
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.198,
+                "pers": 1.075,
+                "mem": 5389,
+                "#threads": 16,
+                "#Min-saddle": 28140,
+                "#Saddle-max": 29514,
+                "#Total pairs": 57654
+            }
+        }
+    },
+    "tacc_turbulence_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.127,
+                "pers": 551.377,
+                "mem": 13311,
+                "#threads": 16,
+                "#Min-saddle": 8533,
+                "#Saddle-max": 7389,
+                "#Total pairs": 15922
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.182,
+                "pers": 310.677,
+                "mem": 13901,
+                "#threads": 16,
+                "#Min-saddle": 8533,
+                "#Saddle-max": 7389,
+                "#Total pairs": 15922
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.187,
+                "pers": 22.588,
+                "mem": 18633,
+                "#threads": 16,
+                "#Min-saddle": 8533,
+                "#Saddle-max": 7389,
+                "#Total pairs": 15922
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.184,
+                "pers": 22.276,
+                "mem": 18633,
+                "#threads": 16,
+                "#Min-saddle": 8533,
+                "#Saddle-max": 7389,
+                "#Total pairs": 15922
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.212,
+                "pers": 1.024,
+                "mem": 5385,
+                "#threads": 16,
+                "#Min-saddle": 8533,
+                "#Saddle-max": 7389,
+                "#Total pairs": 15922
+            }
+        }
+    },
+    "tooth_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.135,
+                "pers": 1503.05,
+                "mem": 13311,
+                "#threads": 16,
+                "#Min-saddle": 9602,
+                "#Saddle-max": 9634,
+                "#Total pairs": 19236
+            }
+        },
+        "PairCriticalSimplices": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.168,
+                "pers": 18.546,
+                "mem": 18638,
+                "#threads": 16,
+                "#Min-saddle": 9602,
+                "#Saddle-max": 9634,
+                "#Total pairs": 19236
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.182,
+                "pers": 26.028,
+                "mem": 18638,
+                "#threads": 16,
+                "#Min-saddle": 9602,
+                "#Saddle-max": 9634,
+                "#Total pairs": 19236
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.205,
+                "pers": 1.02,
+                "mem": 5385,
+                "#threads": 16,
+                "#Min-saddle": 9602,
+                "#Saddle-max": 9634,
+                "#Total pairs": 19236
+            }
+        }
+    },
+    "vertebra_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "timeout": 1800
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.17,
+                "pers": 1753.944,
+                "mem": 13903,
+                "#threads": 16,
+                "#Min-saddle": 18866,
+                "#Saddle-max": 18435,
+                "#Total pairs": 37301
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.192,
+                "pers": 25.91,
+                "mem": 18678,
+                "#threads": 16,
+                "#Min-saddle": 18866,
+                "#Saddle-max": 18435,
+                "#Total pairs": 37301
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.217,
+                "pers": 25.822,
+                "mem": 18678,
+                "#threads": 16,
+                "#Min-saddle": 18866,
+                "#Saddle-max": 18435,
+                "#Total pairs": 37301
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.214,
+                "pers": 1.064,
+                "mem": 5387,
+                "#threads": 16,
+                "#Min-saddle": 18866,
+                "#Saddle-max": 18435,
+                "#Total pairs": 37301
+            }
+        }
+    },
+    "zeiss_4096x4096x1_order_expl": {
+        "#Vertices": "4096x4096x1",
+        "PairCells": {
+            "para": {
+                "prec": 4.128,
+                "pers": 741.919,
+                "mem": 13311,
+                "#threads": 16,
+                "#Min-saddle": 9324,
+                "#Saddle-max": 9890,
+                "#Total pairs": 19214
+            }
+        },
+        "PairCriticalSimplices": {
+            "para": {
+                "prec": 4.192,
+                "pers": 124.59,
+                "mem": 13901,
+                "#threads": 16,
+                "#Min-saddle": 9324,
+                "#Saddle-max": 9890,
+                "#Total pairs": 19214
+            }
+        },
+        "PairCriticalSimplices_BCaching": {
+            "para": {
+                "prec": 4.216,
+                "pers": 18.202,
+                "mem": 18637,
+                "#threads": 16,
+                "#Min-saddle": 9324,
+                "#Saddle-max": 9890,
+                "#Total pairs": 19214
+            }
+        },
+        "PairCriticalSimplices_Sandwiching": {
+            "para": {
+                "prec": 4.204,
+                "pers": 17.388,
+                "mem": 18637,
+                "#threads": 16,
+                "#Min-saddle": 9324,
+                "#Saddle-max": 9890,
+                "#Total pairs": 19214
+            }
+        },
+        "DiscreteMorseSandwich": {
+            "para": {
+                "prec": 4.19,
+                "pers": 1.047,
+                "mem": 5385,
+                "#threads": 16,
+                "#Min-saddle": 9324,
+                "#Saddle-max": 9890,
+                "#Total pairs": 19214
+            }
+        }
+    }
+}
