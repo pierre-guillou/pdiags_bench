@@ -634,10 +634,11 @@ def compute_javaplex(fname, times, backend):
     return elapsed
 
 
-def compute_phat(fname, times, backend):
+@parallel_decorator
+def compute_phat(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}_{backend.value}.gudhi"
-    cmd = [sys.executable, "phat2gudhi.py", "-o", outp, fname]
+    cmd = [sys.executable, "phat2gudhi.py", "-o", outp, fname, "-t", str(num_threads)]
 
     out, err = launch_process(cmd)
 
@@ -657,7 +658,9 @@ def compute_phat(fname, times, backend):
     }
 
     res.update(get_pairs_number(outp))
-    times[dataset][backend.value] = {"para": res}
+    times[dataset].setdefault(backend.value, {}).update(
+        {("seq" if num_threads == 1 else "para"): res}
+    )
     return elapsed
 
 
