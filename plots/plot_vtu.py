@@ -69,6 +69,7 @@ def wrap_pgfplots(txt):
             r"\node at (plots c2r1.south)"
             + r"[inner sep=0pt, yshift=-12ex] {\ref{grouplegend}};",
             r"\end{tikzpicture}",
+            "",
         ]
     )
 
@@ -162,7 +163,7 @@ def transpose_data(data, dim, mode="seq"):
 
 def generate_plot(data, backends, dim, mode="seq"):
     plot = [
-        r"\nextgroupplot[legend to name=grouplegend, legend columns=6, title="
+        r"\nextgroupplot[legend to name=grouplegend, legend columns=7, title="
         + str(dim + 1)
         + "D datasets, ymode=log]"
     ]
@@ -181,7 +182,9 @@ def generate_plot(data, backends, dim, mode="seq"):
             plot.append(r"\addlegendentry{" + backend + "}")
 
         except KeyError:
-            pass
+            if backend == "TTK-FTM":
+                plot.append(r"\addlegendimage{" + legend + "}")
+                plot.append(r"\addlegendentry{" + backend + "}")
 
     return plot
 
