@@ -1,15 +1,21 @@
 import argparse
+import multiprocessing
 import os
 import subprocess
 import time
 
 
-def main(input_dataset, output_diagram, phat_exec):
+def main(input_dataset, output_diagram, phat_exec, thread_number):
     # call PHAT on input dataset
     phat_diag = "diagram.phat"
+
+    env = dict(os.environ)
+    env["OMP_NUM_THREADS"] = str(thread_number)
+
     subprocess.check_call(
         [phat_exec, "--verbose", "--ascii", "--spectral_sequence"]
-        + [input_dataset, phat_diag]
+        + [input_dataset, phat_diag],
+        env=env,
     )
 
     start = time.time()
@@ -69,6 +75,13 @@ if __name__ == "__main__":
         help="Path to PHAT executable",
         default="build_dirs/phat/phat",
     )
+    parser.add_argument(
+        "-t",
+        "--thread_number",
+        type=int,
+        help="Number of threads",
+        default=multiprocessing.cpu_count(),
+    )
 
     args = parser.parse_args()
-    main(args.input_dataset, args.output_diagram, args.phat_exec)
+    main(args.input_dataset, args.output_diagram, args.phat_exec, args.thread_number)
