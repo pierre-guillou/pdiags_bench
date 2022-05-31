@@ -542,7 +542,14 @@ def compute_oineus(fname, times, backend, num_threads=1):
 def compute_diamorse(fname, times, backend):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}_{backend.value}.gudhi"
-    cmd = ["python2", "diamorse/python/persistence.py", fname, "-r", "-o", outp]
+    cmd = [
+        "python2",
+        "backends_src/diamorse/python/persistence.py",
+        fname,
+        "-r",
+        "-o",
+        outp,
+    ]
 
     _, err = launch_process(cmd, env={})  # reset environment for Python2
     elapsed, mem = get_time_mem(err)
