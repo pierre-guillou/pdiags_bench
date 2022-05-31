@@ -162,7 +162,7 @@ def transpose_data(data, dim, mode="seq"):
 
 def generate_plot(data, backends, dim, mode="seq"):
     plot = [
-        r"\nextgroupplot[legend to name=grouplegend, legend columns=5, title="
+        r"\nextgroupplot[legend to name=grouplegend, legend columns=6, title="
         + str(dim + 1)
         + "D datasets, ymode=log]"
     ]
@@ -178,11 +178,10 @@ def generate_plot(data, backends, dim, mode="seq"):
                 coords.append(f"({n_pairs}, {val})")
             coords.append("};")
             plot.append(" ".join(coords))
+            plot.append(r"\addlegendentry{" + backend + "}")
 
         except KeyError:
-            plot.append(r"\addlegendimage{" + legend + "}")
-
-        plot.append(r"\addlegendentry{" + backend + "}")
+            pass
 
     return plot
 
