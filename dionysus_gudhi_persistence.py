@@ -100,6 +100,11 @@ class Ripser_SparseDM:
             os.remove("dist_mat")
 
     def write_diag(self, output):
+        n_pairs = 0
+        for pairs in self.diag:
+            n_pairs += len(pairs)
+        if n_pairs == 0:
+            return
         with open(output, "w") as dst:
             for dim, pairs in enumerate(self.diag):
                 for birth, death in pairs:
