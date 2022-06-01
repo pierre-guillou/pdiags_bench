@@ -1,6 +1,7 @@
 import argparse
 import multiprocessing
 import os
+import re
 import subprocess
 import time
 
@@ -19,6 +20,10 @@ def main(input_dataset, output_diagram, phat_exec, thread_number):
     )
 
     start = time.time()
+
+    patt = re.compile(r".*_(\d+)x(\d+)x(\d+)_.*")
+    dims = [int(a) for a in re.match(patt, input_dataset).groups()]
+    max_death = dims[0] * dims[1] * dims[2] - 1
 
     # read PHAT persistence_pairs binary format file
     with open(phat_diag) as src:
@@ -48,6 +53,9 @@ def main(input_dataset, output_diagram, phat_exec, thread_number):
             od = offsets[death]
             dim = dims[birth]
             if ob != od:
+                # fix death of global min-max pair
+                if dim == 0 and ob == 0 and od == 1:
+                    od = max_death
                 dst.write(f"{dim} {ob} {od}\n")
 
     print(f"Converted PHAT pairs to Gudhi format (took {time.time() - start:.3f}s)")
