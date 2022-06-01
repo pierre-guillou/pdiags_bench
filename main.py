@@ -566,7 +566,7 @@ def compute_diamorse(fname, times, backend):
 
 def compute_perseus(fname, times, backend):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
+    outp = f"diagrams/{dataset}-{backend.value}.gudhi"
     subc = "simtop" if backend == SoftBackend.PERSEUS_SIM else "cubtop"
     cmd = ["backends_src/perseus/perseus", subc, fname]
 
