@@ -116,9 +116,9 @@ def compare_pairs(pairs0, pairs1, ptype, show_diff):
                 3600,
             )
             try:
-                wass_dist = dists["sad-max"]
-            except KeyError:
                 wass_dist = dists["min-sad"]
+            except KeyError:
+                wass_dist = dists["sad-max"]
 
         except ImportError:
             print("Fallback to Wassertein overapproximation")
