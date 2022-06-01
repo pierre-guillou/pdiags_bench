@@ -918,7 +918,7 @@ def main():
         "--method",
         help="Comparison method",
         choices=["auction", "bottleneck", "lexico"],
-        default="auction",
+        default="lexico",
     )
     get_dists.add_argument(
         "-p",
