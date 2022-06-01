@@ -77,11 +77,14 @@ class Ripser_SparseDM:
                 dst.write(f"{i} {j} {v}\n")
 
     def compute_pers(self):
-        with subprocess.Popen(
+        cmd = (
             ["backends_src/ripser/ripser"]
             + ["--format", "sparse"]
             + ["--dim", "2"]
-            + ["dist_mat"],
+            + ["dist_mat"]
+        )
+        with subprocess.Popen(
+            cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
@@ -89,7 +92,7 @@ class Ripser_SparseDM:
             self.diag = [[], [], []]
             if proc.returncode != 0:
                 print(proc.stderr.read())
-                return
+                raise subprocess.CalledProcessError(proc.returncode, cmd)
             for line in proc.stdout.readlines():
                 if "intervals" in line:
                     dim = int(line.strip()[-2])
