@@ -160,6 +160,46 @@ def transpose_data(data, dim):
     return backend_ds_res
 
 
+def generate_dat(data, dim, pref_mode="para"):
+
+    n_pairs_sorted = sort_datasets_by_n_pairs(data)
+    unpref_mode = "seq" if pref_mode == "para" else "para"
+    n_simplices = compute_n_simplices(dim)
+
+    backends = list(
+        filter(
+            lambda x: "#Vertices" not in x,
+            data[next(filter(lambda x: "impl" in x, data))].keys(),
+        )
+    )
+
+    header = ["nPairs"] + backends
+    table = ["\t".join(header)]
+
+    for ds, npairs in n_pairs_sorted.items():
+        res = data[ds]
+        line = []
+        line.append(npairs)
+        if "expl" in ds:
+            continue
+        for bk in backends:
+            perfs = res[bk]
+            if "error" in perfs:
+                val = 0.0
+            elif pref_mode in perfs:
+                val = perfs[pref_mode]["pers"]
+            elif unpref_mode in perfs:
+                val = perfs[unpref_mode]["pers"]
+            elif "timeout" in perfs:
+                val = perfs["timeout"]
+            line.append(n_simplices / val if val > 0.0 else 0.0)
+
+        table.append("\t".join((str(a) for a in line)))
+
+    with open(f"plot_vti_{pref_mode}_{dim + 1}D.dat", "w") as dst:
+        dst.write("\n".join(table))
+
+
 def generate_plot(data, backends, dim):
     plot = [
         r"\nextgroupplot[legend to name=grouplegend, ymode=log, "
