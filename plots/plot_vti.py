@@ -79,7 +79,7 @@ def wrap_pgfplots(txt):
         + [
             r"""
 \end{groupplot}
-\node at (plots c2r1.east)[inner sep=0pt, xshift=15ex] {\pgfplotslegendfromname{grouplegend}};
+\node at (plots c2r1.east)[inner sep=0pt, xshift=8ex] {\pgfplotslegendfromname{grouplegend}};
 \end{tikzpicture}
 """
         ]
@@ -162,10 +162,8 @@ def transpose_data(data, dim):
 
 def generate_plot(data, backends, dim):
     plot = [
-        r"""\nextgroupplot[
-  legend to name=grouplegend, ymode=log,
-  ylabel=Computation speed (voxels/second),
-]"""
+        r"\nextgroupplot[legend to name=grouplegend, ymode=log, "
+        + ("ylabel=Computation speed (voxels/second),]" if dim == 1 else "]")
     ]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim)
@@ -194,6 +192,12 @@ def sort_backends(data, cpx="expl"):
         "DiscreteMorseSandwich": None,
         "Dipha": None,
         "Gudhi": None,
+        "TTK-FTM": None,
+        "PersistenceCycles": None,
+        "Oineus": None,
+        "CubicalRipser": None,
+        "Diamorse": None,
+        "Perseus": None,
     }
     for d in data:
         for ds, res in d.items():
@@ -203,22 +207,10 @@ def sort_backends(data, cpx="expl"):
                 if backend == "#Vertices":
                     continue
                 backends[backend] = None
-    legend = [
-        "col1",
-        "col4",
-        "col3",
-        "col5, dashdotted",
-        "col6, densely dashdotdotted",
-        "col7, dashed",
-        "col8, densely dotted",
-        "red",
-        "cyan",
-        "teal",
-        "lime",
-        "orange",
-        "black",
-    ]
-    return dict(zip(backends.keys(), legend))
+
+    return dict(
+        zip(backends.keys(), ["curve" + str(i + 1) for i in range(len(backends))])
+    )
 
 
 def main():
