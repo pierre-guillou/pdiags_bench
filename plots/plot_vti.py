@@ -6,33 +6,62 @@ import sys
 def wrap_standalone(txt):
     return (
         [
-            r"\documentclass{standalone}",
-            "",
-            r"\usepackage{tikz}",
-            r"\usepackage{pgfplots}",
-            r"\usepgfplotslibrary{groupplots}",
-            r"""\pgfplotsset{
-  every axis plot/.append style={line width=1pt},
-  legend style={font=\scriptsize},
+            r"""\documentclass{standalone}
+
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
+
+\pgfplotsset{
+  every axis/.append style={
+    no markers,
+    grid=major,
+    grid style={dashed},
+    legend style={font=\scriptsize},
+    ylabel style={font=\scriptsize},
+    xlabel style={font=\scriptsize},
+  },
+  every axis plot/.append style={line width=1.2pt, line join=round},
+  every axis legend/.append style={legend columns=1},
   group/group size=3 by 1,
-}""",
-            "",
-            r"\definecolor{col1}{RGB}{53, 110, 175}",
-            r"\definecolor{col2}{RGB}{204, 42, 42}",
-            r"\definecolor{col3}{RGB}{255, 175, 35}",
-            r"\definecolor{col4}{RGB}{79, 162, 46}",
-            r"\definecolor{col5}{RGB}{97, 97, 97}",
-            r"\definecolor{col6}{RGB}{103, 63, 153}",
-            r"\definecolor{col7}{RGB}{0, 0, 0}",
-            r"\definecolor{col8}{RGB}{123, 63, 0}",
-            "",
-            r"\begin{document}",
-            "",
+  every x tick label/.append style={alias=XTick,inner xsep=0pt},
+  every x tick scale label/.style={at=(XTick.base east),anchor=base west}
+}
+
+\definecolor{col1}{RGB}{53, 110, 175}
+\definecolor{col2}{RGB}{204, 42, 42}
+\definecolor{col3}{RGB}{255, 175, 35}
+\definecolor{col4}{RGB}{79, 162, 46}
+\definecolor{col5}{RGB}{97, 97, 97}
+\definecolor{col6}{RGB}{103, 63, 153}
+\definecolor{col7}{RGB}{0, 0, 0}
+\definecolor{col8}{RGB}{123, 63, 0}
+
+\tikzset{
+  curve1/.style={col1},
+  curve2/.style={col2},
+  curve3/.style={col4},
+  curve4/.style={col3},
+  curve5/.style={col6},
+  curve6/.style={cyan},
+  curve7/.style={col5, dashdotted},
+  curve8/.style={col7, dashed},
+  curve9/.style={col8, densely dotted},
+  curve10/.style={teal},
+  curve11/.style={lime},
+  curve12/.style={orange},
+}
+
+\begin{document}
+"""
         ]
         + txt
         + [
-            "",
-            r"\end{document}",
+            r"""
+\end{document}
+"""
         ]
     )
 
@@ -40,18 +69,19 @@ def wrap_standalone(txt):
 def wrap_pgfplots(txt):
     return (
         [
-            r"\begin{tikzpicture}",
-            r"\begin{groupplot}[",
-            r"  group style={group name=plots},",
-            "]",
+            r"""\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group name=plots,},
+  xlabel=Output size  (\(\sum_{i = 0}^d |diagram_i(f)|\)),
+]"""
         ]
         + txt
         + [
-            r"\end{groupplot}",
-            r"\node at (plots c2r1.east)"
-            + r"[inner sep=0pt, xshift=15ex] {\ref{grouplegend}};",
-            r"\end{tikzpicture}",
-            "",
+            r"""
+\end{groupplot}
+\node at (plots c2r1.east)[inner sep=0pt, xshift=15ex] {\pgfplotslegendfromname{grouplegend}};
+\end{tikzpicture}
+"""
         ]
     )
 
@@ -132,8 +162,10 @@ def transpose_data(data, dim):
 
 def generate_plot(data, backends, dim):
     plot = [
-        r"\nextgroupplot[legend to name=grouplegend, legend columns=1, "
-        + r"legend style={font=\scriptsize}, ymode=log]"
+        r"""\nextgroupplot[
+  legend to name=grouplegend, ymode=log,
+  ylabel=Computation speed (voxels/second),
+]"""
     ]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim)
