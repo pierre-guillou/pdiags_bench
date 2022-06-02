@@ -150,7 +150,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 92.778,
+                "mem": 699,
+                "#Min-saddle": 1651,
+                "#Saddle-saddle": 10388,
+                "#Saddle-max": 13646,
+                "#Total pairs": 25685
+            }
         },
         "Gudhi": {
             "para": {
@@ -397,7 +405,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 478.206,
+                "mem": 1596,
+                "#Min-saddle": 252233,
+                "#Saddle-saddle": 406813,
+                "#Saddle-max": 103413,
+                "#Total pairs": 762459
+            }
         },
         "Gudhi": {
             "para": {
@@ -633,7 +649,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 128.767,
+                "mem": 882,
+                "#Min-saddle": 26579,
+                "#Saddle-saddle": 64790,
+                "#Saddle-max": 27943,
+                "#Total pairs": 119312
+            }
         },
         "Gudhi": {
             "para": {
@@ -880,7 +904,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 163.581,
+                "mem": 609,
+                "#Min-saddle": 6472,
+                "#Saddle-saddle": 17245,
+                "#Saddle-max": 5296,
+                "#Total pairs": 29013
+            }
         },
         "Gudhi": {
             "para": {
@@ -1127,7 +1159,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 479.34,
+                "mem": 2170,
+                "#Min-saddle": 535641,
+                "#Saddle-saddle": 659401,
+                "#Saddle-max": 127330,
+                "#Total pairs": 1322372
+            }
         },
         "Gudhi": {
             "para": {
@@ -1374,7 +1414,7 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "timeout": 900
         },
         "Gudhi": {
             "para": {
@@ -1621,7 +1661,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 62.534,
+                "mem": 552,
+                "#Min-saddle": 2697,
+                "#Saddle-saddle": 7939,
+                "#Saddle-max": 1852,
+                "#Total pairs": 12488
+            }
         },
         "Gudhi": {
             "para": {
@@ -1868,7 +1916,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 36.779,
+                "mem": 636,
+                "#Min-saddle": 1,
+                "#Saddle-saddle": 0,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
         },
         "Gudhi": {
             "para": {
@@ -2123,7 +2179,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 145.528,
+                "mem": 837,
+                "#Min-saddle": 103192,
+                "#Saddle-saddle": 168308,
+                "#Saddle-max": 46972,
+                "#Total pairs": 318472
+            }
         },
         "Gudhi": {
             "para": {
@@ -2370,7 +2434,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 220.816,
+                "mem": 1275,
+                "#Min-saddle": 111555,
+                "#Saddle-saddle": 178104,
+                "#Saddle-max": 55555,
+                "#Total pairs": 345214
+            }
         },
         "Gudhi": {
             "para": {
@@ -2617,7 +2689,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 37.027,
+                "mem": 612,
+                "#Min-saddle": 119,
+                "#Saddle-saddle": 240,
+                "#Saddle-max": 65,
+                "#Total pairs": 424
+            }
         },
         "Gudhi": {
             "para": {
@@ -2855,7 +2935,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 43.956,
+                "mem": 585,
+                "#Min-saddle": 1776,
+                "#Saddle-saddle": 2518,
+                "#Saddle-max": 345,
+                "#Total pairs": 4639
+            }
         },
         "Gudhi": {
             "para": {
@@ -3102,7 +3190,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 816.58,
+                "mem": 2940,
+                "#Min-saddle": 736239,
+                "#Saddle-saddle": 949065,
+                "#Saddle-max": 178156,
+                "#Total pairs": 1863460
+            }
         },
         "Gudhi": {
             "para": {
@@ -3349,7 +3445,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 529.394,
+                "mem": 892,
+                "#Min-saddle": 54398,
+                "#Saddle-saddle": 100785,
+                "#Saddle-max": 32768,
+                "#Total pairs": 187951
+            }
         },
         "Gudhi": {
             "para": {
@@ -3596,7 +3700,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 633.056,
+                "mem": 2847,
+                "#Min-saddle": 786153,
+                "#Saddle-saddle": 941569,
+                "#Saddle-max": 162067,
+                "#Total pairs": 1889789
+            }
         },
         "Gudhi": {
             "para": {
@@ -3843,7 +3955,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 712.841,
+                "mem": 3114,
+                "#Min-saddle": 856475,
+                "#Saddle-saddle": 1039560,
+                "#Saddle-max": 192597,
+                "#Total pairs": 2088632
+            }
         },
         "Gudhi": {
             "para": {
@@ -4071,7 +4191,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 21.097,
+                "mem": 206,
+                "#Min-saddle": 389,
+                "#Saddle-saddle": 327,
+                "#Saddle-max": 28,
+                "#Total pairs": 744
+            }
         },
         "Gudhi": {
             "para": {
@@ -4318,7 +4446,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 392.571,
+                "mem": 1924,
+                "#Min-saddle": 414942,
+                "#Saddle-saddle": 565283,
+                "#Saddle-max": 117555,
+                "#Total pairs": 1097780
+            }
         },
         "Gudhi": {
             "para": {
@@ -4565,7 +4701,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 537.95,
+                "mem": 2255,
+                "#Min-saddle": 471836,
+                "#Saddle-saddle": 708678,
+                "#Saddle-max": 173139,
+                "#Total pairs": 1353653
+            }
         },
         "Gudhi": {
             "para": {
@@ -4812,7 +4956,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 34.111,
+                "mem": 357,
+                "#Min-saddle": 910,
+                "#Saddle-saddle": 1338,
+                "#Saddle-max": 268,
+                "#Total pairs": 2516
+            }
         },
         "Gudhi": {
             "para": {
@@ -5059,7 +5211,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 301.368,
+                "mem": 1466,
+                "#Min-saddle": 222905,
+                "#Saddle-saddle": 363398,
+                "#Saddle-max": 102644,
+                "#Total pairs": 688947
+            }
         },
         "Gudhi": {
             "para": {
@@ -5306,7 +5466,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 38.091,
+                "mem": 476,
+                "#Min-saddle": 150,
+                "#Saddle-saddle": 287,
+                "#Saddle-max": 145,
+                "#Total pairs": 582
+            }
         },
         "Gudhi": {
             "para": {
@@ -5553,7 +5721,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 561.662,
+                "mem": 2041,
+                "#Min-saddle": 413170,
+                "#Saddle-saddle": 595339,
+                "#Saddle-max": 133593,
+                "#Total pairs": 1142102
+            }
         },
         "Gudhi": {
             "para": {
@@ -5800,7 +5976,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 748.814,
+                "mem": 2442,
+                "#Min-saddle": 523468,
+                "#Saddle-saddle": 688778,
+                "#Saddle-max": 148764,
+                "#Total pairs": 1361010
+            }
         },
         "Gudhi": {
             "para": {
@@ -6028,7 +6212,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 551.482,
+                "mem": 2447,
+                "#Min-saddle": 580462,
+                "#Saddle-saddle": 722041,
+                "#Saddle-max": 135044,
+                "#Total pairs": 1437547
+            }
         },
         "Gudhi": {
             "para": {
@@ -6267,7 +6459,7 @@
             "timeout": 900
         },
         "Diamorse": {
-            "error": "abort"
+            "timeout": 900
         },
         "Gudhi": {
             "para": {
@@ -6522,7 +6714,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 36.672,
+                "mem": 411,
+                "#Min-saddle": 141,
+                "#Saddle-saddle": 229,
+                "#Saddle-max": 103,
+                "#Total pairs": 473
+            }
         },
         "Gudhi": {
             "para": {
@@ -6769,7 +6969,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 30.227,
+                "mem": 385,
+                "#Min-saddle": 189,
+                "#Saddle-saddle": 479,
+                "#Saddle-max": 114,
+                "#Total pairs": 782
+            }
         },
         "Gudhi": {
             "para": {
@@ -7016,7 +7224,7 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "timeout": 900
         },
         "Gudhi": {
             "para": {
@@ -7263,7 +7471,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 70.47,
+                "mem": 606,
+                "#Min-saddle": 20040,
+                "#Saddle-saddle": 27093,
+                "#Saddle-max": 6060,
+                "#Total pairs": 53193
+            }
         },
         "Gudhi": {
             "para": {
@@ -7510,7 +7726,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 161.555,
+                "mem": 876,
+                "#Min-saddle": 39492,
+                "#Saddle-saddle": 118198,
+                "#Saddle-max": 49262,
+                "#Total pairs": 206952
+            }
         },
         "Gudhi": {
             "para": {
@@ -7757,7 +7981,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 242.133,
+                "mem": 1180,
+                "#Min-saddle": 229743,
+                "#Saddle-saddle": 305574,
+                "#Saddle-max": 65425,
+                "#Total pairs": 600742
+            }
         },
         "Gudhi": {
             "para": {
@@ -7985,7 +8217,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 125.211,
+                "mem": 725,
+                "#Min-saddle": 135951,
+                "#Saddle-saddle": 171480,
+                "#Saddle-max": 6122,
+                "#Total pairs": 313553
+            }
         },
         "Gudhi": {
             "para": {
@@ -8232,7 +8472,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 190.208,
+                "mem": 803,
+                "#Min-saddle": 92785,
+                "#Saddle-saddle": 171744,
+                "#Saddle-max": 49438,
+                "#Total pairs": 313967
+            }
         },
         "Gudhi": {
             "para": {
@@ -8479,7 +8727,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 375.288,
+                "mem": 1767,
+                "#Min-saddle": 335340,
+                "#Saddle-saddle": 501783,
+                "#Saddle-max": 117803,
+                "#Total pairs": 954926
+            }
         },
         "Gudhi": {
             "para": {
@@ -8726,7 +8982,15 @@
             }
         },
         "Diamorse": {
-            "error": "abort"
+            "seq": {
+                "prec": 0.0,
+                "pers": 210.991,
+                "mem": 842,
+                "#Min-saddle": 83167,
+                "#Saddle-saddle": 94351,
+                "#Saddle-max": 17274,
+                "#Total pairs": 194792
+            }
         },
         "Gudhi": {
             "para": {
