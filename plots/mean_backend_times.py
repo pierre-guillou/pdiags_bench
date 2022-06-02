@@ -59,6 +59,21 @@ def main():
         print("  parallel speedup:", speedup)
         print("  parallel efficiency (16 threads):", speedup / 16)
 
+    for i in range(3):
+        print(f"{i + 1}D:")
+        speedups = []
+        for ds, perf in data[i].items():
+            if "impl" in ds:
+                continue
+            for bk, res in perf.items():
+                if bk != "DiscreteMorseSandwich":
+                    continue
+                val = res["seq"]["pers"] / res["para"]["pers"]
+                speedups.append(val)
+                # print(ds, bk, val)
+        print("  parallel speedup:", sum(speedups) / len(speedups))
+        print("  parallel efficiency (16 threads):", speedup / 16)
+
     # with open("mean_res.json", "w") as dst:
     #     json.dump(res, dst, indent=4)
 
