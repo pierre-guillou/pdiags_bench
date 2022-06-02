@@ -35,8 +35,6 @@ def main():
         found = replace_inf(diag)
         if found:
             print(f"Post-processed {diag}")
-        else:
-            print(f"Skipped {diag}")
 
 
 if __name__ == "__main__":
