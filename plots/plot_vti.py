@@ -1,104 +1,6 @@
 import json
-import subprocess
-import sys
 
-
-def wrap_standalone(txt):
-    return (
-        [
-            r"""\documentclass{standalone}
-
-\usepackage{lmodern}
-\usepackage{hyperref}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\usepgfplotslibrary{groupplots}
-
-\pgfplotsset{
-  every axis/.append style={
-    no markers,
-    grid=major,
-    grid style={dashed},
-    legend style={font=\scriptsize},
-    ylabel style={font=\scriptsize},
-    xlabel style={font=\scriptsize},
-  },
-  every axis plot/.append style={line width=1.2pt, line join=round},
-  every axis legend/.append style={legend columns=1},
-  group/group size=3 by 1,
-  every x tick label/.append style={alias=XTick,inner xsep=0pt},
-  every x tick scale label/.style={at=(XTick.base east),anchor=base west}
-}
-
-\definecolor{col1}{RGB}{53, 110, 175}
-\definecolor{col2}{RGB}{204, 42, 42}
-\definecolor{col3}{RGB}{255, 175, 35}
-\definecolor{col4}{RGB}{79, 162, 46}
-\definecolor{col5}{RGB}{97, 97, 97}
-\definecolor{col6}{RGB}{103, 63, 153}
-\definecolor{col7}{RGB}{0, 0, 0}
-\definecolor{col8}{RGB}{123, 63, 0}
-
-\tikzset{
-  curve1/.style={col1},
-  curve2/.style={col2},
-  curve3/.style={col4},
-  curve4/.style={col3},
-  curve5/.style={col6},
-  curve6/.style={cyan},
-  curve7/.style={col5, dashdotted},
-  curve8/.style={col7, dashed},
-  curve9/.style={col8, densely dotted},
-  curve10/.style={teal},
-  curve11/.style={lime},
-  curve12/.style={orange},
-}
-
-\begin{document}
-"""
-        ]
-        + txt
-        + [
-            r"""
-\end{document}
-"""
-        ]
-    )
-
-
-def wrap_pgfplots(txt):
-    return (
-        [
-            r"""\begin{tikzpicture}
-\begin{groupplot}[
-  group style={group name=plots,},
-  xlabel=Output size  (\(\sum_{i = 0}^d |diagram_i(f)|\)),
-]"""
-        ]
-        + txt
-        + [
-            r"""
-\end{groupplot}
-\node at (plots c2r1.east)[inner sep=0pt, xshift=8ex] {\pgfplotslegendfromname{grouplegend}};
-\end{tikzpicture}
-"""
-        ]
-    )
-
-
-def output_tex_file(lines, fname="dest", toFile=False, standalone=False, gen_pdf=False):
-    lines = wrap_pgfplots(lines)
-    if standalone:
-        lines = wrap_standalone(lines)
-    txt = "\n".join(lines)
-    if toFile:
-        with open(f"{fname}.tex", "w") as dst:
-            dst.write(txt)
-    else:
-        sys.stdout.writelines(txt)
-
-    if standalone and toFile and gen_pdf:
-        subprocess.check_call(["tectonic", f"{fname}.tex"])
+import plots_utils
 
 
 def load_data():
@@ -109,7 +11,7 @@ def load_data():
     return data
 
 
-def compute_n_simplices(dim):
+def compute_n_voxels(dim):
     return [
         1048575,  # number of 1D edges
         16769025,  # number of 2D pixels
@@ -117,25 +19,11 @@ def compute_n_simplices(dim):
     ][dim]
 
 
-def sort_datasets_by_n_pairs(data):
-    n_pairs = {}
-
-    # sum of number of DiscreteMorseSandwich pairs
-    for ds, res in data.items():
-        dsname = "_".join(ds.split("_")[:-3])
-        for backend, perfs in res.items():
-            if "DiscreteMorseSandwich" not in backend:
-                continue
-            n_pairs[dsname] = perfs["seq"].get("#Total pairs", 0)
-
-    return dict(sorted(n_pairs.items(), key=lambda item: item[1]))
-
-
 def transpose_data(data, dim):
     # exec times per dataset per backend
     backend_ds_res = {}
 
-    n_simplices = compute_n_simplices(dim)
+    n_simplices = compute_n_voxels(dim)
 
     for ds, res in data.items():
         dsname = "_".join(ds.split("_")[:-3])
@@ -162,9 +50,9 @@ def transpose_data(data, dim):
 
 def generate_dat(data, dim, pref_mode="para"):
 
-    n_pairs_sorted = sort_datasets_by_n_pairs(data)
+    n_pairs_sorted = plots_utils.sort_datasets_by_n_pairs(data)
     unpref_mode = "seq" if pref_mode == "para" else "para"
-    n_simplices = compute_n_simplices(dim)
+    n_simplices = compute_n_voxels(dim)
 
     backends = list(
         filter(
@@ -205,7 +93,7 @@ def generate_plot(data, backends, dim):
         r"\nextgroupplot[legend to name=grouplegend, ymode=log, "
         + ("ylabel=Computation speed (voxels/second),]" if dim == 1 else "]")
     ]
-    n_pairs_sorted = sort_datasets_by_n_pairs(data)
+    n_pairs_sorted = plots_utils.sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim)
 
     for backend, legend in backends.items():
@@ -264,7 +152,10 @@ def main():
             generate_plot({k: v for k, v in data[i].items() if cpx in k}, backends, i)
         )
 
-    output_tex_file(res, f"plot_{cpx}", True, True, True)
+    legend_pos = r"""\node at (plots c2r1.east)[inner sep=0pt, xshift=8ex]
+{\pgfplotslegendfromname{grouplegend}};"""
+
+    plots_utils.output_tex_file(res, f"plot_{cpx}", True, True, "", legend_pos)
 
 
 if __name__ == "__main__":
