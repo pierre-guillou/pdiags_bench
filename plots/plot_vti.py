@@ -11,6 +11,11 @@ def wrap_standalone(txt):
             r"\usepackage{tikz}",
             r"\usepackage{pgfplots}",
             r"\usepgfplotslibrary{groupplots}",
+            r"""\pgfplotsset{
+  every axis plot/.append style={line width=1pt},
+  legend style={font=\scriptsize},
+  group/group size=3 by 1,
+}""",
             "",
             r"\definecolor{col1}{RGB}{53, 110, 175}",
             r"\definecolor{col2}{RGB}{204, 42, 42}",
@@ -37,15 +42,14 @@ def wrap_pgfplots(txt):
         [
             r"\begin{tikzpicture}",
             r"\begin{groupplot}[",
-            r"  width=.5\linewidth,",
-            r"  group style={group size=4 by 1,group name=plots},",
+            r"  group style={group name=plots},",
             "]",
         ]
         + txt
         + [
             r"\end{groupplot}",
-            r"\node at (plots c2r1.south west)"
-            + r"[inner sep=0pt, yshift=-12ex] {\ref{grouplegend}};",
+            r"\node at (plots c2r1.east)"
+            + r"[inner sep=0pt, xshift=15ex] {\ref{grouplegend}};",
             r"\end{tikzpicture}",
             "",
         ]
@@ -128,9 +132,8 @@ def transpose_data(data, dim):
 
 def generate_plot(data, backends, dim):
     plot = [
-        r"\nextgroupplot[legend to name=grouplegend, legend columns=4, title="
-        + str(dim + 1)
-        + "D datasets, ymode=log]"
+        r"\nextgroupplot[legend to name=grouplegend, legend columns=1, "
+        + r"legend style={font=\scriptsize}, ymode=log]"
     ]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim)
@@ -169,20 +172,19 @@ def sort_backends(data, cpx="expl"):
                     continue
                 backends[backend] = None
     legend = [
-        "col1, mark=*",
-        "col2, mark=square*",
-        "col4, mark=x",
-        "col3, mark=o",
-        "col5, mark=triangle*",
-        "col6, mark=diamond*",
-        "col7, mark=star",
-        "col8, mark=oplus*",
-        "red, mark=pentagon*",
-        "cyan, mark=asterisk",
-        "teal, mark=pentagon",
-        "lime, mark=star*",
-        "orange, mark=triangle",
-        "mark=o",
+        "col1",
+        "col4",
+        "col3",
+        "col5, dashdotted",
+        "col6, densely dashdotdotted",
+        "col7, dashed",
+        "col8, densely dotted",
+        "red",
+        "cyan",
+        "teal",
+        "lime",
+        "orange",
+        "black",
     ]
     return dict(zip(backends.keys(), legend))
 
