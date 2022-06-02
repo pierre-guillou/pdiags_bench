@@ -63,12 +63,10 @@ def main():
             dms_val = bk["DiscreteMorseSandwich"]["para"]["pers"]
             if "para" in bk["PairCells"]:
                 pc_val = bk["PairCells"]["para"]["pers"]
-            else:
-                pc_val = bk["PairCells"]["timeout"]
-            mean_pc_speedup[dim][ds] = pc_val / dms_val
+                mean_pc_speedup[dim][ds] = pc_val / dms_val
 
     for i, dim_res in enumerate(mean_pc_speedup):
-        print(f"{i + 1}D:")
+        print(f"{i + 1}D: ({len(dim_res)} datasets without PairCells timeout)")
         mean = sum(dim_res.values()) / len(dim_res.values())
         print(f"  Mean DiscreteMorseSandwich speedup over PairCells: {mean}")
 
