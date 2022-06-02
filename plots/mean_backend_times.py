@@ -46,10 +46,21 @@ def main():
                 for val in perf.values():
                     mean += val
                 mean /= len(perf)
+                if bk == "DiscreteMorseSandwich":
+                    print(mean, perf)
                 res[mode][dim][bk] = mean
 
-    with open("mean_res.json", "w") as dst:
-        json.dump(res, dst, indent=4)
+    for i in range(3):
+        print(f"{i + 1}D:")
+        key = "DiscreteMorseSandwich"
+        for mode in ["seq", "para"]:
+            print(f"  {key} mean time in {mode}:", res[mode][i][key], "s")
+        speedup = res["seq"][i][key] / res["para"][i][key]
+        print("  parallel speedup:", speedup)
+        print("  parallel efficiency (16 threads):", speedup / 16)
+
+    # with open("mean_res.json", "w") as dst:
+    #     json.dump(res, dst, indent=4)
 
 
 if __name__ == "__main__":
