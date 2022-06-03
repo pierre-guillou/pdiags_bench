@@ -174,7 +174,7 @@ def main():
                     "git",
                     "apply",
                     "../../patches/PersistenceCycles_0001-Fix-Wreturn-type.patch",
-                    "../../patches/PersistenceCycles_0002-Make-Persistent-Diagram-VTU-compatible-with-TTK.patch",
+                    "../../patches/PersistenceCycles_0003-Output-Diagram-in-Gudhi-format.patch",
                 ],
                 cwd=soft_src,
                 check=True,

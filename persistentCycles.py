@@ -1,6 +1,7 @@
 import argparse
 import multiprocessing
 import os
+import shutil
 import subprocess
 import sys
 import sysconfig
@@ -17,7 +18,8 @@ def main(input_dataset, output_diagram):
         ds = simple.XMLImageDataReader(FileName=[input_dataset])
     pd = simple.TTKFG_PersistentHomology(Input=ds)
     pd.ScalarField = "ImageFile_Order"
-    simple.SaveData(output_diagram, proxy=simple.OutputPort(pd, 1))
+    simple.UpdatePipeline()
+    shutil.move("/tmp/out.gudhi", output_diagram)
 
 
 def set_env_and_run(thread_number):
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("input_dataset", type=str, help="Input dataset")
     parser.add_argument(
-        "-o", "--output_diagram", type=str, help="Output diagram", default="out.vtu"
+        "-o", "--output_diagram", type=str, help="Output diagram", default="out.gudhi"
     )
     parser.add_argument(
         "-t",

@@ -674,7 +674,7 @@ def compute_phat(fname, times, backend, num_threads=1):
 @parallel_decorator
 def compute_persistenceCycles(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
-    outp = f"diagrams/{dataset}_{backend.value}.vtu"
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     cmd = [
         sys.executable,
         "persistentCycles.py",

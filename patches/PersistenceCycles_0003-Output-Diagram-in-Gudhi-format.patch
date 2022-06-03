@@ -1,0 +1,23 @@
+diff --git i/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp w/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp
+index b7b0b21..d939e54 100644
+--- i/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp
++++ w/ttk-0.9.7/core/vtk/ttkFG_PersistentHomology/ttkFG_PersistentHomology.cpp
+@@ -169,6 +169,18 @@ void ttkFG_PersistentHomology::outPersistencePairs(vtkDataArray *inputScalarFiel
+         filtrationPD->InsertNextTuple1(criticalPointsFunctionValue[i+1]-criticalPointsFunctionValue[i]);
+     }
+ 
++    std::ofstream out("/tmp/out.gudhi");
++    out << "0 0 "<< static_cast<int>(inputScalarField->GetRange()[1]) <<'\n';
++    for (size_t i = 0; i < criticalPointsCellDimension.size(); i += 2) {
++      if (criticalPointsFunctionValue[i + 1] ==
++          criticalPointsFunctionValue[i]) {
++        continue;
++      }
++      out << static_cast<int>(criticalPointsCellDimension[i]) << " "
++          << static_cast<int>(criticalPointsFunctionValue[i]) << " "
++          << static_cast<int>(criticalPointsFunctionValue[i + 1]) << '\n';
++    }
++
+     pointsPD->InsertNextPoint((float)minFunctionValue,(float)minFunctionValue,0);
+     pairType->InsertNextTuple1(-1);
+     filtrationPD->InsertNextTuple1(maxFunctValue+1);
