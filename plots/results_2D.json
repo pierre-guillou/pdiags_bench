@@ -33,6 +33,15 @@
                 "#Min-saddle": 470,
                 "#Saddle-max": 613,
                 "#Total pairs": 1083
+            },
+            "seq": {
+                "prec": 278.335,
+                "pers": 6.3,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
             }
         },
         "Gudhi": {
@@ -299,6 +308,15 @@
                 "#Min-saddle": 38854,
                 "#Saddle-max": 41192,
                 "#Total pairs": 80046
+            },
+            "seq": {
+                "prec": 282.246,
+                "pers": 12.8,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 38854,
+                "#Saddle-max": 41192,
+                "#Total pairs": 80046
             }
         },
         "Gudhi": {
@@ -537,6 +555,15 @@
                 "prec": 294.179,
                 "pers": 5.0,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 3527,
+                "#Saddle-max": 4640,
+                "#Total pairs": 8167
+            },
+            "seq": {
+                "prec": 279.455,
+                "pers": 11.6,
+                "mem": 10398,
                 "#threads": 16,
                 "#Min-saddle": 3527,
                 "#Saddle-max": 4640,
@@ -807,6 +834,15 @@
                 "#Min-saddle": 5575,
                 "#Saddle-max": 6261,
                 "#Total pairs": 11836
+            },
+            "seq": {
+                "prec": 288.251,
+                "pers": 10.6,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 5575,
+                "#Saddle-max": 6261,
+                "#Total pairs": 11836
             }
         },
         "Gudhi": {
@@ -1045,6 +1081,15 @@
                 "prec": 291.183,
                 "pers": 5.7,
                 "mem": 10396,
+                "#threads": 16,
+                "#Min-saddle": 65493,
+                "#Saddle-max": 64461,
+                "#Total pairs": 129954
+            },
+            "seq": {
+                "prec": 290.412,
+                "pers": 14.5,
+                "mem": 10401,
                 "#threads": 16,
                 "#Min-saddle": 65493,
                 "#Saddle-max": 64461,
@@ -1292,6 +1337,15 @@
                 "prec": 289.905,
                 "pers": 8.3,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 99366,
+                "#Saddle-max": 97877,
+                "#Total pairs": 197243
+            },
+            "seq": {
+                "prec": 281.623,
+                "pers": 14.0,
+                "mem": 10400,
                 "#threads": 16,
                 "#Min-saddle": 99366,
                 "#Saddle-max": 97877,
@@ -1562,6 +1616,15 @@
                 "#Min-saddle": 1027,
                 "#Saddle-max": 1180,
                 "#Total pairs": 2207
+            },
+            "seq": {
+                "prec": 281.057,
+                "pers": 7.8,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 1027,
+                "#Saddle-max": 1180,
+                "#Total pairs": 2207
             }
         },
         "Gudhi": {
@@ -1817,6 +1880,15 @@
                 "prec": 284.663,
                 "pers": 3.7,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            },
+            "seq": {
+                "prec": 274.71,
+                "pers": 6.0,
+                "mem": 10399,
                 "#threads": 16,
                 "#Min-saddle": 1,
                 "#Saddle-max": 0,
@@ -2079,6 +2151,15 @@
                 "#Min-saddle": 25357,
                 "#Saddle-max": 24208,
                 "#Total pairs": 49565
+            },
+            "seq": {
+                "prec": 283.829,
+                "pers": 10.0,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 25357,
+                "#Saddle-max": 24208,
+                "#Total pairs": 49565
             }
         },
         "Gudhi": {
@@ -2326,6 +2407,15 @@
                 "prec": 283.339,
                 "pers": 6.3,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 14383,
+                "#Saddle-max": 13761,
+                "#Total pairs": 28144
+            },
+            "seq": {
+                "prec": 278.614,
+                "pers": 8.8,
+                "mem": 10403,
                 "#threads": 16,
                 "#Min-saddle": 14383,
                 "#Saddle-max": 13761,
@@ -2596,6 +2686,15 @@
                 "#Min-saddle": 151,
                 "#Saddle-max": 151,
                 "#Total pairs": 302
+            },
+            "seq": {
+                "prec": 277.144,
+                "pers": 6.6,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
             }
         },
         "Gudhi": {
@@ -2858,6 +2957,15 @@
                 "prec": 288.044,
                 "pers": 5.6,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            },
+            "seq": {
+                "prec": 282.623,
+                "pers": 7.7,
+                "mem": 10400,
                 "#threads": 16,
                 "#Min-saddle": 181,
                 "#Saddle-max": 119,
@@ -3128,6 +3236,15 @@
                 "#Min-saddle": 55928,
                 "#Saddle-max": 55954,
                 "#Total pairs": 111882
+            },
+            "seq": {
+                "prec": 287.457,
+                "pers": 13.9,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 55928,
+                "#Saddle-max": 55954,
+                "#Total pairs": 111882
             }
         },
         "Gudhi": {
@@ -3359,6 +3476,15 @@
                 "prec": 298.597,
                 "pers": 8.3,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 34144,
+                "#Saddle-max": 34538,
+                "#Total pairs": 68682
+            },
+            "seq": {
+                "prec": 287.589,
+                "pers": 12.0,
+                "mem": 10403,
                 "#threads": 16,
                 "#Min-saddle": 34144,
                 "#Saddle-max": 34538,
@@ -3601,6 +3727,15 @@
                 "prec": 289.382,
                 "pers": 7.2,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 42300,
+                "#Saddle-max": 40021,
+                "#Total pairs": 82321
+            },
+            "seq": {
+                "prec": 284.276,
+                "pers": 12.7,
+                "mem": 10399,
                 "#threads": 16,
                 "#Min-saddle": 42300,
                 "#Saddle-max": 40021,
@@ -3871,6 +4006,15 @@
                 "#Min-saddle": 207893,
                 "#Saddle-max": 200684,
                 "#Total pairs": 408577
+            },
+            "seq": {
+                "prec": 283.554,
+                "pers": 15.2,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 207893,
+                "#Saddle-max": 200684,
+                "#Total pairs": 408577
             }
         },
         "Gudhi": {
@@ -4107,6 +4251,15 @@
                 "prec": 288.308,
                 "pers": 9.8,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 12190,
+                "#Saddle-max": 11247,
+                "#Total pairs": 23437
+            },
+            "seq": {
+                "prec": 286.131,
+                "pers": 11.7,
+                "mem": 10401,
                 "#threads": 16,
                 "#Min-saddle": 12190,
                 "#Saddle-max": 11247,
@@ -4377,6 +4530,15 @@
                 "#Min-saddle": 48090,
                 "#Saddle-max": 45238,
                 "#Total pairs": 93328
+            },
+            "seq": {
+                "prec": 287.418,
+                "pers": 18.4,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 48090,
+                "#Saddle-max": 45238,
+                "#Total pairs": 93328
             }
         },
         "Gudhi": {
@@ -4628,6 +4790,15 @@
                 "#Min-saddle": 92848,
                 "#Saddle-max": 88899,
                 "#Total pairs": 181747
+            },
+            "seq": {
+                "prec": 286.239,
+                "pers": 15.9,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 92848,
+                "#Saddle-max": 88899,
+                "#Total pairs": 181747
             }
         },
         "Gudhi": {
@@ -4866,6 +5037,15 @@
                 "prec": 287.479,
                 "pers": 4.8,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
+            },
+            "seq": {
+                "prec": 285.308,
+                "pers": 7.1,
+                "mem": 10400,
                 "#threads": 16,
                 "#Min-saddle": 180,
                 "#Saddle-max": 212,
@@ -5136,6 +5316,15 @@
                 "#Min-saddle": 505354,
                 "#Saddle-max": 394892,
                 "#Total pairs": 900246
+            },
+            "seq": {
+                "prec": 287.55,
+                "pers": 19.8,
+                "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 505354,
+                "#Saddle-max": 394892,
+                "#Total pairs": 900246
             }
         },
         "Gudhi": {
@@ -5402,6 +5591,15 @@
                 "#Min-saddle": 426,
                 "#Saddle-max": 435,
                 "#Total pairs": 861
+            },
+            "seq": {
+                "prec": 290.783,
+                "pers": 9.9,
+                "mem": 10396,
+                "#threads": 16,
+                "#Min-saddle": 426,
+                "#Saddle-max": 435,
+                "#Total pairs": 861
             }
         },
         "Gudhi": {
@@ -5649,6 +5847,15 @@
                 "prec": 292.295,
                 "pers": 5.5,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 29354,
+                "#Saddle-max": 28938,
+                "#Total pairs": 58292
+            },
+            "seq": {
+                "prec": 282.853,
+                "pers": 11.3,
+                "mem": 10398,
                 "#threads": 16,
                 "#Min-saddle": 29354,
                 "#Saddle-max": 28938,
@@ -5919,6 +6126,15 @@
                 "#Min-saddle": 108172,
                 "#Saddle-max": 87690,
                 "#Total pairs": 195862
+            },
+            "seq": {
+                "prec": 291.506,
+                "pers": 14.6,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 108172,
+                "#Saddle-max": 87690,
+                "#Total pairs": 195862
             }
         },
         "Gudhi": {
@@ -6150,6 +6366,15 @@
                 "prec": 294.068,
                 "pers": 8.0,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 54846,
+                "#Saddle-max": 53727,
+                "#Total pairs": 108573
+            },
+            "seq": {
+                "prec": 281.215,
+                "pers": 12.0,
+                "mem": 10398,
                 "#threads": 16,
                 "#Min-saddle": 54846,
                 "#Saddle-max": 53727,
@@ -6663,6 +6888,15 @@
                 "#Min-saddle": 423,
                 "#Saddle-max": 568,
                 "#Total pairs": 991
+            },
+            "seq": {
+                "prec": 276.736,
+                "pers": 6.8,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
             }
         },
         "Gudhi": {
@@ -6929,6 +7163,15 @@
                 "#Min-saddle": 632,
                 "#Saddle-max": 969,
                 "#Total pairs": 1601
+            },
+            "seq": {
+                "prec": 284.846,
+                "pers": 9.8,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 632,
+                "#Saddle-max": 969,
+                "#Total pairs": 1601
             }
         },
         "Gudhi": {
@@ -7176,6 +7419,15 @@
                 "prec": 304.518,
                 "pers": 7.2,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 26918,
+                "#Saddle-max": 26855,
+                "#Total pairs": 53773
+            },
+            "seq": {
+                "prec": 283.974,
+                "pers": 10.8,
+                "mem": 10399,
                 "#threads": 16,
                 "#Min-saddle": 26918,
                 "#Saddle-max": 26855,
@@ -7435,6 +7687,15 @@
                 "prec": 297.002,
                 "pers": 5.0,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 9055,
+                "#Saddle-max": 8817,
+                "#Total pairs": 17872
+            },
+            "seq": {
+                "prec": 279.742,
+                "pers": 7.0,
+                "mem": 10399,
                 "#threads": 16,
                 "#Min-saddle": 9055,
                 "#Saddle-max": 8817,
@@ -7705,6 +7966,15 @@
                 "#Min-saddle": 11617,
                 "#Saddle-max": 12492,
                 "#Total pairs": 24109
+            },
+            "seq": {
+                "prec": 284.385,
+                "pers": 8.1,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 11617,
+                "#Saddle-max": 12492,
+                "#Total pairs": 24109
             }
         },
         "Gudhi": {
@@ -7971,6 +8241,15 @@
                 "#Min-saddle": 28140,
                 "#Saddle-max": 29514,
                 "#Total pairs": 57654
+            },
+            "seq": {
+                "prec": 281.098,
+                "pers": 9.6,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 28140,
+                "#Saddle-max": 29514,
+                "#Total pairs": 57654
             }
         },
         "Gudhi": {
@@ -8226,6 +8505,15 @@
                 "prec": 290.063,
                 "pers": 7.8,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 8533,
+                "#Saddle-max": 7389,
+                "#Total pairs": 15922
+            },
+            "seq": {
+                "prec": 282.439,
+                "pers": 11.5,
+                "mem": 10398,
                 "#threads": 16,
                 "#Min-saddle": 8533,
                 "#Saddle-max": 7389,
@@ -8739,6 +9027,15 @@
                 "#Min-saddle": 18866,
                 "#Saddle-max": 18435,
                 "#Total pairs": 37301
+            },
+            "seq": {
+                "prec": 281.559,
+                "pers": 12.3,
+                "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 18866,
+                "#Saddle-max": 18435,
+                "#Total pairs": 37301
             }
         },
         "Gudhi": {
@@ -8994,6 +9291,15 @@
                 "prec": 286.812,
                 "pers": 4.6,
                 "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 9324,
+                "#Saddle-max": 9890,
+                "#Total pairs": 19214
+            },
+            "seq": {
+                "prec": 276.716,
+                "pers": 7.8,
+                "mem": 10399,
                 "#threads": 16,
                 "#Min-saddle": 9324,
                 "#Saddle-max": 9890,
