@@ -10,15 +10,24 @@ def main(json0, json1, dry_run=True):
 
     for k in data1.keys():
         # datasets
+        if "impl" in k:
+            continue
         if not k in data0:
             print(f"adding {data1[k]}")
             data0[k] = data1[k]
         else:
             # backends
             for kk in data1[k].keys():
+                if "#Vertices" in kk:
+                    continue
                 if kk not in data0[k] or "error" in data0[k][kk]:
                     print(f"adding {k}: {{{kk}: {data1[k][kk]}}}")
                     data0[k][kk] = data1[k][kk]
+                else:
+                    for kkk in data1[k][kk].keys():
+                        if kkk not in data0[k][kk]:
+                            print(f"adding {k}: {{{kk}: {data1[k][kk][kkk]}}}")
+                            data0[k][kk][kkk] = data1[k][kk][kkk]
 
     if not dry_run:
         with open(json0, "w") as dst:
