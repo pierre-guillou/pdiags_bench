@@ -15,7 +15,7 @@
             "para": {
                 "prec": 16.8,
                 "pers": 29.2,
-                "mem": 1419,
+                "mem": 20278.0,
                 "#threads": 16,
                 "#Min-saddle": 1643,
                 "#Saddle-saddle": 7535,
@@ -271,7 +271,7 @@
             "para": {
                 "prec": 8.8,
                 "pers": 46.3,
-                "mem": 1467,
+                "mem": 20669.0,
                 "#threads": 16,
                 "#Min-saddle": 176850,
                 "#Saddle-saddle": 313747,
@@ -536,7 +536,7 @@
             "para": {
                 "prec": 8.6,
                 "pers": 41.7,
-                "mem": 1439,
+                "mem": 20346.0,
                 "#threads": 16,
                 "#Min-saddle": 21615,
                 "#Saddle-saddle": 55525,
@@ -790,7 +790,7 @@
             "para": {
                 "prec": 7.3,
                 "pers": 45.7,
-                "mem": 1434,
+                "mem": 20454.0,
                 "#threads": 16,
                 "#Min-saddle": 7751,
                 "#Saddle-saddle": 24775,
@@ -1055,7 +1055,7 @@
             "para": {
                 "prec": 8.2,
                 "pers": 48.4,
-                "mem": 1474,
+                "mem": 20793.0,
                 "#threads": 16,
                 "#Min-saddle": 361259,
                 "#Saddle-saddle": 458007,
@@ -1320,7 +1320,7 @@
             "para": {
                 "prec": 8.8,
                 "pers": 54.4,
-                "mem": 1438,
+                "mem": 20702.0,
                 "#threads": 16,
                 "#Min-saddle": 474050,
                 "#Saddle-saddle": 663666,
@@ -1577,7 +1577,7 @@
             "para": {
                 "prec": 7.3,
                 "pers": 42.5,
-                "mem": 1400,
+                "mem": 20270.0,
                 "#threads": 16,
                 "#Min-saddle": 3128,
                 "#Saddle-saddle": 8840,
@@ -1842,7 +1842,7 @@
             "para": {
                 "prec": 7.6,
                 "pers": 41.0,
-                "mem": 1412,
+                "mem": 20663.0,
                 "#threads": 16,
                 "#Min-saddle": 1,
                 "#Saddle-saddle": 0,
@@ -2115,7 +2115,7 @@
             "para": {
                 "prec": 8.3,
                 "pers": 44.8,
-                "mem": 1425,
+                "mem": 20653.0,
                 "#threads": 16,
                 "#Min-saddle": 81207,
                 "#Saddle-saddle": 207287,
@@ -2380,7 +2380,7 @@
             "para": {
                 "prec": 10.3,
                 "pers": 41.3,
-                "mem": 1421,
+                "mem": 20488.0,
                 "#threads": 16,
                 "#Min-saddle": 81576,
                 "#Saddle-saddle": 128196,
@@ -2645,7 +2645,7 @@
             "para": {
                 "prec": 6.3,
                 "pers": 31.6,
-                "mem": 1395,
+                "mem": 20256.0,
                 "#threads": 16,
                 "#Min-saddle": 111,
                 "#Saddle-saddle": 572,
@@ -2920,7 +2920,7 @@
             "para": {
                 "prec": 7.4,
                 "pers": 40.1,
-                "mem": 1445,
+                "mem": 20327.0,
                 "#threads": 16,
                 "#Min-saddle": 2163,
                 "#Saddle-saddle": 5661,
@@ -3166,7 +3166,7 @@
             "para": {
                 "prec": 10.0,
                 "pers": 53.1,
-                "mem": 1476,
+                "mem": 20824.0,
                 "#threads": 16,
                 "#Min-saddle": 497773,
                 "#Saddle-saddle": 575144,
@@ -3431,7 +3431,7 @@
             "para": {
                 "prec": 9.7,
                 "pers": 62.8,
-                "mem": 1420,
+                "mem": 20702.0,
                 "#threads": 16,
                 "#Min-saddle": 44384,
                 "#Saddle-saddle": 458949,
@@ -3696,7 +3696,7 @@
             "para": {
                 "prec": 8.7,
                 "pers": 53.4,
-                "mem": 1435,
+                "mem": 20668.0,
                 "#threads": 16,
                 "#Min-saddle": 538171,
                 "#Saddle-saddle": 606177,
@@ -3961,7 +3961,7 @@
             "para": {
                 "prec": 47.1,
                 "pers": 45.5,
-                "mem": 1439,
+                "mem": 20743.0,
                 "#threads": 16,
                 "#Min-saddle": 582944,
                 "#Saddle-saddle": 680329,
@@ -4226,7 +4226,7 @@
             "para": {
                 "prec": 9.1,
                 "pers": 43.1,
-                "mem": 1395,
+                "mem": 20386.0,
                 "#threads": 16,
                 "#Min-saddle": 385,
                 "#Saddle-saddle": 7413,
@@ -4472,7 +4472,7 @@
             "para": {
                 "prec": 8.3,
                 "pers": 50.0,
-                "mem": 1439,
+                "mem": 20778.0,
                 "#threads": 16,
                 "#Min-saddle": 303295,
                 "#Saddle-saddle": 444979,
@@ -4737,7 +4737,7 @@
             "para": {
                 "prec": 9.8,
                 "pers": 47.9,
-                "mem": 1446,
+                "mem": 20828.0,
                 "#threads": 16,
                 "#Min-saddle": 352681,
                 "#Saddle-saddle": 657051,
@@ -5002,7 +5002,7 @@
             "para": {
                 "prec": 9.2,
                 "pers": 42.1,
-                "mem": 1437,
+                "mem": 20529.0,
                 "#threads": 16,
                 "#Min-saddle": 895,
                 "#Saddle-saddle": 2894,
@@ -5267,7 +5267,7 @@
             "para": {
                 "prec": 8.8,
                 "pers": 49.4,
-                "mem": 1448,
+                "mem": 20629.0,
                 "#threads": 16,
                 "#Min-saddle": 171807,
                 "#Saddle-saddle": 489906,
@@ -5532,7 +5532,7 @@
             "para": {
                 "prec": 8.6,
                 "pers": 55.9,
-                "mem": 1413,
+                "mem": 20614.0,
                 "#threads": 16,
                 "#Min-saddle": 153,
                 "#Saddle-saddle": 697,
@@ -5797,7 +5797,7 @@
             "para": {
                 "prec": 8.6,
                 "pers": 51.9,
-                "mem": 1425,
+                "mem": 20806.0,
                 "#threads": 16,
                 "#Min-saddle": 299800,
                 "#Saddle-saddle": 654025,
@@ -6062,7 +6062,7 @@
             "para": {
                 "prec": 9.4,
                 "pers": 54.6,
-                "mem": 1427,
+                "mem": 20569.0,
                 "#threads": 16,
                 "#Min-saddle": 361868,
                 "#Saddle-saddle": 466740,
@@ -6327,7 +6327,7 @@
             "para": {
                 "prec": 9.9,
                 "pers": 50.1,
-                "mem": 1456,
+                "mem": 20726.0,
                 "#threads": 16,
                 "#Min-saddle": 391185,
                 "#Saddle-saddle": 463091,
@@ -6573,7 +6573,7 @@
             "para": {
                 "prec": 8.8,
                 "pers": 62.3,
-                "mem": 1467,
+                "mem": 21269.0,
                 "#threads": 16,
                 "#Min-saddle": 696294,
                 "#Saddle-saddle": 796112,
@@ -6822,7 +6822,7 @@
             "para": {
                 "prec": 6.1,
                 "pers": 31.0,
-                "mem": 1393,
+                "mem": 20225.0,
                 "#threads": 16,
                 "#Min-saddle": 145,
                 "#Saddle-saddle": 1024,
@@ -7095,7 +7095,7 @@
             "para": {
                 "prec": 8.4,
                 "pers": 58.5,
-                "mem": 1435,
+                "mem": 20869.0,
                 "#threads": 16,
                 "#Min-saddle": 190,
                 "#Saddle-saddle": 496,
@@ -7360,7 +7360,7 @@
             "para": {
                 "prec": 8.4,
                 "pers": 48.1,
-                "mem": 1421,
+                "mem": 20754.0,
                 "#threads": 16,
                 "#Min-saddle": 193777,
                 "#Saddle-saddle": 277309,
@@ -7617,7 +7617,7 @@
             "para": {
                 "prec": 6.4,
                 "pers": 30.1,
-                "mem": 1400,
+                "mem": 20258.0,
                 "#threads": 16,
                 "#Min-saddle": 13903,
                 "#Saddle-saddle": 19831,
@@ -7882,7 +7882,7 @@
             "para": {
                 "prec": 9.4,
                 "pers": 44.1,
-                "mem": 1463,
+                "mem": 20663.0,
                 "#threads": 16,
                 "#Min-saddle": 34361,
                 "#Saddle-saddle": 141558,
@@ -8147,7 +8147,7 @@
             "para": {
                 "prec": 9.5,
                 "pers": 43.7,
-                "mem": 1426,
+                "mem": 20497.0,
                 "#threads": 16,
                 "#Min-saddle": 160583,
                 "#Saddle-saddle": 239080,
@@ -8412,7 +8412,7 @@
             "para": {
                 "prec": 10.1,
                 "pers": 46.3,
-                "mem": 1450,
+                "mem": 20680.0,
                 "#threads": 16,
                 "#Min-saddle": 84894,
                 "#Saddle-saddle": 106660,
@@ -8658,7 +8658,7 @@
             "para": {
                 "prec": 8.9,
                 "pers": 51.9,
-                "mem": 1418,
+                "mem": 20538.0,
                 "#threads": 16,
                 "#Min-saddle": 76463,
                 "#Saddle-saddle": 134418,
@@ -8923,7 +8923,7 @@
             "para": {
                 "prec": 9.7,
                 "pers": 49.1,
-                "mem": 1446,
+                "mem": 20593.0,
                 "#threads": 16,
                 "#Min-saddle": 244787,
                 "#Saddle-saddle": 344148,
@@ -9188,7 +9188,7 @@
             "para": {
                 "prec": 9.7,
                 "pers": 38.0,
-                "mem": 1416,
+                "mem": 20462.0,
                 "#threads": 16,
                 "#Min-saddle": 55077,
                 "#Saddle-saddle": 60527,
