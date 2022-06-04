@@ -53,6 +53,8 @@ def wrap_standalone(txt):
   curve12/.style={orange},
 }
 
+\newcommand{\diagram}{\mathcal{D}}
+
 \begin{document}
 """
         ]
@@ -71,7 +73,7 @@ def wrap_pgfplots(txt, extra_group_opts="", legend_pos=""):
         rf"""\begin{{tikzpicture}}
 \begin{{groupplot}}[
   group style={{group name=plots,}}, {extra_group_opts},
-  xlabel=Output size  (\(\sum_{{i = 0}}^d |diagram_i(f)|\)),]
+  xlabel=Output size  (\(\sum_{{i = 0}}^d |\diagram_i(f)|\)),]
 
 {txt}
 
