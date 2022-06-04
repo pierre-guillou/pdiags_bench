@@ -224,6 +224,16 @@ def main():
             # build & install TTK in ParaView install prefix
             subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
         else:
+            if soft == "dipha":
+                subprocess.run(
+                    [
+                        "git",
+                        "apply",
+                        "../../patches/Dipha_0001-Print-sum-of-ranks-memory-peaks.patch",
+                    ],
+                    cwd=soft_src,
+                    check=True,
+                )
             create_dir(builddir)
             subprocess.check_call(
                 ["cmake", "-S", soft_src, "-B", builddir, "-DCMAKE_BUILD_TYPE=Release"]

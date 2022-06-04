@@ -1,0 +1,30 @@
+From bea05ae930c5f4ffc9c790bd9c7480db7905c4a8 Mon Sep 17 00:00:00 2001
+From: Pierre Guillou <pierre.guillou@lip6.fr>
+Date: Sat, 4 Jun 2022 10:46:14 +0200
+Subject: [PATCH] Print sum of ranks memory peaks
+
+---
+ src/dipha.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/dipha.cpp b/src/dipha.cpp
+index 1a7acc9..4193582 100644
+--- a/src/dipha.cpp
++++ b/src/dipha.cpp
+@@ -155,10 +155,13 @@ int main(int argc, char** argv)
+                                      << std::endl;
+ 
+     dipha::mpi_utils::cout_if_root() << std::endl << "Individual peak mem in GB of per rank: " << std::endl;
++    int64_t glob_peak_mem{};
+     for (int64_t peak_mem : peak_mem_per_rank)
+     {
+       dipha::mpi_utils::cout_if_root() << (double)peak_mem / 1024.0 << std::endl;
++      glob_peak_mem += peak_mem;
+     }
++    dipha::mpi_utils::cout_if_root() << std::endl << "Global peak mem (MB): " << glob_peak_mem << std::endl;
+ 
+     std::vector< int64_t > bytes_received_per_rank(dipha::mpi_utils::get_num_processes());
+     MPI_Gather(&dipha::globals::bytes_received, 1, MPI_LONG_LONG, bytes_received_per_rank.data(), 1, MPI_LONG_LONG, 0, MPI_COMM_WORLD);
+-- 
+2.36.1
+
