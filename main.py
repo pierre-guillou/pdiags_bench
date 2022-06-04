@@ -423,12 +423,19 @@ def compute_dipha(fname, times, backend):
         pers = round(run_time - prec, 3)
         return prec, pers
 
+
+    def dipha_mem_peak(dipha_output):
+        mem_pat = r"^Global peak mem \(MB\): (\d+.\d+|\d+)$"
+        mem_peak = re.search(mem_pat, dipha_output, re.MULTILINE).group(1)
+        mem_peak = float(mem_peak)
+        return mem_peak
+
     prec, pers = dipha_compute_time(out)
-    elapsed, mem = get_time_mem(err)
+    elapsed, _ = get_time_mem(err)
     res = {
         "prec": prec,
         "pers": pers,
-        "mem": mem,
+        "mem": dipha_mem_peak(out),
         "#threads": num_threads,
     }
     res.update(get_pairs_number(outp))
