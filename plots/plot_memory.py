@@ -54,7 +54,7 @@ def transpose_data(data, dim, mode="seq"):
                 continue
 
             if mode in perfs:
-                val = n_simplices / perfs[mode]["mem"]
+                val = n_simplices / perfs[mode]["mem"] / 10e6
             else:
                 val = 0
             backend_ds_res.setdefault(backend, {}).update({dsname: val})
@@ -67,7 +67,7 @@ def generate_plot(data, backends, dim, mode="seq"):
         "",
         "",
         r"\nextgroupplot[legend to name=grouplegend, ymode=log, "
-        + ("ylabel=Memory Peak (simplices / MB),]" if dim == 0 else "]"),
+        + ("ylabel=Memory Peak (simplices / B),]" if dim == 0 else "]"),
     ]
     n_pairs_sorted = sort_datasets_by_n_pairs(data)
     backend_ds_res = transpose_data(data, dim, mode)
