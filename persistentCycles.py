@@ -22,9 +22,8 @@ def main(input_dataset, output_diagram):
     shutil.move("/tmp/out.gudhi", output_diagram)
 
 
-def set_env_and_run(thread_number):
+def set_env_and_run(thread_number, prefix):
     env = dict(os.environ)
-    prefix = f"{os.getcwd()}/build_dirs/install_paraview_v5.6.1"
     env["PV_PLUGIN_PATH"] = f"{prefix}/lib/plugins"
     env["LD_LIBRARY_PATH"] = f"{prefix}/lib:" + os.environ.get("LD_LIBRARY_PATH", "")
     env["PYTHONPATH"] = ":".join(
@@ -53,9 +52,15 @@ if __name__ == "__main__":
         help="Number of threads",
         default=multiprocessing.cpu_count(),
     )
+    parser.add_argument(
+        "-p",
+        "--install_prefix",
+        help="Install prefix",
+        default=f"{os.getcwd()}/build_dirs/install_paraview_v5.6.1",
+    )
     args = parser.parse_args()
 
     if psutil.Process().parent().cmdline()[1:] == sys.argv:
         main(args.input_dataset, args.output_diagram)
     else:
-        set_env_and_run(args.thread_number)
+        set_env_and_run(args.thread_number, args.install_prefix)
