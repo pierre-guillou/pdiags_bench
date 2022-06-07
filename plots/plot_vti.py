@@ -146,16 +146,18 @@ def main():
     cpx = "impl"
     backends = sort_backends(data, cpx)
 
-    res = []
-    for i in range(1, 3):
-        res.extend(
-            generate_plot({k: v for k, v in data[i].items() if cpx in k}, backends, i)
-        )
-
     legend_pos = r"""\node at (plots c2r1.east)[inner sep=0pt, xshift=8ex]
 {\pgfplotslegendfromname{grouplegend}};"""
 
-    plots_utils.output_tex_file(res, f"plot_{cpx}", True, True, "", legend_pos)
+
+    for mode in ["seq", "para"]:
+        res = []
+        for i in range(1, 3):
+            res.extend(
+                generate_plot({k: v for k, v in data[i].items() if cpx in k}, backends, i)
+            )
+
+        plots_utils.output_tex_file(res, f"plot_{cpx}_{mode}", False, False, "", legend_pos)
 
 
 if __name__ == "__main__":
