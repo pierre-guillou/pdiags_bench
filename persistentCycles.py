@@ -19,7 +19,6 @@ def main(input_dataset, output_diagram):
     pd = simple.TTKFG_PersistentHomology(Input=ds)
     pd.ScalarField = "ImageFile_Order"
     simple.UpdatePipeline()
-    shutil.move("/tmp/out.gudhi", output_diagram)
 
 
 def set_env_and_run(thread_number, prefix):
