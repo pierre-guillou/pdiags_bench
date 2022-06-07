@@ -45,11 +45,26 @@ for raw in raws/*.raw; do
 
     for nt in 32 64 96 128; do
         for vtu in datasets/*.vtu; do
-            echo "Processing $vtu with TTK with $nt threads..." >> $out
+            echo "Processing $vtu with DiscreteMorseSandwich with $nt threads..." >> $out
             omplace -nt $nt \
                     ttkPersistenceDiagramCmd -B 2 -i $vtu -t $nt -d 4 \
                  1>> $out 2>> $err
+
+            sleep 5
+
+            echo "Processing $vtu with TTK-FTM with $nt threads..." >> $out
+            omplace -nt $nt \
+                    ttkPersistenceDiagramCmd -B 0 -i $vtu -t $nt -d 4 \
+                 1>> $out 2>> $err
+
+            sleep 5
+
+            echo "Processing $vtu with PersistenceCycles with $nt threads..." >> $out
+            omplace -nt $nt \
+                    python3 persistentCycles.py $vtu -o out.vtu -t $nt -p $HOME/install_pv56 \
+                 1>> $out 2>> $err
         done
+
 
         sleep 5                 # flush?
 
