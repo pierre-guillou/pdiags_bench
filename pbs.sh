@@ -61,7 +61,7 @@ for raw in raws/*.raw; do
 
             echo "Processing $vtu with PersistenceCycles with $nt threads..." >> $out
             omplace -nt $nt \
-                    python3 persistentCycles.py $vtu -o out.vtu -t $nt -p $HOME/install_pv56 \
+                    python3 $WD/persistentCycles.py $vtu -o out.vtu -t $nt -p $HOME/install_pv56 \
                  1>> $out 2>> $err
         done
 
