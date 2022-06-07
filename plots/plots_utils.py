@@ -1,4 +1,3 @@
-import functools
 import subprocess
 
 
@@ -111,7 +110,7 @@ def compute_n_simplices(dim):
     ]
 
     # number of simplices per dimension
-    return functools.reduce(lambda a, b: a * b, simplices[dim].values())
+    return sum(simplices[dim].values())
 
 
 def sort_datasets_by_n_pairs(data, mode="seq"):
