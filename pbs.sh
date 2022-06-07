@@ -2,14 +2,14 @@
 #PBS -S /bin/bash
 #PBS -q alpha
 #PBS -l select=1:ncpus=128
-#PBS -l walltime=00:50:00
+#PBS -l walltime=20:00:00
 #PBS -N dipha_bench
 #PBS -j oe
 
 # load appropriate modules
 module purge
 # mpt must be loaded before openMPI to avoid mixing MPI implementations
-module load mpt openMPI gcc
+module load mpt openMPI/4.1.2-gcc82 gcc/8.2 python/3.9
 
 # move to PBS_O_WORKDIR
 cd $PBS_O_WORKDIR
@@ -18,21 +18,17 @@ cd $PBS_O_WORKDIR
 PROJECT=dipha
 SCRATCH=/scratchalpha/$USER/$PROJECT
 mkdir -p $SCRATCH
+rm -rf $SCRATCH/*
 
 # working directory
 WD=$HOME/pdiags_bench
+mkdir -p $WD/log
 
 # copy some input files to  $SCRATCH directory
 cp -r $WD/raws $SCRATCH
 
 # env variables
-INSTDIR=/home/guilloup/install
-TTK_BUILD=/home/guilloup/ttk-guillou/build
-PY38=python3.8/site-packages
-export LD_LIBRARY_PATH=$INSTDIR/lib64:$INSTDIR/lib:$TTK_BUILD/lib64:$LD_LIBARY_PATH
-export PATH=$INSTDIR/bin:$WD/build_dipha:$TTK_BUILD/bin:$PATH
-export PYTHONPATH=$INSTDIR/lib64/$PY38:$INSTDIR/lib/$PY38:$TTK_BUILD/lib64/$PY38
-export PV_PLUGIN_PATH=$TTK_BUILD/lib64/TopologyToolKit
+source $HOME/env.sh
 
 # execute your program
 cd $SCRATCH || exit 1
@@ -40,24 +36,44 @@ cd $SCRATCH || exit 1
 # prepare datasets
 mkdir datasets
 
-for raw in raws/*.raw; do
-    echo "Converting $raw..."
-    time python $WD/convert_datasets.py $raw datasets
-    raw_stem=${raw#raws/}
-    out=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.out
-    err=$WD/log/${raw_stem}_${PBS_JOBID}_${NCPUS}.err
-    vtu=datasets/${raw_stem%.raw}_order_expl.vtu
-    for nt in 1 16 32 48 64 80 96 112 128; do
-        echo "Processing $vtu with TTK with $nt threads..." >> $out
-        omplace -nt $nt \
-                ttkPersistenceDiagramCmd -i $vtu -t $nt \
-                1>> $out 2>> $err
-        rm $vtu
-    done
-done
+out=$WD/log/${PBS_JOBID}.out
+err=$WD/log/${PBS_JOBID}.err
 
-# copy some output files to submission directory
-# cp -p $PBS_JOBNAME.out $PBS_JOBNAME.err $PBS_O_WORKDIR || exit 1
+for raw in raws/*.raw; do
+    echo "Converting $raw..." 1>> $out 2>> $err
+    python3 $WD/convert_datasets.py $raw 1> /dev/null 2>> $out
+
+    for nt in 32 64 96 128; do
+        for vtu in datasets/*.vtu; do
+            echo "Processing $vtu with TTK with $nt threads..." >> $out
+            omplace -nt $nt \
+                    ttkPersistenceDiagramCmd -B 2 -i $vtu -t $nt -d 4 \
+                 1>> $out 2>> $err
+        done
+
+        sleep 5                 # flush?
+
+        for dph in datasets/*.dipha; do
+            echo "Processing $dph with Dipha with $nt processes..." >> $out
+            mpirun -np $nt --oversubscribe \
+                 dipha --benchmark $dph out.dipha \
+                 1>> $out 2>> $err
+        done
+
+        sleep 5                 # flush?
+
+        for ph in datasets/*.phat; do
+            echo "Processing $ph with PHAT with $nt threads..." >> $out
+            OMP_NUM_THREADS=$nt omplace -nt $nt \
+                 phat --verbose --ascii --spectral_sequence $ph out.phat \
+                 1>> $out 2>> $err
+        done
+
+        sleep 5                 # flush?
+    done
+
+    rm datasets/*
+done
 
 # clean the temporary directory
 rm -rf "$SCRATCH"/*
