@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 
@@ -111,10 +112,13 @@ def main():
     sections, delimiters = split_sections(lines)
     res = parse_sections(lines, sections, delimiters)
 
-    for k, v in sorted(res.items()):
-        print(k)
-        for kk, vv in v.items():
-            print(f"  ({kk}, {sorted(vv.items())})")
+    # for k, v in sorted(res.items()):
+    #     print(k)
+    #     for kk, vv in v.items():
+    #         print(f"  ({kk}, {sorted(vv.items())})")
+
+    with open("results_mesu.json", "w") as dst:
+        json.dump(res, dst, indent=4)
 
 
 if __name__ == "__main__":
