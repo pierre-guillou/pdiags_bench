@@ -86,8 +86,9 @@ for raw in raws/*.raw; do
 
         for ph in datasets/*.phat; do
             echo "$(date) Processing $ph with PHAT with $nt threads..." >> $out
+            OMP_NUM_THREADS=$nt \
             /usr/bin/timeout --preserve-status $TIMEOUT_S \
-            OMP_NUM_THREADS=$nt omplace -nt $nt \
+            omplace -nt $nt \
                  phat --verbose --ascii --spectral_sequence $ph out.phat \
                  1>> $out 2>> $err
         done
