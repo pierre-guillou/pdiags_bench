@@ -36,6 +36,9 @@ cd $SCRATCH || exit 1
 # prepare datasets
 mkdir datasets
 
+# timeout
+TIMEOUT_S=900
+
 out=$WD/log/${PBS_JOBID}.out
 err=$WD/log/${PBS_JOBID}.err
 
@@ -46,6 +49,7 @@ for raw in raws/*.raw; do
     for nt in 32 64 96 128; do
         for vtu in datasets/*.vtu; do
             echo "Processing $vtu with DiscreteMorseSandwich with $nt threads..." >> $out
+            /usr/bin/timeout --preserve-status $TIMEOUT_S \
             omplace -nt $nt \
                     ttkPersistenceDiagramCmd -B 2 -i $vtu -t $nt -d 4 \
                  1>> $out 2>> $err
@@ -53,6 +57,7 @@ for raw in raws/*.raw; do
             sleep 5
 
             echo "Processing $vtu with TTK-FTM with $nt threads..." >> $out
+            /usr/bin/timeout --preserve-status $TIMEOUT_S \
             omplace -nt $nt \
                     ttkPersistenceDiagramCmd -B 0 -i $vtu -t $nt -d 4 \
                  1>> $out 2>> $err
@@ -60,6 +65,7 @@ for raw in raws/*.raw; do
             sleep 5
 
             echo "Processing $vtu with PersistenceCycles with $nt threads..." >> $out
+            /usr/bin/timeout --preserve-status $TIMEOUT_S \
             omplace -nt $nt \
                     python3 $WD/persistentCycles.py $vtu -o out.vtu -t $nt -p $HOME/install_pv56 \
                  1>> $out 2>> $err
@@ -70,6 +76,7 @@ for raw in raws/*.raw; do
 
         for dph in datasets/*.dipha; do
             echo "Processing $dph with Dipha with $nt processes..." >> $out
+            /usr/bin/timeout --preserve-status $TIMEOUT_S \
             mpirun -np $nt --oversubscribe \
                  dipha --benchmark $dph out.dipha \
                  1>> $out 2>> $err
@@ -79,6 +86,7 @@ for raw in raws/*.raw; do
 
         for ph in datasets/*.phat; do
             echo "Processing $ph with PHAT with $nt threads..." >> $out
+            /usr/bin/timeout --preserve-status $TIMEOUT_S \
             OMP_NUM_THREADS=$nt omplace -nt $nt \
                  phat --verbose --ascii --spectral_sequence $ph out.phat \
                  1>> $out 2>> $err
