@@ -62,11 +62,12 @@ def persistenceCycles_compute_time(output):
     return round(float(grad) + float(pers), 3)
 
 
-def main():
-    lines = []
-    with open(sys.argv[1]) as src:
-        lines = src.readlines()
+def read_file(file):
+    with open(file) as src:
+        return src.readlines()
 
+
+def split_sections(lines):
     pat = r"^.*Processing .*\/(.*)\..* with (.*) with (\d*).*...$"
     delimiters = []
     sections = []
@@ -75,8 +76,11 @@ def main():
             delimiters.append(i)
             res = re.search(pat, line)
             sections.append(res.groups())
-
     delimiters.append(len(lines))
+    return sections, delimiters
+
+
+def parse_sections(lines, sections, delimiters):
     dispatch = {
         "DiscreteMorseSandwich": ttk_compute_time,
         "TTK-FTM": ttk_compute_time,
@@ -97,6 +101,15 @@ def main():
         except AttributeError:
             print(seclog)
             continue
+
+    return res
+
+
+def main():
+    lines = read_file(sys.argv[1])
+
+    sections, delimiters = split_sections(lines)
+    res = parse_sections(lines, sections, delimiters)
 
     for k, v in sorted(res.items()):
         print(k)
