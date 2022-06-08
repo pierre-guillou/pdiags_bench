@@ -42,14 +42,24 @@ def dipha_compute_time(dipha_output):
     write_time = float(write_time)
     prec = round(read_time + write_time, 3)
     pers = round(run_time - prec, 3)
-    return prec, pers
+    return pers
 
 
 def phat_compute_time(output):
     pers_pat = r"Computing persistence pairs took (\d+.\d+|\d+)s"
     pers = re.search(pers_pat, output, re.MULTILINE).group(1)
-    pers = round(float(pers), 3)
-    return pers
+    return round(float(pers), 3)
+
+
+def persistenceCycles_compute_time(output):
+    grad_pat = r"Gradient computed in (\d+.\d+|\d+) seconds"
+    grad = re.search(grad_pat, output, re.MULTILINE).group(1)
+    pers_pat = (
+        r"Persistent homology computed in "
+        + r"[+-]?(\d+([.]\d*)?(e[+-]?\d+)?|[.]\d+(e[+-]?\d+)?) seconds"
+    )
+    pers = re.search(pers_pat, output, re.MULTILINE).group(1)
+    return round(float(grad) + float(pers), 3)
 
 
 def main():
@@ -57,33 +67,41 @@ def main():
     with open(sys.argv[1]) as src:
         lines = src.readlines()
 
-    pat = r"Processing .*\/(.*)_192x192x192_order_expl.* with (.*) with (\d*) .*"
+    pat = r"^.*Processing .*\/(.*)\..* with (.*) with (\d*).*...$"
     delimiters = []
     sections = []
     for i, line in enumerate(lines):
         if "Processing" in line:
-            # print(i, line.strip())
             delimiters.append(i)
-            sections.append(re.search(pat, line).groups())
+            res = re.search(pat, line)
+            sections.append(res.groups())
 
     delimiters.append(len(lines))
-    res = {sec[0]: {"TTK": {}, "Dipha": {}, "PHAT": {}} for sec in sections}
+    dispatch = {
+        "DiscreteMorseSandwich": ttk_compute_time,
+        "TTK-FTM": ttk_compute_time,
+        "Dipha": dipha_compute_time,
+        "PHAT": phat_compute_time,
+        "PersistenceCycles": persistenceCycles_compute_time,
+    }
+
+    res = {sec[0]: {k: {} for k in dispatch} for sec in sections}
     for i, sec in enumerate(sections):
         seclog = "".join(lines[slice(delimiters[i], delimiters[i + 1])])
+        dataset, backend, nthreads = sec
         try:
-            if sec[1] == "TTK":
-                res[sec[0]][sec[1]][int(sec[2])] = ttk_compute_time(seclog)
-            elif sec[1] == "Dipha":
-                res[sec[0]][sec[1]][int(sec[2])] = dipha_compute_time(seclog)[1]
-            elif sec[1] == "PHAT":
-                res[sec[0]][sec[1]][int(sec[2])] = phat_compute_time(seclog)
+            res[dataset][backend][nthreads] = {
+                "pers": dispatch[backend](seclog),
+                "#threads": int(nthreads),
+            }
         except AttributeError:
-            break
+            print(seclog)
+            continue
 
     for k, v in sorted(res.items()):
         print(k)
         for kk, vv in v.items():
-            print("  ({}, {})".format(kk, sorted(vv.items())))
+            print(f"  ({kk}, {sorted(vv.items())})")
 
 
 if __name__ == "__main__":
