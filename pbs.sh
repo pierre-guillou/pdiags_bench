@@ -42,11 +42,11 @@ TIMEOUT_S=900
 out=$WD/log/${PBS_JOBID}.out
 err=$WD/log/${PBS_JOBID}.err
 
-for raw in raws/*.raw; do
+for raw in raws/*.{raw,vti}; do
     echo "$(date) Converting $raw..." 1>> $out 2>> $err
     python3 $WD/convert_datasets.py $raw 1> /dev/null 2>> $out
 
-    for nt in 32 64 96 128; do
+    for nt in 1 2 4 8 16 32 64 96 128; do
         for vtu in datasets/*.vtu; do
             echo "$(date) Processing $vtu with DiscreteMorseSandwich with $nt threads..." >> $out
             /usr/bin/timeout --preserve-status $TIMEOUT_S \
