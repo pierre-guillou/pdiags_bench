@@ -78,6 +78,7 @@ def split_sections(lines):
             res = re.search(pat, line)
             sections.append(res.groups())
     delimiters.append(len(lines))
+    # sections: [0] = dataset, [1] = backend, [2] = #threads
     return sections, delimiters
 
 
@@ -90,17 +91,18 @@ def parse_sections(lines, sections, delimiters):
         "PersistenceCycles": persistenceCycles_compute_time,
     }
 
-    res = {sec[0]: {k: {} for k in dispatch} for sec in sections}
+    res = {k: {sec[0]: {} for sec in sections} for k in dispatch}
     for i, sec in enumerate(sections):
         seclog = "".join(lines[slice(delimiters[i], delimiters[i + 1])])
         dataset, backend, nthreads = sec
         try:
-            res[dataset][backend][nthreads] = {
+            res[backend][dataset][nthreads] = {
                 "pers": dispatch[backend](seclog),
                 "#threads": int(nthreads),
             }
         except AttributeError:
-            print(seclog)
+            # print(seclog)
+            # input()
             continue
 
     return res
@@ -112,13 +114,7 @@ def main():
     sections, delimiters = split_sections(lines)
     res = parse_sections(lines, sections, delimiters)
 
-    # for k, v in sorted(res.items()):
-    #     print(k)
-    #     for kk, vv in v.items():
-    #         print(f"  ({kk}, {sorted(vv.items())})")
-
-    with open("results_mesu.json", "w") as dst:
-        json.dump(res, dst, indent=4)
+    json.dump(res, sys.stdout, indent=4)
 
 
 if __name__ == "__main__":
