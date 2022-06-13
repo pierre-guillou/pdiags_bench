@@ -2,6 +2,8 @@ import json
 import re
 import sys
 
+import plots_utils
+
 
 def escape_ansi_chars(txt):
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
@@ -96,7 +98,7 @@ def parse_sections(lines, sections, delimiters):
         seclog = "".join(lines[slice(delimiters[i], delimiters[i + 1])])
         dataset, backend, nthreads = sec
         try:
-            res[backend][dataset][nthreads] = {
+            res[backend][dataset][int(nthreads)] = {
                 "pers": dispatch[backend](seclog),
                 "#threads": int(nthreads),
             }
@@ -108,13 +110,75 @@ def parse_sections(lines, sections, delimiters):
     return res
 
 
+def aggregate_backend_nthreads(res, dim=3):
+    n_simplices = plots_utils.compute_n_simplices(dim - 1)
+    # compute mean times per backend & #thread
+    aggr = {}
+    for bk, bk_data in res.items():
+        aggr[bk] = {}
+        for nthreads in [32, 64, 96, 128]:
+            i = 0
+            time = 0.0
+            speed = 0.0
+            for perf in bk_data.values():
+                if nthreads in perf:
+                    i += 1
+                    time += perf[nthreads]["pers"]
+                    speed += n_simplices / perf[nthreads]["pers"]
+            mtime = time / i
+            mspeed = speed / i
+            aggr[bk][nthreads] = mspeed
+            print(
+                f"{bk} {nthreads} threads ({i} datasets): {mtime:.3f} s, {mspeed:.1f} #simplices/s"
+            )
+
+    return aggr
+
+
+def plot_aggregated_data(aggr, dim=3):
+    legend_pos = r"""\node at (plots c1r1.east)[inner sep=0pt, xshift=15ex]
+{\pgfplotslegendfromname{grouplegend}};"""
+
+    plot = [
+        r"\nextgroupplot[legend to name=grouplegend, ymode=log, "
+        + ("ylabel=Computation speed (simplices/second),]")
+    ]
+    backends_legend = {
+        "DiscreteMorseSandwich": "curve1",
+        "Dipha": "curve2",
+        "PHAT": "curve3",
+        "PersistenceCycles": "curve4",
+        "TTK-FTM": "curve5",
+    }
+
+    for bk, legend in backends_legend.items():
+        if "FTM" in bk and dim == 3:
+            continue
+        coords = [r"\addplot[" + legend + "] coordinates {"]
+        for nthreads, val in aggr[bk].items():
+            coords.append(f"({nthreads}, {val})")
+        coords.append("};")
+        plot.append(" ".join(coords))
+        plot.append(r"\addlegendentry{" + bk + "}")
+
+    plots_utils.output_tex_file(
+        plot, f"plot_mesu_expl_{dim}D", False, False, r"width=.35\linewidth", legend_pos
+    )
+
+    return plot
+
+
 def main():
     lines = read_file(sys.argv[1])
 
     sections, delimiters = split_sections(lines)
     res = parse_sections(lines, sections, delimiters)
 
-    json.dump(res, sys.stdout, indent=4)
+    # json.dump(res, sys.stdout, indent=4)
+
+    aggr = aggregate_backend_nthreads(res)
+
+    plot_aggregated_data(aggr)
 
 
 if __name__ == "__main__":
