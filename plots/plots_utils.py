@@ -72,7 +72,7 @@ def wrap_pgfplots(txt, extra_group_opts="", legend_pos=""):
         rf"""\begin{{tikzpicture}}
 \begin{{groupplot}}[
   group style={{group name=plots,}}, {extra_group_opts},
-  xlabel=Output size  (\(\sum_{{i = 0}}^d |\diagram_i(f)|\)),]
+  xlabel=\#threads]
 
 {txt}
 
