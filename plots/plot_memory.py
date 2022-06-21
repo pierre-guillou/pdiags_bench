@@ -132,7 +132,7 @@ def main():
             )
 
         plots_utils.output_tex_file(
-            res, f"plot_mem_{mode}", False, False, r"width=.35\linewidth", legend_pos
+            res, f"plot_mem_{mode}", False, False, legend_pos
         )
 
 

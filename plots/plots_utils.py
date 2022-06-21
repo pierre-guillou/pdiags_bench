@@ -66,12 +66,12 @@ def wrap_standalone(txt):
     )
 
 
-def wrap_pgfplots(txt, extra_group_opts="", legend_pos=""):
+def wrap_pgfplots(txt, legend_pos=""):
     txt = "\n".join(txt)
     return [
         rf"""\begin{{tikzpicture}}
 \begin{{groupplot}}[
-  group style={{group name=plots,}}, {extra_group_opts},
+  group style={{group name=plots,}},
   xlabel=Output size  (\(\sum_{{i = 0}}^d |\diagram_i(f)|\)),]
 
 {txt}
@@ -88,10 +88,9 @@ def output_tex_file(
     fname="dest",
     standalone=False,
     gen_pdf=False,
-    extra_group_opts="",
     legend_pos="",
 ):
-    lines = wrap_pgfplots(lines, extra_group_opts, legend_pos)
+    lines = wrap_pgfplots(lines, legend_pos)
     if standalone:
         lines = wrap_standalone(lines)
     txt = "\n".join(lines)

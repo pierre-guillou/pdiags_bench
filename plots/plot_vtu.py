@@ -126,7 +126,7 @@ def main():
             )
 
         plots_utils.output_tex_file(
-            res, f"plot_{cpx}_{mode}", False, False, r"width=.35\linewidth", legend_pos
+            res, f"plot_{cpx}_{mode}", False, False, legend_pos
         )
 
 

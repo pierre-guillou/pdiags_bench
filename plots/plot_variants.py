@@ -109,7 +109,6 @@ def main():
         f"plot_variants_{cpx}_{mode}",
         False,
         False,
-        r"width=.35\linewidth",
         legend_pos,
     )
 
