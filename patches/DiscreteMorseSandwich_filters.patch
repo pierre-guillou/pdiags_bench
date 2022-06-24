@@ -1,0 +1,4756 @@
+diff --git c/core/base/discreteGradient/DiscreteGradient.h w/core/base/discreteGradient/DiscreteGradient.h
+index 85dde8e84..3992344c7 100644
+--- c/core/base/discreteGradient/DiscreteGradient.h
++++ w/core/base/discreteGradient/DiscreteGradient.h
+@@ -458,6 +458,22 @@ in the gradient.
+                               const triangulationType &triangulation,
+                               bool isReverse = false) const;
+ 
++#ifndef TTK_ENABLE_DCG_OPTIMIZE_MEMORY
++      inline SimplexId getPairedCell(const Cell &cell) const {
++        if(cell.dim_ < 0 || cell.dim_ > this->dimensionality_ - 1) {
++          return -1;
++        }
++        return (*this->gradient_)[2 * cell.dim_][cell.id_];
++      }
++
++      inline SimplexId getReversePairedCell(const Cell &cell) const {
++        if(cell.dim_ < 1 || cell.dim_ > this->dimensionality_) {
++          return -1;
++        }
++        return (*this->gradient_)[2 * cell.dim_ - 1][cell.id_];
++      }
++#endif // TTK_ENABLE_DCG_OPTIMIZE_MEMORY
++
+       /**
+        * Return the VPath coming from the given cell.
+        */
+diff --git c/core/base/discreteMorseFunction/CMakeLists.txt w/core/base/discreteMorseFunction/CMakeLists.txt
+new file mode 100644
+index 000000000..1b772c087
+--- /dev/null
++++ w/core/base/discreteMorseFunction/CMakeLists.txt
+@@ -0,0 +1,8 @@
++ttk_add_base_library(discreteMorseFunction
++  SOURCES
++    DiscreteMorseFunction.cpp
++  HEADERS
++    DiscreteMorseFunction.h
++  DEPENDS
++    discreteGradient
++    )
+diff --git c/core/base/discreteMorseFunction/DiscreteMorseFunction.cpp w/core/base/discreteMorseFunction/DiscreteMorseFunction.cpp
+new file mode 100644
+index 000000000..62628b890
+--- /dev/null
++++ w/core/base/discreteMorseFunction/DiscreteMorseFunction.cpp
+@@ -0,0 +1,44 @@
++#include <DiscreteMorseFunction.h>
++
++std::vector<ttk::SimplexId> ttk::DiscreteMorseFunction::topologicalSort(
++  const ttk::DiscreteMorseFunction::MonoGraph &monoGraph) const {
++
++  // Kahn algorithm implementation
++  std::vector<SimplexId> sortedVertices{};
++
++  // seeds: local maxima (no edges pointing to them)
++  std::queue<SimplexId> seeds{};
++  const auto nVerts = monoGraph.size();
++
++  std::vector<size_t> nPointed(nVerts);
++  for(const auto &vec : monoGraph) {
++    for(const auto v : vec) {
++      nPointed[v]++;
++    }
++  }
++  for(size_t i = 0; i < nVerts; ++i) {
++    if(nPointed[i] == 0) {
++      seeds.push(i);
++    }
++  }
++
++  while(!seeds.empty()) {
++    const auto curr = seeds.front();
++    seeds.pop();
++    sortedVertices.emplace_back(curr);
++    for(const auto m : monoGraph[curr]) {
++      nPointed[m]--;
++      if(nPointed[m] == 0) {
++        seeds.push(m);
++      }
++    }
++  }
++
++  if(std::any_of(nPointed.begin(), nPointed.end(),
++                 [](const size_t a) { return a > 0; })) {
++    this->printErr("Topological sort: cycle in graph");
++    return {};
++  }
++
++  return sortedVertices;
++}
+diff --git c/core/base/discreteMorseFunction/DiscreteMorseFunction.h w/core/base/discreteMorseFunction/DiscreteMorseFunction.h
+new file mode 100644
+index 000000000..a334b7cb9
+--- /dev/null
++++ w/core/base/discreteMorseFunction/DiscreteMorseFunction.h
+@@ -0,0 +1,360 @@
++/// \ingroup baseCode
++/// \class ttk::dcg::DiscreteMorseFunction
++/// \author Guillaume Favelier <guillaume.favelier@lip6.fr>
++/// \author Julien Tierny <julien.tierny@lip6.fr>
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \author Yizhe Wang <wangyizhe3518@gmail.com>
++/// \date November 2016.
++///
++/// \brief TTK %discreteMorseFunction processing package.
++///
++/// %DiscreteMorseFunction is a TTK processing package that handles discrete
++/// gradient (in the sense of Discrete Morse Theory).
++///
++/// \sa ttk::Triangulation
++
++#pragma once
++
++// base code includes
++#include <DiscreteGradient.h>
++
++namespace ttk {
++
++  class DiscreteMorseFunction : virtual public dcg::DiscreteGradient {
++
++  public:
++    DiscreteMorseFunction() {
++      this->setDebugMsgPrefix("DiscreteMorseFunction");
++    }
++
++    /**
++     * @brief Compute the Discrete Morse Function from the Discrete
++     * Gradient
++     *
++     * @param[out] dmf Discrete Morse Function output: one order
++     * value per simplex in the simplicial complex (lowest values:
++     * minima, highest values: maxima)
++     * @param[in] triangulation Explicit triangulation of the
++     * simplicial complex
++     *
++     * @return 0 in case of success, negative value in case of error
++     * @pre DiscreteMorseFunction::buildGradient() needs to be called
++     * prior to this function
++     */
++    template <typename triangulationType>
++    std::vector<SimplexId> computeDiscreteMorseFunction(
++      const SimplexId *const offset,
++      const triangulationType &triangulation) const;
++
++    struct Simplex;
++
++    template <typename triangulationType>
++    std::vector<Simplex>
++      computeFiltrationOrder(const SimplexId *const offset,
++                             const triangulationType &triangulation) const;
++
++    struct Simplex {
++      SimplexId dim_{}; // dimension
++      SimplexId id_{}; // id in triangulation (overlap between dimensions)
++      SimplexId cellId_{}; // cell id (unique)
++      // order on vertices, sorted in descending order
++      std::array<SimplexId, 4> vertsOrder_{-1, -1, -1, -1};
++
++      friend std::ostream &operator<<(std::ostream &os, const Simplex &rhs) {
++        os << rhs.dim_ << " " << rhs.id_ << " (";
++        for(SimplexId i = 0; i < rhs.dim_; ++i) {
++          os << rhs.vertsOrder_[i] << ", ";
++        }
++        os << rhs.vertsOrder_[rhs.dim_] << ")";
++        return os;
++      }
++
++      friend bool operator<(const Simplex &lhs, const Simplex &rhs) {
++        return lhs.vertsOrder_ < rhs.vertsOrder_;
++      }
++
++      void fillVert(const SimplexId v, const SimplexId *const offset) {
++        this->dim_ = 0;
++        this->id_ = v;
++        this->cellId_ = v;
++        this->vertsOrder_[0] = offset[v];
++      }
++
++      template <typename triangulationType>
++      void fillEdge(const SimplexId e,
++                    const SimplexId c,
++                    const SimplexId *const offset,
++                    const triangulationType &triangulation) {
++        this->dim_ = 1;
++        this->id_ = e;
++        this->cellId_ = c;
++        triangulation.getEdgeVertex(e, 0, this->vertsOrder_[0]);
++        triangulation.getEdgeVertex(e, 1, this->vertsOrder_[1]);
++        this->vertsOrder_[0] = offset[this->vertsOrder_[0]];
++        this->vertsOrder_[1] = offset[this->vertsOrder_[1]];
++        std::sort(this->vertsOrder_.rbegin(), this->vertsOrder_.rend());
++      }
++
++      template <typename triangulationType>
++      void fillTriangle(const SimplexId t,
++                        const SimplexId c,
++                        const SimplexId *const offset,
++                        const triangulationType &triangulation) {
++        this->dim_ = 2;
++        this->id_ = t;
++        this->cellId_ = c;
++        triangulation.getTriangleVertex(t, 0, this->vertsOrder_[0]);
++        triangulation.getTriangleVertex(t, 1, this->vertsOrder_[1]);
++        triangulation.getTriangleVertex(t, 2, this->vertsOrder_[2]);
++        this->vertsOrder_[0] = offset[this->vertsOrder_[0]];
++        this->vertsOrder_[1] = offset[this->vertsOrder_[1]];
++        this->vertsOrder_[2] = offset[this->vertsOrder_[2]];
++        std::sort(this->vertsOrder_.rbegin(), this->vertsOrder_.rend());
++      }
++
++      template <typename triangulationType>
++      void fillTetra(const SimplexId T,
++                     const SimplexId c,
++                     const SimplexId *const offset,
++                     const triangulationType &triangulation) {
++        this->dim_ = 3;
++        this->id_ = T;
++        this->cellId_ = c;
++        triangulation.getCellVertex(T, 0, this->vertsOrder_[0]);
++        triangulation.getCellVertex(T, 1, this->vertsOrder_[1]);
++        triangulation.getCellVertex(T, 2, this->vertsOrder_[2]);
++        triangulation.getCellVertex(T, 3, this->vertsOrder_[3]);
++        this->vertsOrder_[0] = offset[this->vertsOrder_[0]];
++        this->vertsOrder_[1] = offset[this->vertsOrder_[1]];
++        this->vertsOrder_[2] = offset[this->vertsOrder_[2]];
++        this->vertsOrder_[3] = offset[this->vertsOrder_[3]];
++        std::sort(this->vertsOrder_.rbegin(), this->vertsOrder_.rend());
++      }
++    };
++
++  private:
++    /**
++     * Monotonicity graph: for each vertex, store the edges pointing to
++     * the lower neighbors.
++     */
++    using MonoGraph = std::vector<std::vector<SimplexId>>;
++
++    std::vector<ttk::SimplexId>
++      topologicalSort(const MonoGraph &monoGraph) const;
++  };
++} // namespace ttk
++
++template <typename triangulationType>
++std::vector<SimplexId> ttk::DiscreteMorseFunction::computeDiscreteMorseFunction(
++  const SimplexId *const offset, const triangulationType &triangulation) const {
++
++  Timer tm{};
++  std::vector<SimplexId> res{};
++
++  if(this->gradient_[0].empty()) {
++    this->printErr("Empty gradient");
++    return res;
++  }
++
++  const auto dim = triangulation.getDimensionality();
++  const auto nVerts = triangulation.getNumberOfVertices();
++  const auto nEdges = triangulation.getNumberOfEdges();
++  const auto nTri = dim > 1 ? triangulation.getNumberOfTriangles() : 0;
++  const auto nTetra = dim > 2 ? triangulation.getNumberOfCells() : 0;
++
++  // global number of cells (vertices + edges + triangles + tetras)
++  const auto num_simplices = nVerts + nEdges + nTri + nTetra;
++  // monotonicity graph: each simplex points to its paired co-facet in
++  // the Discrete Gradient
++  MonoGraph mg(num_simplices);
++
++  // vertices sorted by the inputOffsets field
++  std::vector<SimplexId> orderVerts(nVerts);
++  for(size_t i = 0; i < orderVerts.size(); ++i) {
++    orderVerts[offset[i]] = i;
++  }
++
++  // compare consecutive sorted vertices
++  for(int i = 0; i < nVerts - 1; ++i) {
++    mg[orderVerts[i + 1]].emplace_back(orderVerts[i]);
++  }
++
++  for(int i = 0; i < nVerts; ++i) {
++    const auto pe = this->getPairedCell(Cell{0, i}, triangulation);
++    if(pe != -1) {
++      mg[i].emplace_back(nVerts + pe);
++    }
++    // every other neighbor edge is higher that the current vertex
++    const auto ne = triangulation.getVertexEdgeNumber(i);
++    for(SimplexId j = 0; j < ne; ++j) {
++      SimplexId e{};
++      triangulation.getVertexEdge(i, j, e);
++      // skip paired edge
++      if(e == pe) {
++        continue;
++      }
++      mg[nVerts + e].emplace_back(i);
++    }
++  }
++  for(int i = 0; i < nEdges; ++i) {
++    const auto pt = this->getPairedCell(Cell{1, i}, triangulation);
++    if(pt != -1) {
++      mg[nVerts + i].emplace_back(nVerts + nEdges + pt);
++    }
++    // every other neighbor triangle is higher that the current edge
++    const auto nt = triangulation.getEdgeTriangleNumber(i);
++    for(SimplexId j = 0; j < nt; ++j) {
++      SimplexId t{};
++      triangulation.getEdgeTriangle(i, j, t);
++      // skip paired triangle
++      if(t == pt) {
++        continue;
++      }
++      mg[nVerts + nEdges + t].emplace_back(i);
++    }
++  }
++  for(int i = 0; i < nTri; ++i) {
++    const auto pT = this->getPairedCell(Cell{2, i}, triangulation);
++    if(pT != -1) {
++      mg[nVerts + nEdges + i].emplace_back(nVerts + nEdges + nTri + pT);
++    }
++    if(dim < 3) {
++      continue;
++    }
++    // every other neighbor tetra is higher that the current triangle
++    const auto nT = triangulation.getTriangleStarNumber(i);
++    for(SimplexId j = 0; j < nT; ++j) {
++      SimplexId T{};
++      triangulation.getTriangleStar(i, j, T);
++      // skip paired tetra
++      if(T == pT) {
++        continue;
++      }
++      mg[nVerts + nEdges + nTri + T].emplace_back(i);
++    }
++  }
++
++  // fetch critical points
++  std::vector<Cell> criticalPoints{};
++  this->getCriticalPoints(criticalPoints, triangulation);
++  std::sort(
++    criticalPoints.begin(), criticalPoints.end(),
++    [this, offset, &triangulation](const Cell &a, const Cell &b) {
++      const auto oa = offset[this->getCellGreaterVertex(a, triangulation)];
++      const auto ob = offset[this->getCellGreaterVertex(b, triangulation)];
++      return oa < ob;
++    });
++
++  const auto cellId = [&](const Cell &c) {
++    if(c.dim_ == 0)
++      return c.id_;
++    if(c.dim_ == 1)
++      return c.id_ + nVerts;
++    if(c.dim_ == 2)
++      return c.id_ + nVerts + nEdges;
++    if(c.dim_ == 3)
++      return c.id_ + nVerts + nEdges + nTri;
++    return -1;
++  };
++
++  // compare critical cells two by two
++  for(size_t i = 0; i < criticalPoints.size() - 1; ++i) {
++    mg[cellId(criticalPoints[i + 1])].emplace_back(cellId(criticalPoints[i]));
++  }
++
++  const auto sortedSimplices = this->topologicalSort(mg);
++  if(sortedSimplices.empty()) {
++    return {};
++  }
++
++  res.resize(sortedSimplices.size());
++  for(size_t i = 0; i < sortedSimplices.size(); ++i) {
++    res[sortedSimplices[i]] = sortedSimplices.size() - 1 - i;
++  }
++
++  this->printMsg("Computed Morse Discrete Function", 1.0, tm.getElapsedTime(),
++                 this->threadNumber_);
++
++  // check that discrete gradient is upheld
++  for(int i = 0; i < nVerts; ++i) {
++    const auto pe = this->getPairedCell(Cell{0, i}, triangulation);
++    if(pe != -1 && res[i] < res[nVerts + pe]) {
++      this->printErr("Vertex " + std::to_string(i)
++                     + " should be higher than edge " + std::to_string(pe));
++    }
++  }
++  for(int i = 0; i < nEdges; ++i) {
++    const auto pt = this->getPairedCell(Cell{1, i}, triangulation);
++    if(pt != -1 && res[nVerts + i] < res[nVerts + nEdges + pt]) {
++      this->printErr("Edge " + std::to_string(i)
++                     + " should be higher than triangle " + std::to_string(pt));
++    }
++  }
++  for(int i = 0; i < nTri; ++i) {
++    const auto pT = this->getPairedCell(Cell{2, i}, triangulation);
++    if(pT != -1
++       && res[nVerts + nEdges + i] < res[nVerts + nEdges + nTri + pT]) {
++      this->printErr("Triangle " + std::to_string(i)
++                     + " should be higher than tetra " + std::to_string(pT));
++    }
++  }
++
++  return res;
++}
++
++template <typename triangulationType>
++std::vector<ttk::DiscreteMorseFunction::Simplex>
++  ttk::DiscreteMorseFunction::computeFiltrationOrder(
++    const SimplexId *const offset,
++    const triangulationType &triangulation) const {
++
++  Timer tm{};
++
++  const auto dim = triangulation.getDimensionality();
++
++  const auto nVerts = triangulation.getNumberOfVertices();
++  const auto nEdges = triangulation.getNumberOfEdges();
++  const auto nTri = dim > 1 ? triangulation.getNumberOfTriangles() : 0;
++  const auto nTetra = dim > 2 ? triangulation.getNumberOfCells() : 0;
++  const auto num_simplices = nVerts + nEdges + nTri + nTetra;
++
++  std::vector<Simplex> res(num_simplices);
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(SimplexId i = 0; i < nVerts; ++i) {
++    res[i].fillVert(i, offset);
++  }
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(SimplexId i = 0; i < nEdges; ++i) {
++    const auto o = nVerts + i;
++    res[o].fillEdge(i, o, offset, triangulation);
++  }
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(SimplexId i = 0; i < nTri; ++i) {
++    const auto o = nVerts + nEdges + i;
++    res[o].fillTriangle(i, o, offset, triangulation);
++  }
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(SimplexId i = 0; i < nTetra; ++i) {
++    const auto o = nVerts + nEdges + nTri + i;
++    res[o].fillTetra(i, o, offset, triangulation);
++  }
++
++  TTK_PSORT(this->threadNumber_, res.begin(), res.end());
++
++  this->printMsg(
++    "Computed filtration order", 1.0, tm.getElapsedTime(), this->threadNumber_);
++
++  return res;
++}
+diff --git c/core/base/persistenceDiagram/PersistenceDiagram.h w/core/base/persistenceDiagram/PersistenceDiagram.h
+index dd82c0b7c..b8e407639 100644
+--- c/core/base/persistenceDiagram/PersistenceDiagram.h
++++ w/core/base/persistenceDiagram/PersistenceDiagram.h
+@@ -136,6 +136,10 @@ namespace ttk {
+                                    const scalarType *inputScalars,
+                                    const triangulationType *triangulation);
+ 
++    inline void setZomorodianVariant(PersistentSimplexPairs::Variant va) {
++      this->psp_.setVariant(va);
++    }
++
+     template <typename scalarType, class triangulationType>
+     int executePersistentSimplex(std::vector<PersistencePair> &CTDiagram,
+                                  const scalarType *inputScalars,
+diff --git c/core/base/persistentSimplexPairs/CMakeLists.txt w/core/base/persistentSimplexPairs/CMakeLists.txt
+index 88a12a432..6afb24acf 100644
+--- c/core/base/persistentSimplexPairs/CMakeLists.txt
++++ w/core/base/persistentSimplexPairs/CMakeLists.txt
+@@ -5,4 +5,5 @@ ttk_add_base_library(persistentSimplexPairs
+     PersistentSimplexPairs.h
+   DEPENDS
+     triangulation
++    discreteGradient
+ )
+diff --git c/core/base/persistentSimplexPairs/PersistentSimplexPairs.cpp w/core/base/persistentSimplexPairs/PersistentSimplexPairs.cpp
+index 26b40795e..cf42688a7 100644
+--- c/core/base/persistentSimplexPairs/PersistentSimplexPairs.cpp
++++ w/core/base/persistentSimplexPairs/PersistentSimplexPairs.cpp
+@@ -43,7 +43,11 @@ int ttk::PersistentSimplexPairs::pairCells(
+ 
+   Timer tm{};
+ 
+-  for(const auto &c : filtration) {
++  this->printMsg("Computing pairs", 0, 0, 1, ttk::debug::LineMode::REPLACE);
++
++  for(size_t i = 0; i < filtration.size(); ++i) {
++
++    const auto &c{filtration[i]};
+ 
+     // skip vertices
+     if(c.dim_ == 0) {
+@@ -64,6 +68,13 @@ int ttk::PersistentSimplexPairs::pairCells(
+         pairs.emplace_back(partner, c.id_, c.dim_ - 1);
+       }
+     }
++
++    if(filtration.size() > 10 && i % (filtration.size() / 10) == 0) {
++      this->printMsg(
++        "Computing pairs",
++        std::round(10 * i / static_cast<float>(filtration.size())) / 10.0f,
++        tm.getElapsedTime(), 1, ttk::debug::LineMode::REPLACE);
++    }
+   }
+ 
+   const auto nRegPairs{pairs.size()};
+@@ -100,3 +111,693 @@ int ttk::PersistentSimplexPairs::pairCells(
+ 
+   return 0;
+ }
++
++template <typename Container>
++ttk::SimplexId ttk::PersistentSimplexPairs::eliminateBoundariesV4(
++  const Simplex &c,
++  std::vector<bool> &onBoundary,
++  std::vector<Container> &boundaries,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder,
++  const std::vector<Simplex> &partners) const {
++
++  auto &boundary{boundaries[c.cellId_]};
++  if(!boundary.empty()) {
++    for(const auto e : boundary) {
++      onBoundary[e] = true;
++    }
++  } else {
++    this->addCellBoundary(c, onBoundary, boundary);
++  }
++
++  const auto getLocalId = [&c, this](const SimplexId a) {
++    if(c.dim_ == 1) {
++      return a;
++    } else if(c.dim_ == 2) {
++      return a - this->nVerts_;
++    } else if(c.dim_ == 3) {
++      return a - this->nVerts_ - this->nEdges_;
++    }
++    return -1;
++  };
++
++  while(!boundary.empty()) {
++    // youngest cell on boundary
++    const auto tau{getLocalId(*boundary.begin())};
++    const Cell cTau{c.dim_ - 1, tau};
++    const auto pTau{this->dg_.getPairedCell(cTau)};
++    const Simplex *partnerTau{}; // co-facet of tau
++    if(pTau == -1) {
++      // tau is a critical cell
++      partnerTau = &partners[getCellId(c.dim_ - 1, tau)];
++    } else {
++      partnerTau = &filtration[filtOrder[getCellId(c.dim_, pTau)]];
++    }
++    if(partnerTau->dim_ == -1 || partnerTau->id_ == -1) {
++      return tau;
++    }
++    if(pTau == -1) {
++      for(const auto e : boundaries[partnerTau->cellId_]) {
++        if(!onBoundary[e]) {
++          boundary.emplace(e);
++          onBoundary[e] = true;
++        } else {
++          const auto it{boundary.find(e)};
++          boundary.erase(it);
++          onBoundary[e] = false;
++        }
++      }
++    } else {
++      this->addCellBoundary(*partnerTau, onBoundary, boundary);
++    }
++  }
++
++  return -1;
++}
++
++int ttk::PersistentSimplexPairs::pairCellsV4(
++  std::vector<PersistencePair> &pairs,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder) const {
++
++  Timer tmall{};
++
++  // paired simplices
++  std::vector<Simplex> partners(filtration.size());
++  std::vector<bool> onBoundary(filtration.size(), false);
++
++  const auto cmpSimplices = [&filtOrder](const SimplexId a, const SimplexId b) {
++    return filtOrder[a] > filtOrder[b];
++  };
++
++  // boundaries storage
++  using Container = std::set<SimplexId, decltype(cmpSimplices)>;
++  std::vector<Container> boundaries(filtration.size(), Container(cmpSimplices));
++
++  // critical simplices indices in filtration vector
++  std::array<std::vector<SimplexId>, 3> critFilt{};
++  for(size_t i = 0; i < filtration.size(); ++i) {
++    const auto &s{filtration[i]};
++    if(this->dg_.isCellCritical(Cell{s.dim_, s.id_}) && s.dim_ > 0) {
++      critFilt[s.dim_ - 1].emplace_back(i);
++    }
++  }
++
++  this->printMsg("Memory allocations", 1.0, tmall.getElapsedTime(), 1,
++                 debug::LineMode::NEW, debug::Priority::DETAIL);
++
++  Timer tmpar{};
++
++  for(const auto &vec : critFilt) {
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(threadNumber_) schedule(dynamic) \
++  firstprivate(onBoundary)
++#endif // TTK_ENABLE_OPENMP
++    for(size_t i = 0; i < vec.size(); ++i) {
++      const auto &c{filtration[vec[i]]};
++
++      this->eliminateBoundariesV4(
++        c, onBoundary, boundaries, filtration, filtOrder, partners);
++
++      // clean mask
++      for(const auto e : boundaries[c.cellId_]) {
++        onBoundary[e] = false;
++      }
++    }
++  }
++
++  Timer tm{};
++
++  const auto processDim = [&](const std::vector<SimplexId> &critSimplices,
++                              std::vector<PersistencePair> &res) {
++    for(size_t i = 0; i < critSimplices.size(); ++i) {
++
++      const auto &c{filtration[critSimplices[i]]};
++
++      const auto partner = eliminateBoundariesV4(
++        c, onBoundary, boundaries, filtration, filtOrder, partners);
++      if(partner != -1) {
++        const auto &pc{filtration[filtOrder[getCellId(c.dim_ - 1, partner)]]};
++        partners[c.cellId_] = pc;
++        partners[pc.cellId_] = c;
++
++        // only record pairs with non-null persistence
++        if(c.vertsOrder_[0] != pc.vertsOrder_[0]) {
++          res.emplace_back(partner, c.id_, c.dim_ - 1);
++        }
++      }
++
++      // clean mask
++      for(const auto e : boundaries[c.cellId_]) {
++        onBoundary[e] = false;
++      }
++    }
++  };
++
++  const auto dim{this->dg_.getDimensionality()};
++
++  // avoid concurrent writes into pairs vector
++  std::vector<PersistencePair> pairsSaddleMax{};
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel sections if(dim > 1)
++#endif // TTK_ENABLE_OPENMP
++  {
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp section
++#endif // TTK_ENABLE_OPENMP
++    {
++      Timer tcrit{};
++      processDim(critFilt[0], pairs);
++      this->printMsg(
++        "Computed min-saddle pairs", 1.0, tcrit.getElapsedTime(), 1);
++    }
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp section
++#endif // TTK_ENABLE_OPENMP
++    if(dim > 1) {
++      Timer tcrit{};
++      processDim(critFilt[dim - 1], pairsSaddleMax);
++      this->printMsg(
++        "Computed saddle-max pairs", 1.0, tcrit.getElapsedTime(), 1);
++    }
++  }
++
++  pairs.insert(pairs.end(), pairsSaddleMax.begin(), pairsSaddleMax.end());
++
++  if(dim > 2) { // sandwich
++    Timer tcrit{};
++    std::vector<SimplexId> nonPaired2Saddles{};
++    nonPaired2Saddles.reserve(critFilt[1].size());
++    for(const auto s2 : critFilt[1]) {
++      const auto &p{partners[filtration[s2].cellId_]};
++      if(p.id_ == -1 || p.dim_ == -1) {
++        nonPaired2Saddles.emplace_back(s2);
++      }
++    }
++    processDim(nonPaired2Saddles, pairs);
++    this->printMsg(
++      "Computed saddle-saddle pairs", 1.0, tcrit.getElapsedTime(), 1);
++  }
++
++  const auto nRegPairs{pairs.size()};
++
++  this->printMsg("Computed " + std::to_string(nRegPairs) + " regular pair"
++                   + (nRegPairs > 1 ? "s" : ""),
++                 1.0, tm.getElapsedTime(), 1);
++
++  // get infinite pairs
++  for(SimplexId i = 0; i < this->nVerts_; ++i) {
++    if(partners[i].id_ == -1 && this->dg_.isCellCritical(Cell{0, i})) {
++      pairs.emplace_back(i, -1, 0);
++    }
++  }
++  if(this->nTri_ > 0) {
++    for(SimplexId i = 0; i < this->nEdges_; ++i) {
++      if(partners[i + this->nVerts_].id_ == -1
++         && this->dg_.isCellCritical(Cell{1, i})) {
++        pairs.emplace_back(i, -1, 1);
++      }
++    }
++  }
++  if(this->nTetra_ > 0) {
++    for(SimplexId i = 0; i < this->nTri_; ++i) {
++      if(partners[i + this->nVerts_ + this->nEdges_].id_ == -1
++         && this->dg_.isCellCritical(Cell{2, i})) {
++        pairs.emplace_back(i, -1, 2);
++      }
++    }
++  }
++
++  const auto nInfPairs{pairs.size() - nRegPairs};
++
++  this->printMsg("Detected " + std::to_string(nInfPairs) + " infinite pair"
++                 + (nInfPairs > 1 ? "s" : ""));
++
++  return 0;
++}
++
++template <typename Container>
++ttk::SimplexId ttk::PersistentSimplexPairs::eliminateBoundariesV3(
++  const Simplex &c,
++  std::vector<bool> &onBoundary,
++  std::vector<Container> &boundaries,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder,
++  const std::vector<Simplex> &partners) const {
++
++  auto &boundary{boundaries[c.cellId_]};
++  this->addCellBoundary(c, onBoundary, boundary);
++
++  const auto getLocalId = [&c, this](const SimplexId a) {
++    if(c.dim_ == 1) {
++      return a;
++    } else if(c.dim_ == 2) {
++      return a - this->nVerts_;
++    } else if(c.dim_ == 3) {
++      return a - this->nVerts_ - this->nEdges_;
++    }
++    return -1;
++  };
++
++  while(!boundary.empty()) {
++    // youngest cell on boundary
++    const auto tau{getLocalId(*boundary.begin())};
++    const Cell cTau{c.dim_ - 1, tau};
++    const auto pTau{this->dg_.getPairedCell(cTau)};
++    const Simplex *partnerTau{}; // co-facet of tau
++    if(pTau == -1) {
++      // tau is a critical cell
++      partnerTau = &partners[getCellId(c.dim_ - 1, tau)];
++    } else {
++      partnerTau = &filtration[filtOrder[getCellId(c.dim_, pTau)]];
++    }
++    if(partnerTau->dim_ == -1 || partnerTau->id_ == -1) {
++      return tau;
++    }
++    if(pTau == -1) {
++      for(const auto e : boundaries[partnerTau->cellId_]) {
++        if(!onBoundary[e]) {
++          boundary.emplace(e);
++          onBoundary[e] = true;
++        } else {
++          const auto it{boundary.find(e)};
++          boundary.erase(it);
++          onBoundary[e] = false;
++        }
++      }
++    } else {
++      this->addCellBoundary(*partnerTau, onBoundary, boundary);
++    }
++  }
++
++  return -1;
++}
++
++int ttk::PersistentSimplexPairs::pairCellsV3(
++  std::vector<PersistencePair> &pairs,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder) const {
++
++  Timer tmall{};
++
++  // paired simplices
++  std::vector<Simplex> partners(filtration.size());
++  std::vector<bool> onBoundary(filtration.size(), false);
++
++  const auto cmpSimplices = [&filtOrder](const SimplexId a, const SimplexId b) {
++    return filtOrder[a] > filtOrder[b];
++  };
++
++  // boundaries storage
++  using Container = std::set<SimplexId, decltype(cmpSimplices)>;
++  std::vector<Container> boundaries(filtration.size(), Container(cmpSimplices));
++
++  // critical simplices indices in filtration vector
++  std::array<std::vector<SimplexId>, 3> critFilt{};
++  for(size_t i = 0; i < filtration.size(); ++i) {
++    const auto &s{filtration[i]};
++    if(this->dg_.isCellCritical(Cell{s.dim_, s.id_}) && s.dim_ > 0) {
++      critFilt[s.dim_ - 1].emplace_back(i);
++    }
++  }
++
++  this->printMsg("Memory allocations", 1.0, tmall.getElapsedTime(), 1,
++                 debug::LineMode::NEW, debug::Priority::DETAIL);
++
++  Timer tm{};
++
++  const auto processDim = [&](const std::vector<SimplexId> &critSimplices) {
++    for(size_t i = 0; i < critSimplices.size(); ++i) {
++
++      const auto &c{filtration[critSimplices[i]]};
++
++      const auto partner = eliminateBoundariesV3(
++        c, onBoundary, boundaries, filtration, filtOrder, partners);
++      if(partner != -1) {
++        const auto &pc{filtration[filtOrder[getCellId(c.dim_ - 1, partner)]]};
++        partners[c.cellId_] = pc;
++        partners[pc.cellId_] = c;
++
++        // only record pairs with non-null persistence
++        if(c.vertsOrder_[0] != pc.vertsOrder_[0]) {
++          pairs.emplace_back(partner, c.id_, c.dim_ - 1);
++        }
++      }
++
++      // clean mask
++      for(const auto e : boundaries[c.cellId_]) {
++        onBoundary[e] = false;
++      }
++    }
++  };
++
++  const auto dim{this->dg_.getDimensionality()};
++
++  {
++    Timer tcrit{};
++    processDim(critFilt[0]);
++    this->printMsg("Computed min-saddle pairs", 1.0, tcrit.getElapsedTime(), 1);
++  }
++
++  if(dim > 1) {
++    Timer tcrit{};
++    processDim(critFilt[dim - 1]);
++    this->printMsg("Computed saddle-max pairs", 1.0, tcrit.getElapsedTime(), 1);
++  }
++
++  if(dim > 2) { // sandwich
++    Timer tcrit{};
++    std::vector<SimplexId> nonPaired2Saddles{};
++    nonPaired2Saddles.reserve(critFilt[1].size());
++    for(const auto s2 : critFilt[1]) {
++      const auto &p{partners[filtration[s2].cellId_]};
++      if(p.id_ == -1 || p.dim_ == -1) {
++        nonPaired2Saddles.emplace_back(s2);
++      }
++    }
++    processDim(nonPaired2Saddles);
++    this->printMsg(
++      "Computed saddle-saddle pairs", 1.0, tcrit.getElapsedTime(), 1);
++  }
++
++  const auto nRegPairs{pairs.size()};
++
++  this->printMsg("Computed " + std::to_string(nRegPairs) + " regular pair"
++                   + (nRegPairs > 1 ? "s" : ""),
++                 1.0, tm.getElapsedTime(), 1);
++
++  // get infinite pairs
++  for(SimplexId i = 0; i < this->nVerts_; ++i) {
++    if(partners[i].id_ == -1 && this->dg_.isCellCritical(Cell{0, i})) {
++      pairs.emplace_back(i, -1, 0);
++    }
++  }
++  if(this->nTri_ > 0) {
++    for(SimplexId i = 0; i < this->nEdges_; ++i) {
++      if(partners[i + this->nVerts_].id_ == -1
++         && this->dg_.isCellCritical(Cell{1, i})) {
++        pairs.emplace_back(i, -1, 1);
++      }
++    }
++  }
++  if(this->nTetra_ > 0) {
++    for(SimplexId i = 0; i < this->nTri_; ++i) {
++      if(partners[i + this->nVerts_ + this->nEdges_].id_ == -1
++         && this->dg_.isCellCritical(Cell{2, i})) {
++        pairs.emplace_back(i, -1, 2);
++      }
++    }
++  }
++
++  const auto nInfPairs{pairs.size() - nRegPairs};
++
++  this->printMsg("Detected " + std::to_string(nInfPairs) + " infinite pair"
++                 + (nInfPairs > 1 ? "s" : ""));
++
++  return 0;
++}
++
++template <typename Container>
++ttk::SimplexId ttk::PersistentSimplexPairs::eliminateBoundariesV2(
++  const Simplex &c,
++  std::vector<bool> &onBoundary,
++  std::vector<Container> &boundaries,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder,
++  const std::vector<Simplex> &partners) const {
++
++  auto &boundary{boundaries[c.cellId_]};
++  this->addCellBoundary(c, onBoundary, boundary);
++
++  const auto getLocalId = [&c, this](const SimplexId a) {
++    if(c.dim_ == 1) {
++      return a;
++    } else if(c.dim_ == 2) {
++      return a - this->nVerts_;
++    } else if(c.dim_ == 3) {
++      return a - this->nVerts_ - this->nEdges_;
++    }
++    return -1;
++  };
++
++  while(!boundary.empty()) {
++    // youngest cell on boundary
++    const auto tau{getLocalId(*boundary.begin())};
++    const Cell cTau{c.dim_ - 1, tau};
++    const auto pTau{this->dg_.getPairedCell(cTau)};
++    const Simplex *partnerTau{}; // co-facet of tau
++    if(pTau == -1) {
++      // tau is a critical cell
++      partnerTau = &partners[getCellId(c.dim_ - 1, tau)];
++    } else {
++      partnerTau = &filtration[filtOrder[getCellId(c.dim_, pTau)]];
++    }
++    if(partnerTau->dim_ == -1 || partnerTau->id_ == -1) {
++      return tau;
++    }
++    if(pTau == -1) {
++      for(const auto e : boundaries[partnerTau->cellId_]) {
++        if(!onBoundary[e]) {
++          boundary.emplace(e);
++          onBoundary[e] = true;
++        } else {
++          const auto it{boundary.find(e)};
++          boundary.erase(it);
++          onBoundary[e] = false;
++        }
++      }
++    } else {
++      this->addCellBoundary(*partnerTau, onBoundary, boundary);
++    }
++  }
++
++  return -1;
++}
++
++int ttk::PersistentSimplexPairs::pairCellsV2(
++  std::vector<PersistencePair> &pairs,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder) const {
++
++  Timer tmall{};
++
++  // paired simplices
++  std::vector<Simplex> partners(filtration.size());
++  std::vector<bool> onBoundary(filtration.size(), false);
++
++  const auto cmpSimplices = [&filtOrder](const SimplexId a, const SimplexId b) {
++    return filtOrder[a] > filtOrder[b];
++  };
++
++  // boundaries storage
++  using Container = std::set<SimplexId, decltype(cmpSimplices)>;
++  std::vector<Container> boundaries(filtration.size(), Container(cmpSimplices));
++
++  // critical simplices indices in filtration vector
++  std::vector<SimplexId> critFilt{};
++  for(size_t i = 0; i < filtration.size(); ++i) {
++    const auto &s{filtration[i]};
++    if(this->dg_.isCellCritical(Cell{s.dim_, s.id_}) && s.dim_ > 0) {
++      critFilt.emplace_back(i);
++    }
++  }
++
++  this->printMsg("Memory allocations", 1.0, tmall.getElapsedTime(), 1,
++                 debug::LineMode::NEW, debug::Priority::DETAIL);
++
++  Timer tm{};
++
++  this->printMsg("Computing pairs", 0, 0, 1, ttk::debug::LineMode::REPLACE);
++
++  for(size_t i = 0; i < critFilt.size(); ++i) {
++
++    const auto &c{filtration[critFilt[i]]};
++
++    const auto partner = eliminateBoundariesV2(
++      c, onBoundary, boundaries, filtration, filtOrder, partners);
++    if(partner != -1) {
++      const auto &pc{filtration[filtOrder[getCellId(c.dim_ - 1, partner)]]};
++      partners[c.cellId_] = pc;
++      partners[pc.cellId_] = c;
++
++      // only record pairs with non-null persistence
++      if(c.vertsOrder_[0] != pc.vertsOrder_[0]) {
++        pairs.emplace_back(partner, c.id_, c.dim_ - 1);
++      }
++    }
++
++    // clean mask
++    for(const auto e : boundaries[c.cellId_]) {
++      onBoundary[e] = false;
++    }
++
++    if(critFilt.size() > 10 && i % (critFilt.size() / 10) == 0) {
++      this->printMsg(
++        "Computing pairs",
++        std::round(10 * i / static_cast<float>(critFilt.size())) / 10.0f,
++        tm.getElapsedTime(), 1, ttk::debug::LineMode::REPLACE);
++    }
++  }
++
++  const auto nRegPairs{pairs.size()};
++
++  this->printMsg("Computed " + std::to_string(nRegPairs) + " regular pair"
++                   + (nRegPairs > 1 ? "s" : ""),
++                 1.0, tm.getElapsedTime(), 1);
++
++  // get infinite pairs
++  for(SimplexId i = 0; i < this->nVerts_; ++i) {
++    if(partners[i].id_ == -1 && this->dg_.isCellCritical(Cell{0, i})) {
++      pairs.emplace_back(i, -1, 0);
++    }
++  }
++  if(this->nTri_ > 0) {
++    for(SimplexId i = 0; i < this->nEdges_; ++i) {
++      if(partners[i + this->nVerts_].id_ == -1
++         && this->dg_.isCellCritical(Cell{1, i})) {
++        pairs.emplace_back(i, -1, 1);
++      }
++    }
++  }
++  if(this->nTetra_ > 0) {
++    for(SimplexId i = 0; i < this->nTri_; ++i) {
++      if(partners[i + this->nVerts_ + this->nEdges_].id_ == -1
++         && this->dg_.isCellCritical(Cell{2, i})) {
++        pairs.emplace_back(i, -1, 2);
++      }
++    }
++  }
++
++  const auto nInfPairs{pairs.size() - nRegPairs};
++
++  this->printMsg("Detected " + std::to_string(nInfPairs) + " infinite pair"
++                 + (nInfPairs > 1 ? "s" : ""));
++
++  return 0;
++}
++
++ttk::SimplexId ttk::PersistentSimplexPairs::eliminateBoundariesV1(
++  const Simplex &c,
++  VisitedMask &boundary,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder,
++  const std::vector<Simplex> &partners) const {
++
++  this->addCellBoundary(c, boundary);
++
++  while(!boundary.visitedIds_.empty()) {
++    // youngest cell on boundary
++    const auto tau{*std::max_element(
++      boundary.visitedIds_.begin(), boundary.visitedIds_.end(),
++      [&filtOrder, &c, this](const SimplexId a, const SimplexId b) {
++        return filtOrder[getCellId(c.dim_ - 1, a)]
++               < filtOrder[getCellId(c.dim_ - 1, b)];
++      })};
++    const Cell cTau{c.dim_ - 1, tau};
++    const auto pTau{this->dg_.getPairedCell(cTau)};
++    const Simplex *partnerTau{}; // co-facet of tau
++    if(pTau == -1) {
++      // tau is a critical cell
++      partnerTau = &partners[getCellId(c.dim_ - 1, tau)];
++    } else {
++      partnerTau = &filtration[filtOrder[getCellId(c.dim_, pTau)]];
++    }
++    if(partnerTau->dim_ == -1 || partnerTau->id_ == -1) {
++      return tau;
++    }
++    addCellBoundary(*partnerTau, boundary);
++  }
++
++  return -1;
++}
++
++int ttk::PersistentSimplexPairs::pairCellsV1(
++  std::vector<PersistencePair> &pairs,
++  std::array<std::vector<bool>, 3> &boundaries,
++  const std::vector<Simplex> &filtration,
++  const std::vector<SimplexId> &filtOrder) const {
++
++  // for VisitedMask
++  std::vector<SimplexId> visitedIds{};
++  // paired simplices
++  std::vector<Simplex> partners(filtration.size());
++
++  // critical simplices indices in filtration vector
++  std::vector<SimplexId> critFilt{};
++  for(size_t i = 0; i < filtration.size(); ++i) {
++    const auto &s{filtration[i]};
++    if(this->dg_.isCellCritical(Cell{s.dim_, s.id_}) && s.dim_ > 0) {
++      critFilt.emplace_back(i);
++    }
++  }
++
++  Timer tm{};
++
++  this->printMsg("Computing pairs", 0, 0, 1, ttk::debug::LineMode::REPLACE);
++
++  for(size_t i = 0; i < critFilt.size(); ++i) {
++
++    const auto &c{filtration[critFilt[i]]};
++
++    // store the boundary cells
++    VisitedMask vm{boundaries[c.dim_ - 1], visitedIds};
++
++    const auto partner
++      = eliminateBoundariesV1(c, vm, filtration, filtOrder, partners);
++    if(partner != -1) {
++      const auto &pc{filtration[filtOrder[getCellId(c.dim_ - 1, partner)]]};
++      partners[c.cellId_] = pc;
++      partners[pc.cellId_] = c;
++
++      // only record pairs with non-null persistence
++      if(c.vertsOrder_[0] != pc.vertsOrder_[0]) {
++        pairs.emplace_back(partner, c.id_, c.dim_ - 1);
++      }
++    }
++
++    if(critFilt.size() > 10 && i % (critFilt.size() / 10) == 0) {
++      this->printMsg(
++        "Computing pairs",
++        std::round(10 * i / static_cast<float>(critFilt.size())) / 10.0f,
++        tm.getElapsedTime(), 1, ttk::debug::LineMode::REPLACE);
++    }
++  }
++
++  const auto nRegPairs{pairs.size()};
++
++  this->printMsg("Computed " + std::to_string(nRegPairs) + " regular pair"
++                   + (nRegPairs > 1 ? "s" : ""),
++                 1.0, tm.getElapsedTime(), 1);
++
++  // get infinite pairs
++  for(SimplexId i = 0; i < this->nVerts_; ++i) {
++    if(partners[i].id_ == -1 && this->dg_.isCellCritical(Cell{0, i})) {
++      pairs.emplace_back(i, -1, 0);
++    }
++  }
++  if(this->nTri_ > 0) {
++    for(SimplexId i = 0; i < this->nEdges_; ++i) {
++      if(partners[i + this->nVerts_].id_ == -1
++         && this->dg_.isCellCritical(Cell{1, i})) {
++        pairs.emplace_back(i, -1, 1);
++      }
++    }
++  }
++  if(this->nTetra_ > 0) {
++    for(SimplexId i = 0; i < this->nTri_; ++i) {
++      if(partners[i + this->nVerts_ + this->nEdges_].id_ == -1
++         && this->dg_.isCellCritical(Cell{2, i})) {
++        pairs.emplace_back(i, -1, 2);
++      }
++    }
++  }
++
++  const auto nInfPairs{pairs.size() - nRegPairs};
++
++  this->printMsg("Detected " + std::to_string(nInfPairs) + " infinite pair"
++                 + (nInfPairs > 1 ? "s" : ""));
++
++  return 0;
++}
+diff --git c/core/base/persistentSimplexPairs/PersistentSimplexPairs.h w/core/base/persistentSimplexPairs/PersistentSimplexPairs.h
+index 3d5266861..bf3db15ff 100644
+--- c/core/base/persistentSimplexPairs/PersistentSimplexPairs.h
++++ w/core/base/persistentSimplexPairs/PersistentSimplexPairs.h
+@@ -11,9 +11,7 @@
+ 
+ #pragma once
+ 
+-#include <AbstractTriangulation.h>
+-#include <Debug.h>
+-#include <VisitedMask.h>
++#include <DiscreteGradient.h>
+ 
+ #include <algorithm>
+ #include <string>
+@@ -44,15 +42,8 @@ namespace ttk {
+      */
+     inline void preconditionTriangulation(AbstractTriangulation *const data) {
+       if(data != nullptr) {
++        this->dg_.preconditionTriangulation(data);
+         const auto dim = data->getDimensionality();
+-        data->preconditionEdges();
+-        if(dim == 2) {
+-          data->preconditionCellEdges();
+-        } else if(dim == 3) {
+-          data->preconditionTriangles();
+-          data->preconditionTriangleEdges();
+-          data->preconditionCellTriangles();
+-        }
+         this->nVerts_ = data->getNumberOfVertices();
+         this->nEdges_ = data->getNumberOfEdges();
+         this->nTri_ = dim > 1 ? data->getNumberOfTriangles() : 0;
+@@ -60,6 +51,18 @@ namespace ttk {
+       }
+     }
+ 
++    enum class Variant {
++      ORIGINAL,
++      DG,
++      CACHE_BOUNDARIES,
++      SANDWICH,
++      PARALLEL_PRE_COMPUTE,
++    };
++
++    inline void setVariant(Variant va) {
++      this->va_ = va;
++    }
++
+     /**
+      * @brief Compute the persistence pairs from the triangulation
+      * simplicial complex
+@@ -165,6 +168,23 @@ namespace ttk {
+       }
+     }
+ 
++    template <typename Container>
++    inline void addCellBoundary(const Simplex &c,
++                                std::vector<bool> &onBoundary,
++                                Container &boundary) const {
++      for(SimplexId i = 0; i < c.dim_ + 1; ++i) {
++        const auto f{this->getCellId(c.dim_ - 1, c.faceIds_[i])};
++        if(!onBoundary[f]) {
++          boundary.emplace(f);
++          onBoundary[f] = true;
++        } else {
++          const auto it{boundary.find(f)};
++          boundary.erase(it);
++          onBoundary[f] = false;
++        }
++      }
++    }
++
+     inline SimplexId getCellId(const SimplexId cdim,
+                                const SimplexId cid) const {
+       if(cdim == 0) {
+@@ -179,6 +199,53 @@ namespace ttk {
+       return -1;
+     }
+ 
++    template <typename Container>
++    SimplexId eliminateBoundariesV4(const Simplex &c,
++                                    std::vector<bool> &onBoundary,
++                                    std::vector<Container> &boundaries,
++                                    const std::vector<Simplex> &filtration,
++                                    const std::vector<SimplexId> &filtOrder,
++                                    const std::vector<Simplex> &partners) const;
++
++    int pairCellsV4(std::vector<PersistencePair> &pairs,
++                    const std::vector<Simplex> &filtration,
++                    const std::vector<SimplexId> &filtOrder) const;
++
++    template <typename Container>
++    SimplexId eliminateBoundariesV3(const Simplex &c,
++                                    std::vector<bool> &onBoundary,
++                                    std::vector<Container> &boundaries,
++                                    const std::vector<Simplex> &filtration,
++                                    const std::vector<SimplexId> &filtOrder,
++                                    const std::vector<Simplex> &partners) const;
++
++    int pairCellsV3(std::vector<PersistencePair> &pairs,
++                    const std::vector<Simplex> &filtration,
++                    const std::vector<SimplexId> &filtOrder) const;
++
++    template <typename Container>
++    SimplexId eliminateBoundariesV2(const Simplex &c,
++                                    std::vector<bool> &onBoundary,
++                                    std::vector<Container> &boundaries,
++                                    const std::vector<Simplex> &filtration,
++                                    const std::vector<SimplexId> &filtOrder,
++                                    const std::vector<Simplex> &partners) const;
++
++    int pairCellsV2(std::vector<PersistencePair> &pairs,
++                    const std::vector<Simplex> &filtration,
++                    const std::vector<SimplexId> &filtOrder) const;
++
++    SimplexId eliminateBoundariesV1(const Simplex &c,
++                                    VisitedMask &boundary,
++                                    const std::vector<Simplex> &filtration,
++                                    const std::vector<SimplexId> &filtOrder,
++                                    const std::vector<Simplex> &partners) const;
++
++    int pairCellsV1(std::vector<PersistencePair> &pairs,
++                    std::array<std::vector<bool>, 3> &boundaries,
++                    const std::vector<Simplex> &filtration,
++                    const std::vector<SimplexId> &filtOrder) const;
++
+     SimplexId eliminateBoundaries(const Simplex &c,
+                                   VisitedMask &boundary,
+                                   const std::vector<SimplexId> &filtOrder,
+@@ -193,6 +260,8 @@ namespace ttk {
+     SimplexId nEdges_{0};
+     SimplexId nTri_{0};
+     SimplexId nTetra_{0};
++    mutable ttk::dcg::DiscreteGradient dg_{};
++    Variant va_{Variant::ORIGINAL};
+   };
+ 
+ } // namespace ttk
+@@ -205,15 +274,15 @@ int ttk::PersistentSimplexPairs::computePersistencePairs(
+ 
+   Timer tm{};
+ 
++  if(this->va_ != Variant::ORIGINAL) {
++    this->dg_.setInputOffsets(orderField);
++    this->dg_.buildGradient(triangulation);
++  }
++
+   // every simplex in the triangulation, sorted by filtration
+   const auto filtration
+     = this->computeFiltrationOrder(orderField, triangulation);
+ 
+-  std::array<std::vector<bool>, 3> boundaries{};
+-  boundaries[0].resize(this->nVerts_, false);
+-  boundaries[1].resize(this->nEdges_, false);
+-  boundaries[2].resize(this->nTri_, false);
+-
+   // simplex id -> filtration order
+   std::vector<SimplexId> filtOrder(filtration.size());
+ 
+@@ -224,7 +293,36 @@ int ttk::PersistentSimplexPairs::computePersistencePairs(
+     filtOrder[filtration[i].cellId_] = i;
+   }
+ 
+-  this->pairCells(pairs, boundaries, filtration, filtOrder);
++  switch(this->va_) {
++    case Variant::ORIGINAL: {
++      std::array<std::vector<bool>, 3> boundaries{};
++      boundaries[0].resize(this->nVerts_);
++      boundaries[1].resize(this->nEdges_);
++      boundaries[2].resize(this->nTri_);
++      this->printMsg("Using the original Zomorodian variant");
++      this->pairCells(pairs, boundaries, filtration, filtOrder);
++    } break;
++    case Variant::DG: {
++      std::array<std::vector<bool>, 3> boundaries{};
++      boundaries[0].resize(this->nVerts_);
++      boundaries[1].resize(this->nEdges_);
++      boundaries[2].resize(this->nTri_);
++      this->printMsg("Using Zomorodian + DiscreteGradient");
++      this->pairCellsV1(pairs, boundaries, filtration, filtOrder);
++    } break;
++    case Variant::CACHE_BOUNDARIES:
++      this->printMsg("Using Zomorodian + DiscreteGradient + boundary caching");
++      this->pairCellsV2(pairs, filtration, filtOrder);
++      break;
++    case Variant::SANDWICH:
++      this->printMsg("Using the Sandwich variant");
++      this->pairCellsV3(pairs, filtration, filtOrder);
++      break;
++    case Variant::PARALLEL_PRE_COMPUTE:
++      this->printMsg("Pre-compute boundaries in parallel");
++      this->pairCellsV4(pairs, filtration, filtOrder);
++      break;
++  };
+ 
+   this->printMsg(
+     "Computed " + std::to_string(pairs.size()) + " persistence pairs", 1.0,
+diff --git c/core/vtk/ttkDiphaReader/CMakeLists.txt w/core/vtk/ttkDiphaReader/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkDiphaReader/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkDiphaReader/ttk.module w/core/vtk/ttkDiphaReader/ttk.module
+new file mode 100644
+index 000000000..4945251f9
+--- /dev/null
++++ w/core/vtk/ttkDiphaReader/ttk.module
+@@ -0,0 +1,9 @@
++NAME
++  ttkDiphaReader
++SOURCES
++  ttkDiphaReader.cpp
++HEADERS
++  ttkDiphaReader.h
++DEPENDS
++  ttkAlgorithm
++  common
+diff --git c/core/vtk/ttkDiphaReader/ttkDiphaReader.cpp w/core/vtk/ttkDiphaReader/ttkDiphaReader.cpp
+new file mode 100644
+index 000000000..16233bbe0
+--- /dev/null
++++ w/core/vtk/ttkDiphaReader/ttkDiphaReader.cpp
+@@ -0,0 +1,363 @@
++#include <ttkDiphaReader.h>
++#include <ttkMacros.h>
++
++#include <vtkCellData.h>
++#include <vtkDoubleArray.h>
++#include <vtkFloatArray.h>
++#include <vtkInformation.h>
++#include <vtkLongLongArray.h>
++#include <vtkNew.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkPoints.h>
++#include <vtkUnsignedCharArray.h>
++#include <vtkUnstructuredGrid.h>
++
++#include <array>
++#include <iostream>
++#include <sstream>
++#include <string>
++#include <vector>
++
++vtkStandardNewMacro(ttkDiphaReader);
++
++void ttkDiphaReader::PrintSelf(std::ostream &os, vtkIndent indent) {
++  this->Superclass::PrintSelf(os, indent);
++
++  os << indent << "File Name: " << (this->FileName ? this->FileName : "(none)")
++     << std::endl;
++}
++
++ttkDiphaReader::ttkDiphaReader() {
++  this->setDebugMsgPrefix("DiphaReader");
++  this->SetNumberOfInputPorts(0);
++  this->SetNumberOfOutputPorts(1);
++}
++
++template <typename T>
++void readBin(std::ifstream &stream, T &res) {
++  stream.read(reinterpret_cast<char *>(&res), sizeof(res));
++}
++
++/**
++ * @brief ad-hoc struct to store pairs from a .gudhi file
++ */
++struct PersistencePair {
++  double birth{};
++  double death{};
++  ttk::SimplexId dim{};
++  bool isFinite{true};
++
++  PersistencePair() = default;
++
++  /**
++   * @brief comparison operator for sorting pairs
++   */
++  friend bool operator<(const PersistencePair &lhs,
++                        const PersistencePair &rhs) {
++    return std::tie(lhs.birth, lhs.death) < std::tie(rhs.birth, rhs.death);
++  }
++
++  friend std::ostream &operator<<(std::ostream &os, const PersistencePair &p) {
++    os << p.dim << " " << p.birth << " " << p.death << " " << p.isFinite;
++    return os;
++  }
++};
++
++/**
++ * @brief diagram is a SORTED vector of pairs (diagonal not included)
++ */
++using PersistenceDiagram = std::vector<PersistencePair>;
++
++int ttkDiphaReader::readPersistenceDiagram(std::ifstream &stream,
++                                           vtkUnstructuredGrid *output) const {
++
++  int64_t nPairs{};
++  readBin<int64_t>(stream, nPairs);
++  if(nPairs < 0) {
++    this->printErr("Negative number of persistence pairs");
++    return 0;
++  }
++
++  PersistenceDiagram diag(nPairs);
++
++  for(int64_t i = 0; i < nPairs; ++i) {
++    int64_t dim{};
++    auto &pair = diag[i];
++    readBin(stream, dim);
++    pair.dim = dim;
++    readBin(stream, pair.birth);
++    readBin(stream, pair.death);
++  }
++
++  // sort pairs
++  TTK_PSORT(this->threadNumber_, diag.begin(), diag.end());
++
++  // dataset dimensionality - 1
++  const auto rdim = diag.back().dim;
++
++  // convert data to UnstructuredGrid
++  vtkNew<vtkUnstructuredGrid> mesh{};
++  vtkNew<vtkPoints> points{};
++  points->SetNumberOfPoints(2 * nPairs);
++  vtkNew<vtkIdTypeArray> offsets{}, connectivity{};
++  offsets->SetNumberOfComponents(1);
++  offsets->SetNumberOfTuples(nPairs + 1);
++  connectivity->SetNumberOfComponents(1);
++  connectivity->SetNumberOfTuples(2 * nPairs);
++
++  vtkNew<vtkIntArray> pairType{};
++  pairType->SetNumberOfComponents(1);
++  pairType->SetName("PairType");
++  pairType->SetNumberOfTuples(nPairs);
++  vtkNew<ttkSimplexIdTypeArray> pairId{};
++  pairId->SetNumberOfComponents(1);
++  pairId->SetName("PairIdentifier");
++  pairId->SetNumberOfTuples(nPairs);
++  vtkNew<vtkDoubleArray> pairPers{};
++  pairPers->SetNumberOfComponents(1);
++  pairPers->SetName("Persistence");
++  pairPers->SetNumberOfTuples(nPairs);
++  vtkNew<vtkIntArray> critType{};
++  critType->SetNumberOfComponents(1);
++  critType->SetName("CriticalType");
++  critType->SetNumberOfTuples(2 * nPairs);
++  vtkNew<vtkDoubleArray> births{};
++  births->SetNumberOfComponents(1);
++  births->SetName("Birth");
++  births->SetNumberOfTuples(nPairs);
++  // misc dummy point data
++  vtkNew<ttkSimplexIdTypeArray> vertId{};
++  vertId->SetNumberOfComponents(1);
++  vertId->SetName(ttk::VertexScalarFieldName);
++  vertId->SetNumberOfTuples(2 * nPairs);
++  vertId->Fill(0);
++  vtkNew<vtkFloatArray> coords{};
++  coords->SetNumberOfComponents(3);
++  coords->SetName("Coordinates");
++  coords->SetNumberOfTuples(2 * nPairs);
++  coords->Fill(0.0F);
++  vtkNew<vtkUnsignedCharArray> isFinite{};
++  isFinite->SetNumberOfComponents(1);
++  isFinite->SetName("IsFinite");
++  isFinite->SetNumberOfTuples(nPairs);
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(size_t i = 0; i < diag.size(); ++i) {
++    const auto &pair = diag[i];
++    points->SetPoint(2 * i + 0, pair.birth, pair.birth, 0);
++    points->SetPoint(2 * i + 1, pair.birth, pair.death, 0);
++
++    if(pair.dim == -1) { // global extrema pair
++      critType->SetTuple1(2 * i + 0, 0);
++      critType->SetTuple1(2 * i + 1, 3);
++      pairType->SetTuple1(i, 0);
++      isFinite->SetTuple1(i, 0);
++    } else if(pair.dim < 0) { // essential class
++      critType->SetTuple1(2 * i + 0, pair.dim);
++      critType->SetTuple1(2 * i + 1, pair.dim + 1);
++      pairType->SetTuple1(i, -pair.dim - 1);
++      isFinite->SetTuple1(i, 0);
++    } else { // regular pairs
++      critType->SetTuple1(
++        2 * i + 0, (pair.dim == rdim && rdim > 0) ? 2 : pair.dim);
++      critType->SetTuple1(2 * i + 1, pair.dim == rdim ? 3 : pair.dim + 1);
++      pairType->SetTuple1(i, pair.dim);
++      isFinite->SetTuple1(i, 1);
++    }
++
++    connectivity->SetTuple1(2 * i, 2 * i);
++    connectivity->SetTuple1(2 * i + 1, 2 * i + 1);
++    offsets->SetTuple1(i, 2 * i);
++    pairId->SetTuple1(i, i);
++    pairPers->SetTuple1(i, pair.death - pair.birth);
++    births->SetTuple1(i, pair.birth);
++  }
++
++  offsets->SetTuple1(nPairs, connectivity->GetNumberOfTuples());
++  vtkNew<vtkCellArray> cells{};
++  cells->SetData(offsets, connectivity);
++  mesh->SetCells(VTK_LINE, cells);
++  mesh->SetPoints(points);
++
++  // diagonal
++  const auto minBirth = diag[0].birth;
++  std::array<vtkIdType, 2> diagIds{
++    // id of global minimum in vtkPoints
++    0,
++    // id of local minimum with highest birth in vtkPoints
++    static_cast<vtkIdType>(2 * (nPairs - 1)),
++  };
++  mesh->InsertNextCell(VTK_LINE, 2, diagIds.data());
++  pairId->InsertNextTuple1(-1); // diagonal id = -1
++  pairType->InsertNextTuple1(-1);
++  isFinite->InsertNextTuple1(0);
++  const auto maxDeath
++    = std::max_element(diag.begin(), diag.end(),
++                       [](const PersistencePair &a, const PersistencePair &b) {
++                         return a.death < b.death;
++                       })
++        ->death;
++  pairPers->InsertNextTuple1(2 * (maxDeath - minBirth));
++  births->InsertNextTuple1(minBirth);
++
++  // copy mesh to output (segfault workaround)
++  output->ShallowCopy(mesh);
++  // add data arrays
++  output->GetPointData()->AddArray(vertId);
++  output->GetPointData()->AddArray(critType);
++  output->GetPointData()->AddArray(coords);
++
++  output->GetCellData()->AddArray(births);
++  output->GetCellData()->AddArray(pairId);
++  output->GetCellData()->AddArray(pairType);
++  output->GetCellData()->AddArray(pairPers);
++  output->GetCellData()->AddArray(isFinite);
++
++  return 1;
++}
++
++int ttkDiphaReader::readImageData(std::ifstream &stream,
++                                  vtkUnstructuredGrid *output) const {
++
++  // total number of values
++  int64_t nVerts{};
++  readBin<int64_t>(stream, nVerts);
++
++  // dimension
++  int64_t dim{};
++  readBin<int64_t>(stream, dim);
++
++  // vertex resolution
++  std::array<int64_t, 3> dims{};
++  for(int i = 0; i < dim; ++i) {
++    readBin<int64_t>(stream, dims[i]);
++  }
++
++  // cell resolution
++  std::array<int64_t, 3> nCells{
++    dims[0] - 1, dims[1] - 1, dim == 3 ? dims[2] - 1 : 1};
++
++  // number of points per cell
++  const auto npointscell = dim == 3 ? 8 : 4;
++
++  // grid points
++  vtkNew<vtkPoints> points{};
++  points->SetNumberOfPoints(nVerts);
++  // grid cells connectivity arrays
++  vtkNew<vtkIdTypeArray> offsets{}, connectivity{};
++  offsets->SetNumberOfComponents(1);
++  offsets->SetNumberOfTuples(nCells[0] * nCells[1] * nCells[2] + 1);
++  connectivity->SetNumberOfComponents(1);
++  connectivity->SetNumberOfTuples(npointscell * nCells[0] * nCells[1]
++                                  * nCells[2]);
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(int64_t k = 0; k < dims[2]; ++k) {
++    for(int64_t j = 0; j < dims[1]; ++j) {
++      for(int64_t i = 0; i < dims[0]; ++i) {
++        points->SetPoint(i + j * dims[0] + k * dims[0] * dims[1], i, j, k);
++      }
++    }
++  }
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(int64_t k = 0; k < nCells[2]; ++k) {
++    for(int64_t j = 0; j < nCells[1]; ++j) {
++      for(int64_t i = 0; i < nCells[0]; ++i) {
++        // number of points per grid line
++        const auto nptl = dims[0];
++        // number of points per grid face
++        const auto nptf = nptl * dims[1];
++        const auto curr{static_cast<vtkIdType>(i + j * nptl + k * nptf)};
++        const auto o = i + j * nCells[0] + k * nCells[0] * nCells[1];
++        // build the cell connectivity and offsets array
++        if(dim == 3) {
++          connectivity->SetTuple1(npointscell * o + 0, curr);
++          connectivity->SetTuple1(npointscell * o + 1, curr + 1);
++          connectivity->SetTuple1(npointscell * o + 2, curr + nptl);
++          connectivity->SetTuple1(npointscell * o + 3, curr + nptl + 1);
++
++          connectivity->SetTuple1(npointscell * o + 4, curr + nptf);
++          connectivity->SetTuple1(npointscell * o + 5, curr + nptf + 1);
++          connectivity->SetTuple1(npointscell * o + 6, curr + nptf + nptl);
++          connectivity->SetTuple1(npointscell * o + 7, curr + nptf + nptl + 1);
++        } else if(dim == 2) {
++          connectivity->SetTuple1(npointscell * o + 0, curr);
++          connectivity->SetTuple1(npointscell * o + 1, curr + 1);
++          connectivity->SetTuple1(npointscell * o + 2, curr + nptl);
++          connectivity->SetTuple1(npointscell * o + 3, curr + nptl + 1);
++        }
++        offsets->SetTuple1(o, npointscell * o);
++      }
++    }
++  }
++  offsets->SetTuple1(
++    nCells[0] * nCells[1] * nCells[2], connectivity->GetNumberOfTuples());
++
++  // scalar field
++  vtkNew<vtkDoubleArray> sf{};
++  sf->SetName("ScalarField");
++  sf->SetNumberOfComponents(1);
++  sf->SetNumberOfTuples(nVerts);
++  for(int i = 0; i < nVerts; ++i) {
++    double val{};
++    // ! reading not parallel
++    readBin<double>(stream, val);
++    sf->SetTuple1(i, val);
++  }
++
++  // gather arrays to make the UnstructuredGrid
++  vtkNew<vtkCellArray> cells{};
++  cells->SetData(offsets, connectivity);
++  output->SetPoints(points);
++  output->SetCells(dim == 3 ? VTK_VOXEL : VTK_PIXEL, cells);
++  output->GetPointData()->AddArray(sf);
++
++  return 1;
++}
++
++int ttkDiphaReader::RequestData(vtkInformation *ttkNotUsed(request),
++                                vtkInformationVector **ttkNotUsed(inputVector),
++                                vtkInformationVector *outputVector) {
++
++  // read data from input file
++  std::ifstream stream(FileName, ios::in | ios::binary);
++
++  if(!stream.is_open()) {
++    this->printErr("Can't read file: '" + std::string{FileName} + "'");
++    return 0;
++  }
++
++  int64_t magic{};
++  readBin<int64_t>(stream, magic);
++  if(magic != 8067171840) {
++    this->printErr("Dipha magic number not detected");
++    return 0;
++  }
++
++  auto output = vtkUnstructuredGrid::GetData(outputVector);
++
++  int64_t type{};
++  readBin<int64_t>(stream, type);
++  if(type == 1) {
++    return readImageData(stream, output);
++  } else if(type == 2) {
++    return readPersistenceDiagram(stream, output);
++  } else if(type == 0) {
++    this->printErr("Cannot read Dipha Weighted Boundary Matrices");
++    return 0;
++  } else if(type == 7 || type == 8) {
++    this->printErr("Cannot read Dipha Distance Matrices");
++    return 0;
++  } else {
++    this->printErr("Cannot read unknown Dipha file");
++    return 0;
++  }
++}
+diff --git c/core/vtk/ttkDiphaReader/ttkDiphaReader.h w/core/vtk/ttkDiphaReader/ttkDiphaReader.h
+new file mode 100644
+index 000000000..51f918cd6
+--- /dev/null
++++ w/core/vtk/ttkDiphaReader/ttkDiphaReader.h
+@@ -0,0 +1,44 @@
++/// \ingroup vtk
++/// \class ttkDiphaReader
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date January 2021.
++/// \brief ttkDiphaReader - Object File Format Reader
++///
++/// Load a .dipha file into VTK format
++
++#pragma once
++
++#include <Debug.h>
++#include <ttkDiphaReaderModule.h>
++
++#include <vtkUnstructuredGridAlgorithm.h>
++
++class TTKDIPHAREADER_EXPORT ttkDiphaReader
++  : public vtkUnstructuredGridAlgorithm,
++    protected ttk::Debug {
++public:
++  vtkTypeMacro(ttkDiphaReader, vtkUnstructuredGridAlgorithm);
++
++  static ttkDiphaReader *New();
++
++  void PrintSelf(std::ostream &os, vtkIndent indent) override;
++
++  vtkSetStringMacro(FileName);
++  vtkGetStringMacro(FileName);
++
++protected:
++  ttkDiphaReader();
++
++  int readPersistenceDiagram(std::ifstream &, vtkUnstructuredGrid *) const;
++  int readImageData(std::ifstream &, vtkUnstructuredGrid *) const;
++
++  int RequestData(vtkInformation *,
++                  vtkInformationVector **,
++                  vtkInformationVector *) override;
++
++private:
++  ttkDiphaReader(const ttkDiphaReader &) = delete;
++  void operator=(const ttkDiphaReader &) = delete;
++
++  char *FileName{};
++};
+diff --git c/core/vtk/ttkDiphaReader/vtk.module w/core/vtk/ttkDiphaReader/vtk.module
+new file mode 100644
+index 000000000..135374122
+--- /dev/null
++++ w/core/vtk/ttkDiphaReader/vtk.module
+@@ -0,0 +1,7 @@
++NAME
++ ttkDiphaReader
++DEPENDS
++  VTK::FiltersCore
++  VTK::IOLegacy
++PRIVATE_DEPENDS
++  VTK::CommonCore
+diff --git c/core/vtk/ttkDiphaWriter/CMakeLists.txt w/core/vtk/ttkDiphaWriter/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkDiphaWriter/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkDiphaWriter/ttk.module w/core/vtk/ttkDiphaWriter/ttk.module
+new file mode 100644
+index 000000000..c5aa32a24
+--- /dev/null
++++ w/core/vtk/ttkDiphaWriter/ttk.module
+@@ -0,0 +1,8 @@
++NAME
++  ttkDiphaWriter
++SOURCES
++  ttkDiphaWriter.cpp
++HEADERS
++  ttkDiphaWriter.h
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkDiphaWriter/ttkDiphaWriter.cpp w/core/vtk/ttkDiphaWriter/ttkDiphaWriter.cpp
+new file mode 100644
+index 000000000..ed056579e
+--- /dev/null
++++ w/core/vtk/ttkDiphaWriter/ttkDiphaWriter.cpp
+@@ -0,0 +1,298 @@
++#include <Triangulation.h>
++#include <ttkDiphaWriter.h>
++
++#include <array>
++
++#include <vtkDataArray.h>
++#include <vtkExecutive.h>
++#include <vtkImageData.h>
++#include <vtkInformation.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkUnstructuredGrid.h>
++
++vtkStandardNewMacro(ttkDiphaWriter);
++
++ttkDiphaWriter::ttkDiphaWriter() {
++  this->SetNumberOfInputPorts(1);
++  this->setDebugMsgPrefix("DiphaWriter");
++  this->SetDebugLevel(3);
++}
++
++int ttkDiphaWriter::FillInputPortInformation(int port, vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkDiphaWriter::OpenFile() {
++
++  std::ofstream f(Filename, ios::out | ios::binary);
++
++  if(!f.fail()) {
++    Stream = std::move(f);
++  } else {
++    return -1;
++  }
++
++  return 0;
++}
++
++template <typename T>
++void writeBin(std::ofstream &stream, const T var) {
++  stream.write(reinterpret_cast<const char *>(&var), sizeof(var));
++}
++
++vtkDataArray *getValidArray(vtkPointData *const pd) {
++  if(pd == nullptr) {
++    return {};
++  }
++
++  // get first data array of input point data that is not generated by
++  // Resample to Image
++  vtkDataArray *arr{};
++
++  // avoid "vtkGhostType" arrays generated by Resample to Image
++  std::string ghost{vtkDataSetAttributes::GhostArrayName()};
++  std::string ptmask{"vtkValidPointMask"};
++
++  for(int i = 0; i < pd->GetNumberOfArrays(); ++i) {
++    arr = pd->GetArray(i);
++    if(arr != nullptr && arr->GetName() != ghost && arr->GetName() != ptmask) {
++      break;
++    }
++  }
++  if(arr == nullptr || arr->GetName() == ghost || arr->GetName() == ptmask) {
++    return {};
++  }
++
++  return arr;
++}
++
++int ttkDiphaWriter::writeImageData(vtkDataObject *input) {
++
++  const auto dataSet = vtkImageData::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkImageData");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  // Dipha magic number
++  writeBin<int64_t>(Stream, 8067171840);
++
++  // Dipha type identifier (1 -> image data)
++  writeBin<int64_t>(Stream, 1);
++
++  // total number of values
++  writeBin<int64_t>(Stream, dataSet->GetNumberOfPoints());
++
++  // dimension
++  std::array<int, 3> dims{};
++  dataSet->GetDimensions(dims.data());
++  int dim = dims[2] == 1 ? 2 : 3;
++  writeBin<int64_t>(Stream, dim);
++
++  // resolution
++  writeBin<int64_t>(Stream, dims[0]);
++  writeBin<int64_t>(Stream, dims[1]);
++  if(dim == 3) {
++    writeBin<int64_t>(Stream, dims[2]);
++  }
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++  for(int i = 0; i < arr->GetNumberOfTuples(); ++i) {
++    writeBin<double>(Stream, arr->GetTuple1(i));
++  }
++
++  return 1;
++}
++
++int ttkDiphaWriter::writeUnstructuredGrid(vtkDataObject *input) {
++  const auto dataSet = vtkUnstructuredGrid::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkUnstructuredGrid");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  auto triangulation = ttkAlgorithm::GetTriangulation(dataSet);
++  if(triangulation == nullptr) {
++    this->printErr("Missing triangulation");
++    return 0;
++  }
++  const auto dim = triangulation->getDimensionality();
++  // precondition triangulation
++  triangulation->preconditionEdges();
++  if(dim > 1) {
++    triangulation->preconditionCellEdges();
++  }
++  if(dim > 2) {
++    triangulation->preconditionTriangles();
++    triangulation->preconditionTriangleEdges();
++    triangulation->preconditionCellTriangles();
++  }
++
++  // Dipha magic number
++  writeBin<int64_t>(Stream, 8067171840);
++
++  // Dipha type identifier (0 -> weighted boundary matrix)
++  writeBin<int64_t>(Stream, 0);
++
++  // boundary type (O -> boundary)
++  writeBin<int64_t>(Stream, 0);
++
++  // global number of cells (vertices + edges + triangles + tetras)
++  const auto nVerts = triangulation->getNumberOfVertices();
++  const auto nEdges = triangulation->getNumberOfEdges();
++  const auto nTri = (dim > 1) ? triangulation->getNumberOfTriangles() : 0;
++  const auto nTetra = (dim > 2) ? triangulation->getNumberOfCells() : 0;
++  const auto num_simplices = nVerts + nEdges + nTri + nTetra;
++  writeBin<int64_t>(Stream, num_simplices);
++
++  // max dimension
++  writeBin<int64_t>(Stream, dim);
++
++  // cell dimensions
++  for(int i = 0; i < nVerts; ++i) {
++    writeBin<int64_t>(Stream, 0);
++  }
++  for(int i = 0; i < nEdges; ++i) {
++    writeBin<int64_t>(Stream, 1);
++  }
++  for(int i = 0; i < nTri; ++i) {
++    writeBin<int64_t>(Stream, 2);
++  }
++  for(int i = 0; i < nTetra; ++i) {
++    writeBin<int64_t>(Stream, 3);
++  }
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++
++  // cell values (max vertex value)
++  using ttk::SimplexId;
++  for(int i = 0; i < nVerts; ++i) {
++    writeBin<double>(Stream, arr->GetTuple1(i));
++  }
++  for(int i = 0; i < nEdges; ++i) {
++    SimplexId v0{}, v1{};
++    triangulation->getEdgeVertex(i, 0, v0);
++    triangulation->getEdgeVertex(i, 1, v1);
++    writeBin<double>(Stream, std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)));
++  }
++  for(int i = 0; i < nTri; ++i) {
++    SimplexId v0{}, v1{}, v2{};
++    triangulation->getTriangleVertex(i, 0, v0);
++    triangulation->getTriangleVertex(i, 1, v1);
++    triangulation->getTriangleVertex(i, 2, v2);
++    writeBin<double>(
++      Stream, std::max(std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)),
++                       arr->GetTuple1(v2)));
++  }
++  for(int i = 0; i < nTetra; ++i) {
++    SimplexId v0{}, v1{}, v2{}, v3{};
++    triangulation->getCellVertex(i, 0, v0);
++    triangulation->getCellVertex(i, 1, v1);
++    triangulation->getCellVertex(i, 2, v2);
++    triangulation->getCellVertex(i, 3, v3);
++    writeBin<double>(
++      Stream, std::max(std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)),
++                       std::max(arr->GetTuple1(v2), arr->GetTuple1(v3))));
++  }
++
++  // cell offsets
++  for(int i = 0; i < nVerts; ++i) {
++    writeBin<int64_t>(Stream, 0);
++  }
++  for(int i = 0; i < nEdges; ++i) {
++    writeBin<int64_t>(Stream, 2 * i);
++  }
++  for(int i = 0; i < nTri; ++i) {
++    writeBin<int64_t>(Stream, 2 * nEdges + 3 * i);
++  }
++  for(int i = 0; i < nTetra; ++i) {
++    writeBin<int64_t>(Stream, 2 * nEdges + 3 * nTri + 4 * i);
++  }
++
++  // number of entries in the boundary matrix
++  const auto num_entries = 2 * nEdges + 3 * nTri + 4 * nTetra;
++  writeBin<int64_t>(Stream, num_entries);
++
++  // flattened boundary matrix
++  for(int i = 0; i < nEdges; ++i) {
++    SimplexId v0{}, v1{};
++    triangulation->getEdgeVertex(i, 0, v0);
++    triangulation->getEdgeVertex(i, 1, v1);
++    writeBin<int64_t>(Stream, v0);
++    writeBin<int64_t>(Stream, v1);
++  }
++  for(int i = 0; i < nTri; ++i) {
++    SimplexId e0{}, e1{}, e2{};
++    triangulation->getTriangleEdge(i, 0, e0);
++    triangulation->getTriangleEdge(i, 1, e1);
++    triangulation->getTriangleEdge(i, 2, e2);
++    writeBin<int64_t>(Stream, e0 + nVerts);
++    writeBin<int64_t>(Stream, e1 + nVerts);
++    writeBin<int64_t>(Stream, e2 + nVerts);
++  }
++  for(int i = 0; i < nTetra; ++i) {
++    SimplexId t0{}, t1{}, t2{}, t3{};
++    triangulation->getCellTriangle(i, 0, t0);
++    triangulation->getCellTriangle(i, 1, t1);
++    triangulation->getCellTriangle(i, 2, t2);
++    triangulation->getCellTriangle(i, 3, t3);
++    writeBin<int64_t>(Stream, t0 + nVerts + nEdges);
++    writeBin<int64_t>(Stream, t1 + nVerts + nEdges);
++    writeBin<int64_t>(Stream, t2 + nVerts + nEdges);
++    writeBin<int64_t>(Stream, t3 + nVerts + nEdges);
++  }
++  return 1;
++}
++
++int ttkDiphaWriter::Write() {
++  ttk::Timer tm{};
++
++  const auto dataset = this->GetInput();
++  int ret{};
++  if(dataset->IsA("vtkImageData")) {
++    ret = writeImageData(dataset);
++  } else if(dataset->IsA("vtkUnstructuredGrid")) {
++    ret = writeUnstructuredGrid(dataset);
++  }
++
++  this->printMsg("Wrote file", 1.0, tm.getElapsedTime(), 1);
++  return ret;
++}
++
++vtkDataObject *ttkDiphaWriter::GetInput() {
++  // copied from ParaView's vtkWriter::GetInput()
++  if(this->GetNumberOfInputConnections(0) < 1) {
++    return nullptr;
++  }
++  return this->GetExecutive()->GetInputData(0, 0);
++}
++
++void ttkDiphaWriter::SetInputData(vtkDataObject *input) {
++  // copied from ParaView's vtkWriter::SetInputData()
++  this->SetInputDataInternal(0, input);
++}
+diff --git c/core/vtk/ttkDiphaWriter/ttkDiphaWriter.h w/core/vtk/ttkDiphaWriter/ttkDiphaWriter.h
+new file mode 100644
+index 000000000..0ff7d8d31
+--- /dev/null
++++ w/core/vtk/ttkDiphaWriter/ttkDiphaWriter.h
+@@ -0,0 +1,47 @@
++/// \ingroup vtk
++/// \class ttkDiphaWriter
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date July 2020
++/// \brief ttkDiphaWriter - Dipha Image Data Format Writer
++///
++/// Writes a Dipha Cubical Complex file from a VTK Image Data or a
++/// Dipha Explicit Complex from a VTK Unstructured Grid dataset
++
++#pragma once
++
++#include <ttkAlgorithm.h>
++#include <ttkDiphaWriterModule.h>
++
++#include <fstream>
++
++class TTKDIPHAWRITER_EXPORT ttkDiphaWriter : public ttkAlgorithm {
++
++public:
++  vtkTypeMacro(ttkDiphaWriter, ttkAlgorithm);
++
++  static ttkDiphaWriter *New();
++
++  vtkSetStringMacro(Filename);
++  vtkGetStringMacro(Filename);
++
++  // expose vtkWriter methods (duck-typing)
++  int Write();
++  vtkDataObject *GetInput();
++  void SetInputData(vtkDataObject *input);
++
++protected:
++  // Regular writer management.
++  ttkDiphaWriter();
++  int FillInputPortInformation(int port, vtkInformation *info) override;
++  int writeImageData(vtkDataObject *);
++  int writeUnstructuredGrid(vtkDataObject *);
++
++  int OpenFile();
++
++  char *Filename{};
++  std::ofstream Stream{};
++
++private:
++  ttkDiphaWriter(const ttkDiphaWriter &) = delete;
++  void operator=(const ttkDiphaWriter &) = delete;
++};
+diff --git c/core/vtk/ttkDiphaWriter/vtk.module w/core/vtk/ttkDiphaWriter/vtk.module
+new file mode 100644
+index 000000000..50707ee83
+--- /dev/null
++++ w/core/vtk/ttkDiphaWriter/vtk.module
+@@ -0,0 +1,4 @@
++NAME
++ ttkDiphaWriter
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkDiscreteMorseFunction/CMakeLists.txt w/core/vtk/ttkDiscreteMorseFunction/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkDiscreteMorseFunction/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkDiscreteMorseFunction/ttk.module w/core/vtk/ttkDiscreteMorseFunction/ttk.module
+new file mode 100644
+index 000000000..3259c4e91
+--- /dev/null
++++ w/core/vtk/ttkDiscreteMorseFunction/ttk.module
+@@ -0,0 +1,9 @@
++NAME
++  ttkDiscreteMorseFunction
++SOURCES
++  ttkDiscreteMorseFunction.cpp
++HEADERS
++  ttkDiscreteMorseFunction.h
++DEPENDS
++  discreteMorseFunction
++  ttkAlgorithm
+diff --git c/core/vtk/ttkDiscreteMorseFunction/ttkDiscreteMorseFunction.cpp w/core/vtk/ttkDiscreteMorseFunction/ttkDiscreteMorseFunction.cpp
+new file mode 100644
+index 000000000..b0ca6b40d
+--- /dev/null
++++ w/core/vtk/ttkDiscreteMorseFunction/ttkDiscreteMorseFunction.cpp
+@@ -0,0 +1,230 @@
++#include <ttkDiscreteMorseFunction.h>
++
++#include <vtkCellData.h>
++#include <vtkCellType.h>
++#include <vtkDataArray.h>
++#include <vtkInformation.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkPoints.h>
++#include <vtkSignedCharArray.h>
++#include <vtkUnsignedCharArray.h>
++#include <vtkUnstructuredGrid.h>
++
++#include <ttkMacros.h>
++#include <ttkUtils.h>
++#include <vtkUnstructuredGridBase.h>
++
++vtkStandardNewMacro(ttkDiscreteMorseFunction);
++
++ttkDiscreteMorseFunction::ttkDiscreteMorseFunction() {
++  this->setDebugMsgPrefix("DiscreteMorseFunction");
++  this->SetNumberOfInputPorts(1);
++  this->SetNumberOfOutputPorts(1);
++}
++
++int ttkDiscreteMorseFunction::FillInputPortInformation(int port,
++                                                       vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkDiscreteMorseFunction::FillOutputPortInformation(int port,
++                                                        vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkDiscreteMorseFunction::RequestData(vtkInformation *ttkNotUsed(request),
++                                          vtkInformationVector **inputVector,
++                                          vtkInformationVector *outputVector) {
++
++  auto *inputDataSet = vtkUnstructuredGrid::GetData(inputVector[0]);
++  auto *outputDataSet = vtkUnstructuredGrid::GetData(outputVector, 0);
++  if(inputDataSet == nullptr) {
++    return 0;
++  }
++
++  vtkDataArray *inputScalars = this->GetInputArrayToProcess(0, inputVector);
++  if(inputScalars == nullptr) {
++    this->printErr("Unable to retrieve input array.");
++    return 0;
++  }
++
++  if(this->GetInputArrayAssociation(0, inputVector) != 0) {
++    this->printErr("Input array needs to be a point data array.");
++    return 0;
++  }
++  if(inputScalars->GetNumberOfComponents() != 1) {
++    this->printErr("Input array needs to be a scalar array.");
++    return 0;
++  }
++
++  // If all checks pass then log which array is going to be processed.
++  this->printMsg("Starting computation...");
++  this->printMsg("  Scalar Array: " + std::string(inputScalars->GetName()));
++
++  auto triangulation = ttkAlgorithm::GetTriangulation(inputDataSet);
++  if(triangulation == nullptr) {
++    return 0;
++  }
++  const auto &explTri
++    = *static_cast<ttk::ExplicitTriangulation *>(triangulation->getData());
++
++  this->preconditionTriangulation(triangulation);
++
++  auto inputOffsets = ttkAlgorithm::GetOrderArray(
++    inputDataSet, 0, 1, this->ForceInputOffsetScalarField);
++
++  this->setInputScalarField(
++    ttkUtils::GetVoidPointer(inputScalars), inputScalars->GetMTime());
++  this->setInputOffsets(ttkUtils::GetPointer<SimplexId>(inputOffsets));
++
++  auto status = this->buildGradient(explTri);
++
++  if(status != 0) {
++    this->printErr("Could not compute the Discrete Gradient");
++    return 0;
++  }
++
++  this->dmf = this->computeDiscreteMorseFunction(
++    ttkUtils::GetPointer<SimplexId>(inputOffsets), explTri);
++  const auto res = this->computeFiltrationOrder(
++    ttkUtils::GetPointer<SimplexId>(inputOffsets), explTri);
++  this->filtr.resize(res.size());
++  for(size_t i = 0; i < res.size(); ++i) {
++    this->filtr[res[i].cellId_] = i;
++  }
++
++  if(this->dmf.empty()) {
++    this->printErr("Could not compute Discrete Morse Function");
++    this->dmf.resize(this->filtr.size(), 0);
++  }
++
++  if(status != 0) {
++    this->printErr("Could not extract the Discrete Morse Function");
++    return 0;
++  }
++
++  const auto dim = explTri.getDimensionality();
++  const auto nVerts = explTri.getNumberOfVertices();
++  const auto nEdges = explTri.getNumberOfEdges();
++  const auto nTris = dim > 1 ? explTri.getNumberOfTriangles() : 0;
++  const auto nTetras = dim > 2 ? explTri.getNumberOfCells() : 0;
++
++  const int nCells = this->dmf.size();
++  const int nCellConn = nVerts + 2 * nEdges + 3 * nTris + 4 * nTetras;
++
++  vtkNew<ttkSimplexIdTypeArray> dmfScalars{};
++  dmfScalars->SetName(this->DMFArrayName.c_str());
++  ttkUtils::SetVoidArray(dmfScalars, this->dmf.data(), this->dmf.size(), 1);
++
++  vtkNew<ttkSimplexIdTypeArray> fltScalars{};
++  fltScalars->SetName(this->FiltrArrayName.c_str());
++  ttkUtils::SetVoidArray(fltScalars, this->filtr.data(), this->filtr.size(), 1);
++
++  vtkNew<ttkSimplexIdTypeArray> dmfScalarsVerts{};
++  dmfScalarsVerts->SetName(this->DMFArrayName.c_str());
++  ttkUtils::SetVoidArray(dmfScalarsVerts, this->dmf.data(), nVerts, 1);
++
++  vtkNew<ttkSimplexIdTypeArray> fltScalarsVerts{};
++  fltScalarsVerts->SetName(this->FiltrArrayName.c_str());
++  ttkUtils::SetVoidArray(fltScalarsVerts, this->filtr.data(), nVerts, 1);
++
++  vtkNew<vtkSignedCharArray> cellDimensions{};
++  cellDimensions->SetNumberOfComponents(1);
++  cellDimensions->SetName("CellDimension");
++  cellDimensions->SetNumberOfTuples(nCells);
++
++  vtkNew<vtkUnsignedCharArray> cellTypes{};
++  cellTypes->SetNumberOfComponents(1);
++  cellTypes->SetName("CellTypes");
++  cellTypes->SetNumberOfTuples(nCells);
++
++  vtkNew<ttkSimplexIdTypeArray> cellIds{};
++  cellIds->SetNumberOfComponents(1);
++  cellIds->SetName("CellId");
++  cellIds->SetNumberOfTuples(nCells);
++
++  vtkNew<vtkIdTypeArray> offsets{}, connectivity{};
++  offsets->SetNumberOfComponents(1);
++  offsets->SetNumberOfTuples(nCells + 1);
++  connectivity->SetNumberOfComponents(1);
++  connectivity->SetNumberOfTuples(nCellConn);
++  offsets->SetTuple1(nCells, connectivity->GetNumberOfTuples());
++
++  for(int i = 0; i < nCells; ++i) {
++    int o{}, a{};
++    std::array<SimplexId, 4> verts{};
++    if(i < nVerts) {
++      o = i;
++      a = o;
++      connectivity->SetTuple1(i, i);
++      cellDimensions->SetTuple1(i, 0);
++      cellTypes->SetTuple1(i, VTK_VERTEX);
++    } else if(i < nVerts + nEdges) {
++      o = i - nVerts;
++      a = 2 * o + nVerts;
++      explTri.getEdgeVertex(o, 0, verts[0]);
++      explTri.getEdgeVertex(o, 1, verts[1]);
++      connectivity->SetTuple1(a + 0, verts[0]);
++      connectivity->SetTuple1(a + 1, verts[1]);
++      cellDimensions->SetTuple1(i, 1);
++      cellTypes->SetTuple1(i, VTK_LINE);
++    } else if(i < nVerts + nEdges + nTris) {
++      o = i - nVerts - nEdges;
++      a = 3 * o + 2 * nEdges + nVerts;
++      explTri.getTriangleVertex(o, 0, verts[0]);
++      explTri.getTriangleVertex(o, 1, verts[1]);
++      explTri.getTriangleVertex(o, 2, verts[2]);
++      connectivity->SetTuple1(a + 0, verts[0]);
++      connectivity->SetTuple1(a + 1, verts[1]);
++      connectivity->SetTuple1(a + 2, verts[2]);
++      cellDimensions->SetTuple1(i, 2);
++      cellTypes->SetTuple1(i, VTK_TRIANGLE);
++    } else {
++      o = i - nVerts - nEdges - nTris;
++      a = 4 * o + 3 * nTris + 2 * nEdges + nVerts;
++      explTri.getCellVertex(o, 0, verts[0]);
++      explTri.getCellVertex(o, 1, verts[1]);
++      explTri.getCellVertex(o, 2, verts[2]);
++      explTri.getCellVertex(o, 3, verts[3]);
++      connectivity->SetTuple1(a + 0, verts[0]);
++      connectivity->SetTuple1(a + 1, verts[1]);
++      connectivity->SetTuple1(a + 2, verts[2]);
++      connectivity->SetTuple1(a + 3, verts[3]);
++      cellDimensions->SetTuple1(i, 3);
++      cellTypes->SetTuple1(i, VTK_TETRA);
++    }
++    cellIds->SetTuple1(i, o);
++    offsets->SetTuple1(i, a);
++  }
++
++  // shallow copy input points
++  vtkNew<vtkPoints> points{};
++  points->ShallowCopy(inputDataSet->GetPoints());
++  outputDataSet->SetPoints(points);
++
++  // set point data arrays
++  outputDataSet->GetPointData()->AddArray(dmfScalarsVerts);
++  outputDataSet->GetPointData()->AddArray(fltScalarsVerts);
++
++  // set cells
++  vtkNew<vtkCellArray> cells{};
++  cells->SetData(offsets, connectivity);
++  outputDataSet->SetCells(cellTypes, cells);
++
++  // set cell data arrays
++  outputDataSet->GetCellData()->AddArray(dmfScalars);
++  outputDataSet->GetCellData()->AddArray(fltScalars);
++  outputDataSet->GetCellData()->AddArray(cellDimensions);
++  outputDataSet->GetCellData()->AddArray(cellIds);
++
++  return 1;
++}
+diff --git c/core/vtk/ttkDiscreteMorseFunction/ttkDiscreteMorseFunction.h w/core/vtk/ttkDiscreteMorseFunction/ttkDiscreteMorseFunction.h
+new file mode 100644
+index 000000000..7345fdf38
+--- /dev/null
++++ w/core/vtk/ttkDiscreteMorseFunction/ttkDiscreteMorseFunction.h
+@@ -0,0 +1,75 @@
++/// \ingroup vtk
++/// \class ttkDiscreteMorseFunction
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date August 2021
++///
++/// \brief TTK VTK-filter that computes the Discrete Morse Function.
++///
++/// This VTK filter uses the ttk::dcg::DiscreteMorseFunction module to compute
++/// the Discrete Morse Function of an input scalar field defined on
++/// the vertices of a Simplicial Complex.
++///
++/// \param Input vtkUnstructuredGrid.
++/// \param Output vtkUnstructuredGrid.
++///
++/// This filter can be used as any other VTK filter (for instance, by using the
++/// sequence of calls SetInputData(), Update(), GetOutputDataObject()).
++///
++/// The input data array needs to be specified via the standard VTK call
++/// vtkAlgorithm::SetInputArrayToProcess() with the following parameters:
++/// \param idx 0 (FIXED: the first array the algorithm requires)
++/// \param port 0 (FIXED: first port)
++/// \param connection 0 (FIXED: first connection)
++/// \param fieldAssociation 0 (FIXED: point data)
++/// \param arrayName (DYNAMIC: string identifier of the input array)
++///
++/// See the related ParaView example state files for usage examples within a
++/// VTK pipeline.
++///
++/// \sa ttk::dcg::DiscreteMorseFunction
++/// \sa ttkAlgorithm
++
++#pragma once
++
++// VTK Module
++#include <ttkDiscreteMorseFunctionModule.h>
++
++// VTK Includes
++#include <ttkAlgorithm.h>
++
++// TTK Base Includes
++#include <DiscreteMorseFunction.h>
++
++class TTKDISCRETEMORSEFUNCTION_EXPORT ttkDiscreteMorseFunction
++  : public ttkAlgorithm,
++    protected ttk::DiscreteMorseFunction {
++
++public:
++  vtkSetMacro(DMFArrayName, const std::string &);
++  vtkGetMacro(DMFArrayName, std::string);
++
++  vtkSetMacro(FiltrArrayName, const std::string &);
++  vtkGetMacro(FiltrArrayName, std::string);
++
++  vtkSetMacro(ForceInputOffsetScalarField, bool);
++  vtkGetMacro(ForceInputOffsetScalarField, bool);
++
++  static ttkDiscreteMorseFunction *New();
++  vtkTypeMacro(ttkDiscreteMorseFunction, ttkAlgorithm);
++
++protected:
++  ttkDiscreteMorseFunction();
++  ~ttkDiscreteMorseFunction() override = default;
++
++  int FillInputPortInformation(int port, vtkInformation *info) override;
++  int FillOutputPortInformation(int port, vtkInformation *info) override;
++  int RequestData(vtkInformation *request,
++                  vtkInformationVector **inputVector,
++                  vtkInformationVector *outputVector) override;
++
++private:
++  std::vector<SimplexId> dmf{}, filtr{};
++  std::string DMFArrayName{"DiscreteMorseFunction"};
++  std::string FiltrArrayName{"FiltrationOrder"};
++  bool ForceInputOffsetScalarField{false};
++};
+diff --git c/core/vtk/ttkDiscreteMorseFunction/vtk.module w/core/vtk/ttkDiscreteMorseFunction/vtk.module
+new file mode 100644
+index 000000000..25542009b
+--- /dev/null
++++ w/core/vtk/ttkDiscreteMorseFunction/vtk.module
+@@ -0,0 +1,4 @@
++NAME
++  ttkDiscreteMorseFunction
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkEireneWriter/CMakeLists.txt w/core/vtk/ttkEireneWriter/CMakeLists.txt
+new file mode 100644
+index 000000000..26d8f3afd
+--- /dev/null
++++ w/core/vtk/ttkEireneWriter/CMakeLists.txt
+@@ -0,0 +1,6 @@
++ttk_add_vtk_module()
++
++if(TTK_ENABLE_EIGEN)
++  target_compile_definitions(ttkEireneWriter PRIVATE TTK_ENABLE_EIGEN)
++  target_include_directories(ttkEireneWriter SYSTEM PRIVATE ${EIGEN3_INCLUDE_DIR})
++endif()
+diff --git c/core/vtk/ttkEireneWriter/ttk.module w/core/vtk/ttkEireneWriter/ttk.module
+new file mode 100644
+index 000000000..5672dcd45
+--- /dev/null
++++ w/core/vtk/ttkEireneWriter/ttk.module
+@@ -0,0 +1,8 @@
++NAME
++  ttkEireneWriter
++SOURCES
++  ttkEireneWriter.cpp
++HEADERS
++  ttkEireneWriter.h
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkEireneWriter/ttkEireneWriter.cpp w/core/vtk/ttkEireneWriter/ttkEireneWriter.cpp
+new file mode 100644
+index 000000000..1fc571ea8
+--- /dev/null
++++ w/core/vtk/ttkEireneWriter/ttkEireneWriter.cpp
+@@ -0,0 +1,266 @@
++#include <Triangulation.h>
++#include <ttkEireneWriter.h>
++
++#include <array>
++
++#ifdef TTK_ENABLE_EIGEN
++#include <Eigen/Sparse>
++#endif // TTK_ENABLE_EIGEN
++
++#include <vtkDataArray.h>
++#include <vtkExecutive.h>
++#include <vtkInformation.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkUnstructuredGrid.h>
++
++vtkStandardNewMacro(ttkEireneWriter);
++
++ttkEireneWriter::ttkEireneWriter() {
++  this->SetNumberOfInputPorts(1);
++  this->setDebugMsgPrefix("EireneWriter");
++  this->setDebugLevel(3);
++}
++
++int ttkEireneWriter::FillInputPortInformation(int port, vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkEireneWriter::OpenFile() {
++
++  std::ofstream f(Filename);
++
++  if(!f.fail()) {
++    Stream = std::move(f);
++  } else {
++    return -1;
++  }
++
++  return 0;
++}
++
++template <typename T>
++void writeBin(std::ofstream &stream, const T var) {
++  stream.write(reinterpret_cast<const char *>(&var), sizeof(var));
++}
++
++vtkDataArray *getValidArray(vtkPointData *const pd) {
++  if(pd == nullptr) {
++    return {};
++  }
++
++  // get first data array of input point data that is not generated by
++  // Resample to Image
++  vtkDataArray *arr{};
++
++  // avoid "vtkGhostType" arrays generated by Resample to Image
++  std::string ghost{vtkDataSetAttributes::GhostArrayName()};
++  std::string ptmask{"vtkValidPointMask"};
++
++  for(int i = 0; i < pd->GetNumberOfArrays(); ++i) {
++    arr = pd->GetArray(i);
++    if(arr != nullptr && arr->GetName() != ghost && arr->GetName() != ptmask) {
++      break;
++    }
++  }
++  if(arr == nullptr || arr->GetName() == ghost || arr->GetName() == ptmask) {
++    return {};
++  }
++
++  return arr;
++}
++
++int ttkEireneWriter::writeUnstructuredGrid(vtkDataObject *input) {
++  const auto dataSet = vtkUnstructuredGrid::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkUnstructuredGrid");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  auto triangulation = ttkAlgorithm::GetTriangulation(dataSet);
++  if(triangulation == nullptr) {
++    this->printErr("Missing triangulation");
++    return 0;
++  }
++  const auto dim = triangulation->getDimensionality();
++  // precondition triangulation
++  triangulation->preconditionEdges();
++  if(dim > 2) {
++    triangulation->preconditionTriangles();
++    triangulation->preconditionTriangleEdges();
++    triangulation->preconditionCellTriangles();
++  }
++
++  // global number of cells (vertices + edges + triangles + tetras)
++  const auto nVerts = triangulation->getNumberOfVertices();
++  const auto nEdges = triangulation->getNumberOfEdges();
++  const auto nTri = dim > 1 ? triangulation->getNumberOfTriangles() : 0;
++  const auto nTetra = dim == 3 ? triangulation->getNumberOfCells() : 0;
++  const auto num_simplices = nVerts + nEdges + nTri + nTetra;
++
++  // ev: cell dimensions
++  Stream << nVerts << ',' << nEdges;
++  if(dim > 1) {
++    Stream << ',' << nTri;
++  }
++  if(dim > 2) {
++    Stream << ',' << nTetra;
++  }
++  Stream << '\n';
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++
++  // fv: cell values (max vertex value)
++  using ttk::SimplexId;
++  Stream << arr->GetTuple1(0);
++  for(int i = 1; i < nVerts; ++i) {
++    Stream << ',' << arr->GetTuple1(i);
++  }
++  for(int i = 0; i < nEdges; ++i) {
++    SimplexId v0{}, v1{};
++    triangulation->getEdgeVertex(i, 0, v0);
++    triangulation->getEdgeVertex(i, 1, v1);
++    Stream << ',' << std::max(arr->GetTuple1(v0), arr->GetTuple1(v1));
++  }
++  for(int i = 0; i < nTri; ++i) {
++    SimplexId v0{}, v1{}, v2{};
++    triangulation->getTriangleVertex(i, 0, v0);
++    triangulation->getTriangleVertex(i, 1, v1);
++    triangulation->getTriangleVertex(i, 2, v2);
++    Stream << ','
++           << std::max(std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)),
++                       arr->GetTuple1(v2));
++  }
++  for(int i = 0; i < nTetra; ++i) {
++    SimplexId v0{}, v1{}, v2{}, v3{};
++    triangulation->getCellVertex(i, 0, v0);
++    triangulation->getCellVertex(i, 1, v1);
++    triangulation->getCellVertex(i, 2, v2);
++    triangulation->getCellVertex(i, 3, v3);
++    Stream << ','
++           << std::max(std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)),
++                       std::max(arr->GetTuple1(v2), arr->GetTuple1(v3)));
++  }
++  Stream << '\n';
++
++  // number of entries in the boundary matrix
++  const auto num_entries = 2 * nEdges + 3 * nTri + 4 * nTetra;
++
++  if(num_entries == 0) {
++    this->printErr("Empty boundary matrix!");
++    return 0;
++  }
++
++#ifdef TTK_ENABLE_EIGEN
++
++  // flattened boundary matrix
++  std::vector<Eigen::Triplet<unsigned char>> triplets(num_entries);
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(int i = 0; i < nEdges; ++i) {
++    SimplexId v0{}, v1{};
++    triangulation->getEdgeVertex(i, 0, v0);
++    triangulation->getEdgeVertex(i, 1, v1);
++    triplets[2 * i + 0] = {v0, i + nVerts, 1};
++    triplets[2 * i + 1] = {v1, i + nVerts, 1};
++  }
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(int i = 0; i < nTri; ++i) {
++    SimplexId e0{}, e1{}, e2{};
++    triangulation->getTriangleEdge(i, 0, e0);
++    triangulation->getTriangleEdge(i, 1, e1);
++    triangulation->getTriangleEdge(i, 2, e2);
++    const auto o = 3 * i + 2 * nEdges;
++    triplets[o + 0] = {e0 + nVerts, i + nVerts + nEdges, 1};
++    triplets[o + 1] = {e1 + nVerts, i + nVerts + nEdges, 1};
++    triplets[o + 2] = {e2 + nVerts, i + nVerts + nEdges, 1};
++  }
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(int i = 0; i < nTetra; ++i) {
++    SimplexId t0{}, t1{}, t2{}, t3{};
++    triangulation->getCellTriangle(i, 0, t0);
++    triangulation->getCellTriangle(i, 1, t1);
++    triangulation->getCellTriangle(i, 2, t2);
++    triangulation->getCellTriangle(i, 3, t3);
++    const auto o = 4 * i + 2 * nEdges + 3 * nTri;
++    triplets[o + 0] = {t0 + nVerts + nEdges, i + nVerts + nEdges + nTri, 1};
++    triplets[o + 1] = {t1 + nVerts + nEdges, i + nVerts + nEdges + nTri, 1};
++    triplets[o + 2] = {t2 + nVerts + nEdges, i + nVerts + nEdges + nTri, 1};
++    triplets[o + 3] = {t3 + nVerts + nEdges, i + nVerts + nEdges + nTri, 1};
++  }
++
++  Eigen::SparseMatrix<unsigned char> spmat{};
++  spmat.resize(num_simplices, num_simplices);
++  spmat.setFromTriplets(triplets.begin(), triplets.end());
++  spmat.makeCompressed();
++
++  // rv
++  Stream << spmat.innerIndexPtr()[0] + 1; // (Julia is 1-indexed)
++  for(int i = 1; i < num_entries; ++i) {
++    Stream << ',' << spmat.innerIndexPtr()[i] + 1; // (Julia is 1-indexed)
++  }
++  Stream << '\n';
++
++  // cp
++  Stream << spmat.outerIndexPtr()[0] + 1; // (Julia is 1-indexed)
++  for(int i = 1; i < spmat.cols() + 1; ++i) {
++    Stream << ',' << spmat.outerIndexPtr()[i] + 1; // (Julia is 1-indexed)
++  }
++  Stream << '\n';
++
++#else
++
++  this->printErr("Need Eigen to generate Eirene.jl CSV Sparse Column Format");
++
++#endif // TTK_ENABLE_EIGEN
++
++  return 1;
++}
++
++int ttkEireneWriter::Write() {
++  ttk::Timer tm{};
++
++  const auto dataset = this->GetInput();
++  int ret{};
++  if(dataset->IsA("vtkUnstructuredGrid")) {
++    ret = writeUnstructuredGrid(dataset);
++  }
++
++  this->printMsg("Wrote file", 1.0, tm.getElapsedTime(), 1);
++  return ret;
++}
++
++vtkDataObject *ttkEireneWriter::GetInput() {
++  // copied from ParaView's vtkWriter::GetInput()
++  if(this->GetNumberOfInputConnections(0) < 1) {
++    return nullptr;
++  }
++  return this->GetExecutive()->GetInputData(0, 0);
++}
++
++void ttkEireneWriter::SetInputData(vtkDataObject *input) {
++  // copied from ParaView's vtkWriter::SetInputData()
++  this->SetInputDataInternal(0, input);
++}
+diff --git c/core/vtk/ttkEireneWriter/ttkEireneWriter.h w/core/vtk/ttkEireneWriter/ttkEireneWriter.h
+new file mode 100644
+index 000000000..9a3eb2c30
+--- /dev/null
++++ w/core/vtk/ttkEireneWriter/ttkEireneWriter.h
+@@ -0,0 +1,46 @@
++/// \ingroup vtk
++/// \class ttkEireneWriter
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date July 2020
++/// \brief ttkEireneWriter - Dipha Image Data Format Writer
++///
++/// Writes a Dipha Cubical Complex file from a VTK Image Data or a
++/// Dipha Explicit Complex from a VTK Unstructured Grid dataset
++
++#pragma once
++
++#include <ttkAlgorithm.h>
++#include <ttkEireneWriterModule.h>
++
++#include <fstream>
++
++class TTKEIRENEWRITER_EXPORT ttkEireneWriter : public ttkAlgorithm {
++
++public:
++  vtkTypeMacro(ttkEireneWriter, ttkAlgorithm);
++
++  static ttkEireneWriter *New();
++
++  vtkSetStringMacro(Filename);
++  vtkGetStringMacro(Filename);
++
++  // expose vtkWriter methods (duck-typing)
++  int Write();
++  vtkDataObject *GetInput();
++  void SetInputData(vtkDataObject *input);
++
++protected:
++  // Regular writer management.
++  ttkEireneWriter();
++  int FillInputPortInformation(int port, vtkInformation *info) override;
++  int writeUnstructuredGrid(vtkDataObject *);
++
++  int OpenFile();
++
++  char *Filename{};
++  std::ofstream Stream{};
++
++private:
++  ttkEireneWriter(const ttkEireneWriter &) = delete;
++  void operator=(const ttkEireneWriter &) = delete;
++};
+diff --git c/core/vtk/ttkEireneWriter/vtk.module w/core/vtk/ttkEireneWriter/vtk.module
+new file mode 100644
+index 000000000..40d89c003
+--- /dev/null
++++ w/core/vtk/ttkEireneWriter/vtk.module
+@@ -0,0 +1,4 @@
++NAME
++ ttkEireneWriter
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkGudhiPersistenceDiagramReader/CMakeLists.txt w/core/vtk/ttkGudhiPersistenceDiagramReader/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkGudhiPersistenceDiagramReader/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkGudhiPersistenceDiagramReader/ttk.module w/core/vtk/ttkGudhiPersistenceDiagramReader/ttk.module
+new file mode 100644
+index 000000000..c7e0b438d
+--- /dev/null
++++ w/core/vtk/ttkGudhiPersistenceDiagramReader/ttk.module
+@@ -0,0 +1,9 @@
++NAME
++  ttkGudhiPersistenceDiagramReader
++SOURCES
++  ttkGudhiPersistenceDiagramReader.cpp
++HEADERS
++  ttkGudhiPersistenceDiagramReader.h
++DEPENDS
++  ttkAlgorithm
++  common
+diff --git c/core/vtk/ttkGudhiPersistenceDiagramReader/ttkGudhiPersistenceDiagramReader.cpp w/core/vtk/ttkGudhiPersistenceDiagramReader/ttkGudhiPersistenceDiagramReader.cpp
+new file mode 100644
+index 000000000..c69d1f096
+--- /dev/null
++++ w/core/vtk/ttkGudhiPersistenceDiagramReader/ttkGudhiPersistenceDiagramReader.cpp
+@@ -0,0 +1,243 @@
++#include <ttkGudhiPersistenceDiagramReader.h>
++#include <ttkMacros.h>
++
++#include <vtkCellData.h>
++#include <vtkDoubleArray.h>
++#include <vtkFloatArray.h>
++#include <vtkInformation.h>
++#include <vtkLongLongArray.h>
++#include <vtkNew.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkPoints.h>
++#include <vtkUnstructuredGrid.h>
++
++#include <array>
++#include <cmath>
++#include <iostream>
++#include <sstream>
++#include <string>
++#include <vector>
++
++vtkStandardNewMacro(ttkGudhiPersistenceDiagramReader);
++
++void ttkGudhiPersistenceDiagramReader::PrintSelf(std::ostream &os,
++                                                 vtkIndent indent) {
++  this->Superclass::PrintSelf(os, indent);
++
++  os << indent << "File Name: " << (this->FileName ? this->FileName : "(none)")
++     << std::endl;
++}
++
++ttkGudhiPersistenceDiagramReader::ttkGudhiPersistenceDiagramReader() {
++  this->setDebugMsgPrefix("GudhiPersistenceDiagramReader");
++  this->SetNumberOfInputPorts(0);
++  this->SetNumberOfOutputPorts(1);
++}
++
++// ad-hoc struct to store pairs from a .gudhi file
++struct PersistencePair {
++  double birth{};
++  double death{};
++  ttk::SimplexId dim{};
++  bool isFinite{true};
++
++  PersistencePair(const double bi,
++                  const double de,
++                  const ttk::SimplexId di,
++                  const bool fi)
++    : birth(bi), death(de), dim(di), isFinite(fi) {
++  }
++
++  // comparison operator for sorting pairs
++  friend bool operator<(const PersistencePair &lhs,
++                        const PersistencePair &rhs) {
++    return std::tie(lhs.birth, lhs.death) < std::tie(rhs.birth, rhs.death);
++  }
++
++  friend std::ostream &operator<<(std::ostream &os, const PersistencePair &p) {
++    os << p.dim << " " << p.birth << " " << p.death << " " << p.isFinite;
++    return os;
++  }
++};
++
++// diagram is a SORTED vector of pairs (diagonal not included)
++using PersistenceDiagram = std::vector<PersistencePair>;
++
++int ttkGudhiPersistenceDiagramReader::RequestData(
++  vtkInformation *ttkNotUsed(request),
++  vtkInformationVector **ttkNotUsed(inputVector),
++  vtkInformationVector *outputVector) {
++
++  // read data from input file
++  std::ifstream stream(FileName, ios::in);
++
++  if(!stream.is_open()) {
++    this->printErr("Can't read file: '" + std::string{FileName} + "'");
++    return -1;
++  }
++
++  PersistenceDiagram diag{};
++
++  std::string line{};
++  while(!stream.eof()) {
++    std::getline(stream, line);
++
++    // ignore empty and commented lines (beginning with a "#")
++    if(line.empty() || line[0] == '#') {
++      continue;
++    }
++
++    std::array<double, 4> values{};
++    std::stringstream ss(line);
++    int nVals = std::sscanf(line.c_str(), "%lf %lf %lf %lf", &values[0],
++                            &values[1], &values[2], &values[3]);
++    if(nVals > 1) {
++      const auto isFinite = std::isfinite(values[nVals - 1]);
++      diag.emplace_back(values[nVals - 2], isFinite ? values[nVals - 1] : -1,
++                        nVals > 2 ? values[nVals - 3] : -1, isFinite);
++    }
++  }
++
++  if(diag.empty()) {
++    this->printErr("Diagram has no pairs");
++    return 0;
++  }
++
++  const auto nPairs = diag.size();
++
++  // convert data to UnstructuredGrid
++  vtkNew<vtkUnstructuredGrid> mesh{};
++  vtkNew<vtkPoints> points{};
++  points->SetNumberOfPoints(2 * nPairs);
++  vtkNew<vtkIdTypeArray> offsets{}, connectivity{};
++  offsets->SetNumberOfComponents(1);
++  offsets->SetNumberOfTuples(nPairs + 1);
++  connectivity->SetNumberOfComponents(1);
++  connectivity->SetNumberOfTuples(2 * nPairs);
++
++  vtkNew<vtkIntArray> pairType{};
++  pairType->SetNumberOfComponents(1);
++  pairType->SetName("PairType");
++  pairType->SetNumberOfTuples(nPairs);
++  vtkNew<ttkSimplexIdTypeArray> pairId{};
++  pairId->SetNumberOfComponents(1);
++  pairId->SetName("PairIdentifier");
++  pairId->SetNumberOfTuples(nPairs);
++  vtkNew<vtkDoubleArray> pairPers{};
++  pairPers->SetNumberOfComponents(1);
++  pairPers->SetName("Persistence");
++  pairPers->SetNumberOfTuples(nPairs);
++  vtkNew<vtkUnsignedCharArray> isFinite{};
++  isFinite->SetNumberOfComponents(1);
++  isFinite->SetName("IsFinite");
++  isFinite->SetNumberOfTuples(nPairs);
++  vtkNew<vtkDoubleArray> births{};
++  births->SetNumberOfComponents(1);
++  births->SetName("Birth");
++  births->SetNumberOfTuples(nPairs);
++
++  vtkNew<vtkIntArray> critType{};
++  critType->SetNumberOfComponents(1);
++  critType->SetName("CriticalType");
++  critType->SetNumberOfTuples(2 * nPairs);
++  // misc dummy point data
++  vtkNew<ttkSimplexIdTypeArray> vertId{};
++  vertId->SetNumberOfComponents(1);
++  vertId->SetName(ttk::VertexScalarFieldName);
++  vertId->SetNumberOfTuples(2 * nPairs);
++  vertId->Fill(0);
++  vtkNew<vtkFloatArray> coords{};
++  coords->SetNumberOfComponents(3);
++  coords->SetName("Coordinates");
++  coords->SetNumberOfTuples(2 * nPairs);
++  coords->Fill(0.0F);
++
++  const auto maxDeath
++    = std::max_element(diag.begin(), diag.end(),
++                       [](const PersistencePair &a, const PersistencePair &b) {
++                         return a.death < b.death;
++                       })
++        ->death;
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(size_t i = 0; i < diag.size(); ++i) {
++    auto &pair = diag[i];
++    if(pair.dim == -1 || pair.death == -1) {
++      pair.isFinite = false;
++      pair.death = maxDeath;
++    }
++  }
++
++  // sort pairs
++  TTK_PSORT(this->threadNumber_, diag.begin(), diag.end());
++
++  // dataset dimensionality - 1
++  const auto rdim = diag.back().dim;
++
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(this->threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(size_t i = 0; i < nPairs; ++i) {
++    const auto &pair = diag[i];
++    points->SetPoint(2 * i + 0, pair.birth, pair.birth, 0);
++    points->SetPoint(2 * i + 1, pair.birth, pair.death, 0);
++
++    critType->SetTuple1(
++      2 * i + 0, (pair.dim == rdim && rdim > 0) ? 2 : pair.dim);
++    critType->SetTuple1(2 * i + 1, pair.dim == rdim ? 3 : pair.dim + 1);
++    pairType->SetTuple1(i, pair.dim);
++
++    if(!pair.isFinite) { // global extrema pair
++      isFinite->SetTuple1(i, 0);
++    } else { // regular pairs
++      isFinite->SetTuple1(i, 1);
++    }
++
++    connectivity->SetTuple1(2 * i, 2 * i);
++    connectivity->SetTuple1(2 * i + 1, 2 * i + 1);
++    offsets->SetTuple1(i, 2 * i);
++    pairId->SetTuple1(i, i);
++    pairPers->SetTuple1(i, pair.death - pair.birth);
++    births->SetTuple1(i, pair.birth);
++  }
++
++  offsets->SetTuple1(nPairs, connectivity->GetNumberOfTuples());
++  vtkNew<vtkCellArray> cells{};
++  cells->SetData(offsets, connectivity);
++  mesh->SetCells(VTK_LINE, cells);
++  mesh->SetPoints(points);
++
++  // diagonal
++  const auto minBirth = diag[0].birth;
++  std::array<vtkIdType, 2> diagIds{
++    // id of global minimum in vtkPoints
++    0,
++    // id of local minimum with highest birth in vtkPoints
++    static_cast<vtkIdType>(2 * (nPairs - 1)),
++  };
++  mesh->InsertNextCell(VTK_LINE, 2, diagIds.data());
++  pairId->InsertNextTuple1(-1); // diagonal id = -1
++  pairType->InsertNextTuple1(-1);
++  isFinite->InsertNextTuple1(0);
++  pairPers->InsertNextTuple1(2 * (maxDeath - minBirth));
++  births->InsertNextTuple1(minBirth);
++
++  // copy mesh to output (segfault workaround)
++  auto output = vtkUnstructuredGrid::GetData(outputVector);
++  output->ShallowCopy(mesh);
++  // add data arrays
++  output->GetPointData()->AddArray(vertId);
++  output->GetPointData()->AddArray(critType);
++  output->GetPointData()->AddArray(coords);
++
++  output->GetCellData()->AddArray(pairId);
++  output->GetCellData()->AddArray(pairType);
++  output->GetCellData()->AddArray(pairPers);
++  output->GetCellData()->AddArray(births);
++  output->GetCellData()->AddArray(isFinite);
++
++  return 1;
++}
+diff --git c/core/vtk/ttkGudhiPersistenceDiagramReader/ttkGudhiPersistenceDiagramReader.h w/core/vtk/ttkGudhiPersistenceDiagramReader/ttkGudhiPersistenceDiagramReader.h
+new file mode 100644
+index 000000000..4765d27e1
+--- /dev/null
++++ w/core/vtk/ttkGudhiPersistenceDiagramReader/ttkGudhiPersistenceDiagramReader.h
+@@ -0,0 +1,44 @@
++/// \ingroup vtk
++/// \class ttkGudhiPersistenceDiagramReader
++/// \author Charles Gueunet <charles.gueunet@kitware.com>
++/// \date December 2017.
++/// \brief ttkGudhiPersistenceDiagramReader - Gudhi Persistence Diagram Reader
++///
++/// Load a .pers file into VTK format
++///
++/// Note: This reader is not able to deal with comment on the file
++
++#pragma once
++
++#include <Debug.h>
++#include <ttkGudhiPersistenceDiagramReaderModule.h>
++
++#include <vtkUnstructuredGridAlgorithm.h>
++
++class TTKGUDHIPERSISTENCEDIAGRAMREADER_EXPORT ttkGudhiPersistenceDiagramReader
++  : public vtkUnstructuredGridAlgorithm,
++    protected ttk::Debug {
++public:
++  vtkTypeMacro(ttkGudhiPersistenceDiagramReader, vtkUnstructuredGridAlgorithm);
++
++  static ttkGudhiPersistenceDiagramReader *New();
++
++  void PrintSelf(std::ostream &os, vtkIndent indent) override;
++
++  vtkSetStringMacro(FileName);
++  vtkGetStringMacro(FileName);
++
++protected:
++  ttkGudhiPersistenceDiagramReader();
++
++  int RequestData(vtkInformation *,
++                  vtkInformationVector **,
++                  vtkInformationVector *) override;
++
++private:
++  ttkGudhiPersistenceDiagramReader(const ttkGudhiPersistenceDiagramReader &)
++    = delete;
++  void operator=(const ttkGudhiPersistenceDiagramReader &) = delete;
++
++  char *FileName{};
++};
+diff --git c/core/vtk/ttkGudhiPersistenceDiagramReader/vtk.module w/core/vtk/ttkGudhiPersistenceDiagramReader/vtk.module
+new file mode 100644
+index 000000000..8dfd3fa56
+--- /dev/null
++++ w/core/vtk/ttkGudhiPersistenceDiagramReader/vtk.module
+@@ -0,0 +1,7 @@
++NAME
++ ttkGudhiPersistenceDiagramReader
++DEPENDS
++  VTK::FiltersCore
++  VTK::IOLegacy
++PRIVATE_DEPENDS
++  VTK::CommonCore
+diff --git c/core/vtk/ttkPerseusWriter/CMakeLists.txt w/core/vtk/ttkPerseusWriter/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkPerseusWriter/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkPerseusWriter/ttk.module w/core/vtk/ttkPerseusWriter/ttk.module
+new file mode 100644
+index 000000000..c099e26d1
+--- /dev/null
++++ w/core/vtk/ttkPerseusWriter/ttk.module
+@@ -0,0 +1,8 @@
++NAME
++  ttkPerseusWriter
++SOURCES
++  ttkPerseusWriter.cpp
++HEADERS
++  ttkPerseusWriter.h
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkPerseusWriter/ttkPerseusWriter.cpp w/core/vtk/ttkPerseusWriter/ttkPerseusWriter.cpp
+new file mode 100644
+index 000000000..d5337cccb
+--- /dev/null
++++ w/core/vtk/ttkPerseusWriter/ttkPerseusWriter.cpp
+@@ -0,0 +1,216 @@
++#include <Triangulation.h>
++#include <ttkPerseusWriter.h>
++#include <ttkUtils.h>
++
++#include <array>
++#include <numeric>
++
++#include <vtkDataArray.h>
++#include <vtkExecutive.h>
++#include <vtkImageData.h>
++#include <vtkInformation.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkUnstructuredGrid.h>
++
++vtkStandardNewMacro(ttkPerseusWriter);
++
++ttkPerseusWriter::ttkPerseusWriter() {
++  this->SetNumberOfInputPorts(1);
++  this->setDebugMsgPrefix("PerseusWriter");
++  this->SetDebugLevel(3);
++}
++
++int ttkPerseusWriter::FillInputPortInformation(int port, vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkPerseusWriter::OpenFile() {
++
++  std::ofstream f(Filename, ios::out);
++
++  if(!f.fail()) {
++    Stream = std::move(f);
++  } else {
++    return -1;
++  }
++
++  return 0;
++}
++
++vtkDataArray *getValidArray(vtkPointData *const pd) {
++  if(pd == nullptr) {
++    return {};
++  }
++
++  // get first data array of input point data that is not generated by
++  // Resample to Image
++  vtkDataArray *arr{};
++
++  // avoid "vtkGhostType" arrays generated by Resample to Image
++  std::string ghost{vtkDataSetAttributes::GhostArrayName()};
++  std::string ptmask{"vtkValidPointMask"};
++
++  for(int i = 0; i < pd->GetNumberOfArrays(); ++i) {
++    arr = pd->GetArray(i);
++    if(arr != nullptr && arr->GetName() != ghost && arr->GetName() != ptmask) {
++      break;
++    }
++  }
++  if(arr == nullptr || arr->GetName() == ghost || arr->GetName() == ptmask) {
++    return {};
++  }
++
++  return arr;
++}
++
++int ttkPerseusWriter::writeImageData(vtkDataObject *input) {
++
++  const auto dataSet = vtkImageData::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkImageData");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  // dimension
++  std::array<int, 3> dims{};
++  dataSet->GetDimensions(dims.data());
++  int dim = dims[2] == 1 ? 2 : 3;
++  Stream << dim << '\n';
++
++  // resolution
++  for(int i = 0; i < dim; ++i) {
++    Stream << dims[i] << '\n';
++  }
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++  if(arr->GetNumberOfComponents() != 1) {
++    this->printErr("Data array should have only 1 component");
++    return 0;
++  }
++  for(int i = 0; i < arr->GetNumberOfTuples(); ++i) {
++    Stream << static_cast<long long>(arr->GetTuple1(i)) << '\n';
++  }
++
++  return 1;
++}
++
++int ttkPerseusWriter::writeUnstructuredGrid(vtkDataObject *input) {
++
++  const auto dataSet = vtkUnstructuredGrid::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkUnstructuredGrid");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++
++  using ttk::SimplexId;
++
++  // compute order on scalar field array
++  std::vector<SimplexId> newOrderArray(arr->GetNumberOfTuples());
++
++  switch(arr->GetDataType()) {
++    vtkTemplateMacro(ttk::preconditionOrderArray(
++      arr->GetNumberOfTuples(),
++      static_cast<VTK_TT *>(ttkUtils::GetVoidPointer(arr)),
++      newOrderArray.data(), this->threadNumber_));
++  }
++
++  auto triangulation = ttkAlgorithm::GetTriangulation(dataSet);
++  if(triangulation == nullptr) {
++    this->printErr("Missing triangulation");
++    return 0;
++  }
++
++  if(triangulation->getNumberOfVertices() != arr->GetNumberOfTuples()) {
++    this->printErr("Mismatch between triangulation and scalar field array");
++    return 0;
++  }
++
++  // dimensionality
++  const auto dim = triangulation->getDimensionality();
++  Stream << dim << '\n';
++  // ambient dimension of the vertices (use natural ordering)
++  Stream << 1 << '\n';
++
++  const auto nCells = triangulation->getNumberOfCells();
++  if(nCells < 1) {
++    this->printErr("Triangulation has no cells");
++    return 0;
++  }
++
++  // assume uniform triangulation
++  const auto nVertsCell = triangulation->getCellVertexNumber(0);
++  if(nCells < 1) {
++    this->printErr("Triangulation cell has no vertices");
++    return 0;
++  }
++
++  // write cell vertices + cell order to file
++  for(SimplexId i = 0; i < nCells; ++i) {
++    std::array<SimplexId, 4> cellVertsOrder{};
++    for(SimplexId j = 0; j < nVertsCell; ++j) {
++      SimplexId v{};
++      triangulation->getCellVertex(i, j, v);
++      Stream << v << " ";
++      cellVertsOrder[j] = newOrderArray[v];
++    }
++    Stream << *std::max_element(cellVertsOrder.begin(), cellVertsOrder.end())
++           << '\n';
++  }
++
++  return 1;
++}
++
++int ttkPerseusWriter::Write() {
++  ttk::Timer tm{};
++
++  const auto dataset = this->GetInput();
++  int ret{};
++  if(dataset->IsA("vtkImageData")) {
++    ret = writeImageData(dataset);
++  } else if(dataset->IsA("vtkUnstructuredGrid")) {
++    ret = writeUnstructuredGrid(dataset);
++  }
++
++  this->printMsg("Wrote file", 1.0, tm.getElapsedTime(), 1);
++  return ret;
++}
++
++vtkDataObject *ttkPerseusWriter::GetInput() {
++  // copied from ParaView's vtkWriter::GetInput()
++  if(this->GetNumberOfInputConnections(0) < 1) {
++    return nullptr;
++  }
++  return this->GetExecutive()->GetInputData(0, 0);
++}
++
++void ttkPerseusWriter::SetInputData(vtkDataObject *input) {
++  // copied from ParaView's vtkWriter::SetInputData()
++  this->SetInputDataInternal(0, input);
++}
+diff --git c/core/vtk/ttkPerseusWriter/ttkPerseusWriter.h w/core/vtk/ttkPerseusWriter/ttkPerseusWriter.h
+new file mode 100644
+index 000000000..50b277c51
+--- /dev/null
++++ w/core/vtk/ttkPerseusWriter/ttkPerseusWriter.h
+@@ -0,0 +1,48 @@
++/// \ingroup vtk
++/// \class ttkPerseusWriter
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date July 2020
++/// \brief ttkPerseusWriter - Perseus Cubical Grid Format Writer
++///
++/// Writes a Perseus Cubical Grid file from a VTK Image Data.
++
++#pragma once
++
++#include <vtkDataSetWriter.h>
++
++#include <ttkAlgorithm.h>
++#include <ttkPerseusWriterModule.h>
++
++#include <fstream>
++
++class TTKPERSEUSWRITER_EXPORT ttkPerseusWriter : public ttkAlgorithm {
++
++public:
++  vtkTypeMacro(ttkPerseusWriter, ttkAlgorithm);
++
++  static ttkPerseusWriter *New();
++
++  vtkSetStringMacro(Filename);
++  vtkGetStringMacro(Filename);
++
++  // expose vtkWriter methods (duck-typing)
++  int Write();
++  vtkDataObject *GetInput();
++  void SetInputData(vtkDataObject *input);
++
++protected:
++  // Regular writer management
++  ttkPerseusWriter();
++  int FillInputPortInformation(int port, vtkInformation *info) override;
++  int writeImageData(vtkDataObject *);
++  int writeUnstructuredGrid(vtkDataObject *);
++
++  int OpenFile();
++
++  char *Filename{};
++  std::ofstream Stream{};
++
++private:
++  ttkPerseusWriter(const ttkPerseusWriter &) = delete;
++  void operator=(const ttkPerseusWriter &) = delete;
++};
+diff --git c/core/vtk/ttkPerseusWriter/vtk.module w/core/vtk/ttkPerseusWriter/vtk.module
+new file mode 100644
+index 000000000..9be003959
+--- /dev/null
++++ w/core/vtk/ttkPerseusWriter/vtk.module
+@@ -0,0 +1,4 @@
++NAME
++ ttkPerseusWriter
++DEPENDS
++ ttkAlgorithm
+diff --git c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp
+index c7102da04..653d97c16 100644
+--- c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp
++++ w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp
+@@ -89,6 +89,8 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
+                                        vtkInformationVector **inputVector,
+                                        vtkInformationVector *outputVector) {
+ 
++  ttk::Timer tm{};
++
+   vtkDataSet *input = vtkDataSet::GetData(inputVector[0]);
+   vtkUnstructuredGrid *outputCTPersistenceDiagram
+     = vtkUnstructuredGrid::GetData(outputVector, 0);
+@@ -101,8 +103,14 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
+   }
+ #endif
+ 
++  this->printMsg("Create triangulation", 1.0, tm.getElapsedTime(), 1);
++  tm.reStart();
++
+   this->preconditionTriangulation(triangulation);
+ 
++  this->printMsg("Precondition triangulation", 1.0, tm.getElapsedTime(), 1);
++  tm.reStart();
++
+   vtkDataArray *inputScalars = this->GetInputArrayToProcess(0, inputVector);
+ #ifndef TTK_ENABLE_KAMIKAZE
+   if(!inputScalars) {
+@@ -144,6 +152,8 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
+   outputScalars->DeepCopy(inputScalars);
+   outputScalars->SetName("Cropped");
+ 
++  this->printMsg("Generate order array", 1.0, tm.getElapsedTime(), 1);
++
+   int status{};
+   ttkVtkTemplateMacro(
+     inputScalars->GetDataType(), triangulation->getType(),
+diff --git c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h
+index 1aea2b39d..f01a18cb4 100644
+--- c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h
++++ w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h
+@@ -153,6 +153,12 @@ public:
+   ttkSetEnumMacro(BackEnd, BACKEND);
+   vtkGetEnumMacro(BackEnd, BACKEND);
+ 
++  void SetZomorodianVariant(const int va) {
++    this->setZomorodianVariant(
++      static_cast<ttk::PersistentSimplexPairs::Variant>(va));
++    this->Modified();
++  }
++
+   vtkGetMacro(StartingResolutionLevel, int);
+   vtkSetMacro(StartingResolutionLevel, int);
+ 
+diff --git c/core/vtk/ttkPhatWriter/CMakeLists.txt w/core/vtk/ttkPhatWriter/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkPhatWriter/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkPhatWriter/ttk.module w/core/vtk/ttkPhatWriter/ttk.module
+new file mode 100644
+index 000000000..637a27f0b
+--- /dev/null
++++ w/core/vtk/ttkPhatWriter/ttk.module
+@@ -0,0 +1,9 @@
++NAME
++  ttkPhatWriter
++SOURCES
++  ttkPhatWriter.cpp
++HEADERS
++  ttkPhatWriter.h
++DEPENDS
++  ttkAlgorithm
++  discreteMorseFunction
+diff --git c/core/vtk/ttkPhatWriter/ttkPhatWriter.cpp w/core/vtk/ttkPhatWriter/ttkPhatWriter.cpp
+new file mode 100644
+index 000000000..f2b250ba8
+--- /dev/null
++++ w/core/vtk/ttkPhatWriter/ttkPhatWriter.cpp
+@@ -0,0 +1,189 @@
++#include <DiscreteMorseFunction.h>
++#include <Triangulation.h>
++#include <ttkPhatWriter.h>
++#include <ttkUtils.h>
++
++#include <array>
++
++#include <vtkDataArray.h>
++#include <vtkExecutive.h>
++#include <vtkImageData.h>
++#include <vtkInformation.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkUnstructuredGrid.h>
++
++vtkStandardNewMacro(ttkPhatWriter);
++
++ttkPhatWriter::ttkPhatWriter() {
++  this->SetNumberOfInputPorts(1);
++  this->setDebugMsgPrefix("PhatWriter");
++  this->SetDebugLevel(3);
++}
++
++int ttkPhatWriter::FillInputPortInformation(int port, vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkPhatWriter::OpenFile() {
++
++  std::ofstream f(Filename, ios::out);
++
++  if(!f.fail()) {
++    Stream = std::move(f);
++  } else {
++    return -1;
++  }
++
++  return 0;
++}
++
++template <typename T>
++void writeBin(std::ofstream &stream, const T var) {
++  stream.write(reinterpret_cast<const char *>(&var), sizeof(var));
++}
++
++vtkDataArray *getValidArray(vtkPointData *const pd) {
++  if(pd == nullptr) {
++    return {};
++  }
++
++  // get first data array of input point data that is not generated by
++  // Resample to Image
++  vtkDataArray *arr{};
++
++  // avoid "vtkGhostType" arrays generated by Resample to Image
++  std::string ghost{vtkDataSetAttributes::GhostArrayName()};
++  std::string ptmask{"vtkValidPointMask"};
++
++  for(int i = 0; i < pd->GetNumberOfArrays(); ++i) {
++    arr = pd->GetArray(i);
++    if(arr != nullptr && arr->GetName() != ghost && arr->GetName() != ptmask) {
++      break;
++    }
++  }
++  if(arr == nullptr || arr->GetName() == ghost || arr->GetName() == ptmask) {
++    return {};
++  }
++
++  return arr;
++}
++
++int ttkPhatWriter::writeUnstructuredGrid(vtkDataObject *input) {
++  const auto dataSet = vtkUnstructuredGrid::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkUnstructuredGrid");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  auto triangulation = ttkAlgorithm::GetTriangulation(dataSet);
++  if(triangulation == nullptr) {
++    this->printErr("Missing triangulation");
++    return 0;
++  }
++  const auto dim = triangulation->getDimensionality();
++  // precondition triangulation
++  triangulation->preconditionEdges();
++  if(dim > 2) {
++    triangulation->preconditionTriangles();
++    triangulation->preconditionTriangleEdges();
++    triangulation->preconditionCellTriangles();
++  }
++
++  const auto nVerts = triangulation->getNumberOfVertices();
++  const auto nEdges = triangulation->getNumberOfEdges();
++  const auto nTri = (dim > 1) ? triangulation->getNumberOfTriangles() : 0;
++  const auto nTetra = (dim > 2) ? triangulation->getNumberOfCells() : 0;
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++
++  ttk::DiscreteMorseFunction dmf{};
++  dmf.setThreadNumber(this->threadNumber_);
++  dmf.setDebugLevel(this->debugLevel_);
++  const auto filtOrder = dmf.computeFiltrationOrder(
++    ttkUtils::GetPointer<ttk::SimplexId>(arr), *triangulation);
++
++  std::array<std::vector<SimplexId>, 4> cellPos{};
++  for(size_t i = 0; i < cellPos.size(); ++i) {
++    auto &vec{cellPos[i]};
++    if(i == 0) {
++      vec.resize(nVerts);
++    } else if(i == 1) {
++      vec.resize(nEdges);
++    } else if(i == 2) {
++      vec.resize(nTri);
++    } else if(i == 3) {
++      vec.resize(nTetra);
++    }
++  }
++  for(size_t i = 0; i < filtOrder.size(); ++i) {
++    const auto &c{filtOrder[i]};
++    cellPos[c.dim_][c.id_] = i;
++  }
++
++  for(const auto &c : filtOrder) {
++    // cell dimension
++    Stream << c.dim_ << " ";
++    // cell boundary size
++    Stream << (c.dim_ > 0 ? c.dim_ + 1 : 0) << " ";
++    // cell boundary
++    if(c.dim_ == 0) {
++      Stream << '\n';
++      continue;
++    }
++    for(int i = 0; i < c.dim_ + 1; ++i) {
++      SimplexId v{};
++      if(c.dim_ == 1) {
++        triangulation->getEdgeVertex(c.id_, i, v);
++      } else if(c.dim_ == 2) {
++        triangulation->getTriangleEdge(c.id_, i, v);
++      } else if(c.dim_ == 3) {
++        triangulation->getCellTriangle(c.id_, i, v);
++      }
++      Stream << cellPos[c.dim_ - 1][v] << " ";
++    }
++    Stream << '\n';
++  }
++
++  return 1;
++}
++
++int ttkPhatWriter::Write() {
++  ttk::Timer tm{};
++
++  const auto dataset = this->GetInput();
++  int ret{};
++  if(dataset->IsA("vtkUnstructuredGrid")) {
++    ret = writeUnstructuredGrid(dataset);
++  }
++
++  this->printMsg("Wrote file", 1.0, tm.getElapsedTime(), 1);
++  return ret;
++}
++
++vtkDataObject *ttkPhatWriter::GetInput() {
++  // copied from ParaView's vtkWriter::GetInput()
++  if(this->GetNumberOfInputConnections(0) < 1) {
++    return nullptr;
++  }
++  return this->GetExecutive()->GetInputData(0, 0);
++}
++
++void ttkPhatWriter::SetInputData(vtkDataObject *input) {
++  // copied from ParaView's vtkWriter::SetInputData()
++  this->SetInputDataInternal(0, input);
++}
+diff --git c/core/vtk/ttkPhatWriter/ttkPhatWriter.h w/core/vtk/ttkPhatWriter/ttkPhatWriter.h
+new file mode 100644
+index 000000000..77b31f85a
+--- /dev/null
++++ w/core/vtk/ttkPhatWriter/ttkPhatWriter.h
+@@ -0,0 +1,46 @@
++/// \ingroup vtk
++/// \class ttkPhatWriter
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date July 2020
++/// \brief ttkPhatWriter - Dipha Image Data Format Writer
++///
++/// Writes a Dipha Cubical Complex file from a VTK Image Data or a
++/// Dipha Explicit Complex from a VTK Unstructured Grid dataset
++
++#pragma once
++
++#include <ttkAlgorithm.h>
++#include <ttkPhatWriterModule.h>
++
++#include <fstream>
++
++class TTKPHATWRITER_EXPORT ttkPhatWriter : public ttkAlgorithm {
++
++public:
++  vtkTypeMacro(ttkPhatWriter, ttkAlgorithm);
++
++  static ttkPhatWriter *New();
++
++  vtkSetStringMacro(Filename);
++  vtkGetStringMacro(Filename);
++
++  // expose vtkWriter methods (duck-typing)
++  int Write();
++  vtkDataObject *GetInput();
++  void SetInputData(vtkDataObject *input);
++
++protected:
++  // Regular writer management.
++  ttkPhatWriter();
++  int FillInputPortInformation(int port, vtkInformation *info) override;
++  int writeUnstructuredGrid(vtkDataObject *);
++
++  int OpenFile();
++
++  char *Filename{};
++  std::ofstream Stream{};
++
++private:
++  ttkPhatWriter(const ttkPhatWriter &) = delete;
++  void operator=(const ttkPhatWriter &) = delete;
++};
+diff --git c/core/vtk/ttkPhatWriter/vtk.module w/core/vtk/ttkPhatWriter/vtk.module
+new file mode 100644
+index 000000000..d166769aa
+--- /dev/null
++++ w/core/vtk/ttkPhatWriter/vtk.module
+@@ -0,0 +1,4 @@
++NAME
++ ttkPhatWriter
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkSimplicialComplexWriter/CMakeLists.txt w/core/vtk/ttkSimplicialComplexWriter/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkSimplicialComplexWriter/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkSimplicialComplexWriter/ttk.module w/core/vtk/ttkSimplicialComplexWriter/ttk.module
+new file mode 100644
+index 000000000..3014b69b5
+--- /dev/null
++++ w/core/vtk/ttkSimplicialComplexWriter/ttk.module
+@@ -0,0 +1,8 @@
++NAME
++  ttkSimplicialComplexWriter
++SOURCES
++  ttkSimplicialComplexWriter.cpp
++HEADERS
++  ttkSimplicialComplexWriter.h
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkSimplicialComplexWriter/ttkSimplicialComplexWriter.cpp w/core/vtk/ttkSimplicialComplexWriter/ttkSimplicialComplexWriter.cpp
+new file mode 100644
+index 000000000..dc628e961
+--- /dev/null
++++ w/core/vtk/ttkSimplicialComplexWriter/ttkSimplicialComplexWriter.cpp
+@@ -0,0 +1,220 @@
++#include <Triangulation.h>
++#include <ttkSimplicialComplexWriter.h>
++
++#include <array>
++#include <cstring>
++
++#include <vtkDataArray.h>
++#include <vtkExecutive.h>
++#include <vtkImageData.h>
++#include <vtkInformation.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkUnstructuredGrid.h>
++
++vtkStandardNewMacro(ttkSimplicialComplexWriter);
++
++ttkSimplicialComplexWriter::ttkSimplicialComplexWriter() {
++  this->SetNumberOfInputPorts(1);
++  this->setDebugMsgPrefix("SimplicialComplexWriter");
++  this->setDebugLevel(3);
++}
++
++int ttkSimplicialComplexWriter::FillInputPortInformation(int port,
++                                                         vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkSimplicialComplexWriter::OpenFile() {
++
++  std::ofstream f(Filename, ios::out | ios::binary);
++
++  if(!f.fail()) {
++    Stream = std::move(f);
++  } else {
++    return -1;
++  }
++
++  return 0;
++}
++
++template <typename T>
++void writeBin(std::ofstream &stream, const T var) {
++  stream.write(reinterpret_cast<const char *>(&var), sizeof(var));
++}
++
++vtkDataArray *getValidArray(vtkPointData *const pd) {
++  if(pd == nullptr) {
++    return {};
++  }
++
++  // get first data array of input point data that is not generated by
++  // Resample to Image
++  vtkDataArray *arr{};
++
++  // avoid "vtkGhostType" arrays generated by Resample to Image
++  std::string ghost{vtkDataSetAttributes::GhostArrayName()};
++  std::string ptmask{"vtkValidPointMask"};
++
++  for(int i = 0; i < pd->GetNumberOfArrays(); ++i) {
++    arr = pd->GetArray(i);
++    if(arr != nullptr && arr->GetName() != ghost && arr->GetName() != ptmask) {
++      break;
++    }
++  }
++  if(arr == nullptr || arr->GetName() == ghost || arr->GetName() == ptmask) {
++    return {};
++  }
++
++  return arr;
++}
++
++int ttkSimplicialComplexWriter::writeUnstructuredGrid(vtkDataObject *input) {
++  const auto dataSet = vtkUnstructuredGrid::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkImageData");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  auto triangulation = ttkAlgorithm::GetTriangulation(dataSet);
++  if(triangulation == nullptr) {
++    this->printErr("Missing triangulation");
++    return 0;
++  }
++  const auto dim = triangulation->getDimensionality();
++  // precondition triangulation
++  triangulation->preconditionEdges();
++  if(dim > 2) {
++    triangulation->preconditionTriangles();
++  }
++
++  // magic number
++  const char magic[] = "TTKSimplicialComplex";
++  Stream.write(magic, std::strlen(magic));
++
++  // global number of cells (vertices + edges + triangles + tetras)
++  const auto nVerts = triangulation->getNumberOfVertices();
++  const auto nEdges = triangulation->getNumberOfEdges();
++  const auto nTri = dim > 1 ? triangulation->getNumberOfTriangles() : 0;
++  const auto nTetra = dim > 2 ? triangulation->getNumberOfCells() : 0;
++  const auto num_simplices = nVerts + nEdges + nTri + nTetra;
++  writeBin<ttk::SimplexId>(Stream, num_simplices);
++
++  // max dimension
++  writeBin<ttk::SimplexId>(Stream, dim);
++
++  // number of cells per dimensions
++  writeBin<ttk::SimplexId>(Stream, nVerts);
++  writeBin<ttk::SimplexId>(Stream, nEdges);
++  writeBin<ttk::SimplexId>(Stream, nTri);
++  writeBin<ttk::SimplexId>(Stream, nTetra);
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++
++  // cell values (max vertex value)
++  using ttk::SimplexId;
++  for(int i = 0; i < nVerts; ++i) {
++    writeBin<double>(Stream, arr->GetTuple1(i));
++  }
++  for(int i = 0; i < nEdges; ++i) {
++    SimplexId v0{}, v1{};
++    triangulation->getEdgeVertex(i, 0, v0);
++    triangulation->getEdgeVertex(i, 1, v1);
++    writeBin<double>(Stream, std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)));
++  }
++  for(int i = 0; i < nTri; ++i) {
++    SimplexId v0{}, v1{}, v2{};
++    triangulation->getTriangleVertex(i, 0, v0);
++    triangulation->getTriangleVertex(i, 1, v1);
++    triangulation->getTriangleVertex(i, 2, v2);
++    writeBin<double>(
++      Stream, std::max(std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)),
++                       arr->GetTuple1(v2)));
++  }
++  for(int i = 0; i < nTetra; ++i) {
++    SimplexId v0{}, v1{}, v2{}, v3{};
++    triangulation->getCellVertex(i, 0, v0);
++    triangulation->getCellVertex(i, 1, v1);
++    triangulation->getCellVertex(i, 2, v2);
++    triangulation->getCellVertex(i, 3, v3);
++    writeBin<double>(
++      Stream, std::max(std::max(arr->GetTuple1(v0), arr->GetTuple1(v1)),
++                       std::max(arr->GetTuple1(v2), arr->GetTuple1(v3))));
++  }
++
++  // number of entries in the boundary matrix
++  const auto num_entries = 2 * nEdges + 3 * nTri + 4 * nTetra;
++  writeBin<ttk::SimplexId>(Stream, num_entries);
++
++  // flattened boundary matrix
++  for(int i = 0; i < nEdges; ++i) {
++    SimplexId v0{}, v1{};
++    triangulation->getEdgeVertex(i, 0, v0);
++    triangulation->getEdgeVertex(i, 1, v1);
++    writeBin<ttk::SimplexId>(Stream, v0);
++    writeBin<ttk::SimplexId>(Stream, v1);
++  }
++  for(int i = 0; i < nTri; ++i) {
++    SimplexId v0{}, v1{}, v2{};
++    triangulation->getTriangleVertex(i, 0, v0);
++    triangulation->getTriangleVertex(i, 1, v1);
++    triangulation->getTriangleVertex(i, 2, v2);
++    writeBin<ttk::SimplexId>(Stream, v0);
++    writeBin<ttk::SimplexId>(Stream, v1);
++    writeBin<ttk::SimplexId>(Stream, v2);
++  }
++  for(int i = 0; i < nTetra; ++i) {
++    std::array<SimplexId, 4> v{};
++    triangulation->getCellVertex(i, 0, v[0]);
++    triangulation->getCellVertex(i, 1, v[1]);
++    triangulation->getCellVertex(i, 2, v[2]);
++    triangulation->getCellVertex(i, 3, v[3]);
++    // sort cell vertices in increasing order
++    std::sort(v.begin(), v.end());
++    writeBin<ttk::SimplexId>(Stream, v[0]);
++    writeBin<ttk::SimplexId>(Stream, v[1]);
++    writeBin<ttk::SimplexId>(Stream, v[2]);
++    writeBin<ttk::SimplexId>(Stream, v[3]);
++  }
++  return 1;
++}
++
++int ttkSimplicialComplexWriter::Write() {
++  ttk::Timer tm{};
++
++  const auto dataset = this->GetInput();
++  int ret{};
++  if(dataset->IsA("vtkUnstructuredGrid")) {
++    ret = writeUnstructuredGrid(dataset);
++  }
++
++  this->printMsg("Wrote file", 1.0, tm.getElapsedTime(), 1);
++  return ret;
++}
++
++vtkDataObject *ttkSimplicialComplexWriter::GetInput() {
++  // copied from ParaView's vtkWriter::GetInput()
++  if(this->GetNumberOfInputConnections(0) < 1) {
++    return nullptr;
++  }
++  return this->GetExecutive()->GetInputData(0, 0);
++}
++
++void ttkSimplicialComplexWriter::SetInputData(vtkDataObject *input) {
++  // copied from ParaView's vtkWriter::SetInputData()
++  this->SetInputDataInternal(0, input);
++}
+diff --git c/core/vtk/ttkSimplicialComplexWriter/ttkSimplicialComplexWriter.h w/core/vtk/ttkSimplicialComplexWriter/ttkSimplicialComplexWriter.h
+new file mode 100644
+index 000000000..dcf751178
+--- /dev/null
++++ w/core/vtk/ttkSimplicialComplexWriter/ttkSimplicialComplexWriter.h
+@@ -0,0 +1,47 @@
++/// \ingroup vtk
++/// \class ttkSimplicialComplexWriter
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date July 2020
++/// \brief ttkSimplicialComplexWriter - Dipha Image Data Format Writer
++///
++/// Writes a Dipha Cubical Complex file from a VTK Image Data or a
++/// Dipha Explicit Complex from a VTK Unstructured Grid dataset
++
++#pragma once
++
++#include <ttkAlgorithm.h>
++#include <ttkSimplicialComplexWriterModule.h>
++
++#include <fstream>
++
++class TTKSIMPLICIALCOMPLEXWRITER_EXPORT ttkSimplicialComplexWriter
++  : public ttkAlgorithm {
++
++public:
++  vtkTypeMacro(ttkSimplicialComplexWriter, ttkAlgorithm);
++
++  static ttkSimplicialComplexWriter *New();
++
++  vtkSetStringMacro(Filename);
++  vtkGetStringMacro(Filename);
++
++  // expose vtkWriter methods (duck-typing)
++  int Write();
++  vtkDataObject *GetInput();
++  void SetInputData(vtkDataObject *input);
++
++protected:
++  // Regular writer management.
++  ttkSimplicialComplexWriter();
++  int FillInputPortInformation(int port, vtkInformation *info) override;
++  int writeUnstructuredGrid(vtkDataObject *);
++
++  int OpenFile();
++
++  char *Filename{};
++  std::ofstream Stream{};
++
++private:
++  ttkSimplicialComplexWriter(const ttkSimplicialComplexWriter &) = delete;
++  void operator=(const ttkSimplicialComplexWriter &) = delete;
++};
+diff --git c/core/vtk/ttkSimplicialComplexWriter/vtk.module w/core/vtk/ttkSimplicialComplexWriter/vtk.module
+new file mode 100644
+index 000000000..06f9035d6
+--- /dev/null
++++ w/core/vtk/ttkSimplicialComplexWriter/vtk.module
+@@ -0,0 +1,4 @@
++NAME
++ ttkSimplicialComplexWriter
++DEPENDS
++  ttkAlgorithm
+diff --git c/paraview/xmls/DiphaReader.xml w/paraview/xmls/DiphaReader.xml
+new file mode 100644
+index 000000000..e35ddcf92
+--- /dev/null
++++ w/paraview/xmls/DiphaReader.xml
+@@ -0,0 +1,32 @@
++<ServerManagerConfiguration>
++
++   <ProxyGroup name="sources">
++      <!-- ================================================================== -->
++      <SourceProxy name="ttkDiphaReader"
++                   class="ttkDiphaReader"
++                   label="TTK Dipha File Format Reader">
++         <Documentation
++            long_help="Import a Dipha File Format to a VTK Unstructured Grid."
++            short_help="Read a .dipha file.">
++           Import a Dipha File Format mesh into a VTK Unstructured Grid.
++         </Documentation>
++         <StringVectorProperty
++            name="FileName"
++            animateable="0"
++            command="SetFileName"
++            number_of_elements="1">
++            <FileListDomain name="files"/>
++            <Documentation>
++               This property specifies the file name for the Dipha reader.
++            </Documentation>
++         </StringVectorProperty>
++
++         <Hints>
++            <ReaderFactory extensions="dipha"
++               file_description="Dipha File Format" />
++         </Hints>
++      </SourceProxy>
++      <!-- End Reader -->
++   </ProxyGroup>
++
++</ServerManagerConfiguration>
+diff --git c/paraview/xmls/DiphaWriter.xml w/paraview/xmls/DiphaWriter.xml
+new file mode 100644
+index 000000000..854f08ce7
+--- /dev/null
++++ w/paraview/xmls/DiphaWriter.xml
+@@ -0,0 +1,42 @@
++<ServerManagerConfiguration>
++
++  <ProxyGroup name="writers">
++    <!-- ================================================================== -->
++    <WriterProxy
++        name="ttkDiphaWriter"
++        class="ttkDiphaWriter"
++        label="TTK Dipha File Format Writer">
++        <Documentation
++          long_help="Export a VTK DataSet into the Dipha File Format format."
++          short_help="Write an .dipha file.">
++          Export a VTK DataSet into the Dipha file format.
++        </Documentation>
++        <InputProperty name="Input" command="SetInputConnection">
++          <ProxyGroupDomain name="groups">
++            <Group name="sources"/>
++            <Group name="filters"/>
++          </ProxyGroupDomain>
++          <DataTypeDomain name="input_type" composite_data_supported="0">
++            <DataType value="vtkDataSet"/>
++          </DataTypeDomain>
++        </InputProperty>
++        <StringVectorProperty
++          name="FileName"
++          command="SetFilename"
++          number_of_elements="1">
++          <FileListDomain name="files"/>
++          <Documentation>
++              This property specifies the file name for the Dipha writer.
++          </Documentation>
++        </StringVectorProperty>
++        <Hints>
++          <Property name="Input" show="0"/>
++          <Property name="FileName" show="0"/>
++          <WriterFactory extensions="dipha"
++                file_description="Dipha File Format" />
++        </Hints>
++    </WriterProxy>
++    <!-- End Writer -->
++  </ProxyGroup>
++
++</ServerManagerConfiguration>
+diff --git c/paraview/xmls/DiscreteMorseFunction.xml w/paraview/xmls/DiscreteMorseFunction.xml
+new file mode 100644
+index 000000000..1a024b15f
+--- /dev/null
++++ w/paraview/xmls/DiscreteMorseFunction.xml
+@@ -0,0 +1,117 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<ServerManagerConfiguration>
++  <ProxyGroup name="filters">
++    <SourceProxy name="ttkDiscreteMorseFunction"
++                 class="ttkDiscreteMorseFunction"
++                 label="TTK DiscreteMorseFunction">
++      <Documentation long_help="Computes the Discrete Morse Function of a Simplicial Complex"
++                     short_help="Computes the Discrete Morse Function">
++        This filter computes the Discrete Morse Function of a Simplicial Complex.
++      </Documentation>
++
++      <!-- INPUT DATA OBJECTS -->
++      <InputProperty name="Input" command="SetInputConnection">
++        <ProxyGroupDomain name="groups">
++          <Group name="sources" />
++          <Group name="filters" />
++        </ProxyGroupDomain>
++        <DataTypeDomain name="input_type">
++          <DataType value="vtkUnstructuredGrid" />
++        </DataTypeDomain>
++        <InputArrayDomain name="input_array" attribute_type="point" number_of_components="1" />
++        <Documentation>
++          A vtkUnstructuredGrid that has at least one point data scalar array
++          that can be used to compute the Discrete Morse Function.
++        </Documentation>
++      </InputProperty>
++
++      <!-- INPUT PARAMETER WIDGETS -->
++
++      <StringVectorProperty name="InputArray"
++                            label="Input Array"
++                            command="SetInputArrayToProcess"
++                            element_types="0 0 0 0 2"
++                            number_of_elements="5">
++        <ArrayListDomain attribute_type="Scalars" name="array_list">
++          <RequiredProperties>
++            <Property function="Input" name="Input" />
++          </RequiredProperties>
++        </ArrayListDomain>
++        <Documentation>
++          The scalar array that will be used to compute the Discrete Morse Function.
++        </Documentation>
++      </StringVectorProperty>
++
++      <IntVectorProperty
++        name="ForceInputOffsetScalarField"
++        command="SetForceInputOffsetScalarField"
++        label="Force Input Offset Field"
++        number_of_elements="1"
++        panel_visibility="advanced"
++        default_values="0">
++        <BooleanDomain name="bool"/>
++        <Documentation>
++          Check this box to force the usage of a specific input scalar field
++          as vertex offset (used to disambiguate flat plateaus).
++        </Documentation>
++      </IntVectorProperty>
++
++      <StringVectorProperty name="Offset Field"
++                            command="SetInputArrayToProcess"
++                            element_types="0 0 0 0 2"
++                            number_of_elements="5"
++                            default_values="1"
++                            animateable="0"
++                            panel_visibility="advanced" >
++        <ArrayListDomain name="array_list"
++                         default_values="0" >
++          <RequiredProperties>
++            <Property name="Input" function="Input" />
++          </RequiredProperties>
++        </ArrayListDomain>
++        <Hints>
++          <PropertyWidgetDecorator type="GenericDecorator"
++                                   mode="visibility"
++                                   property="ForceInputOffsetScalarField"
++                                   value="1" />
++        </Hints>
++        <Documentation>
++          Select the input offset field (to disambiguate flat plateaus).
++        </Documentation>
++      </StringVectorProperty>
++
++      <PropertyGroup panel_widget="Line" label="Input Options">
++        <Property name="InputArray" />
++        <Property name="ForceInputOffsetScalarField"/>
++        <Property name="Offset Field"/>
++      </PropertyGroup>
++
++      <!-- OUTPUT PARAMETER WIDGETS -->
++
++      <StringVectorProperty name="DMFArrayName"
++                            label="DMF Array Name"
++                            command="SetDMFArrayName"
++                            number_of_elements="1"
++                            default_values="DiscreteMorseFunction" />
++
++      <StringVectorProperty name="FiltrArrayName"
++                            label="Filtration Array Name"
++                            command="SetFiltrArrayName"
++                            number_of_elements="1"
++                            default_values="FiltrationOrder" />
++
++      <PropertyGroup panel_widget="Line" label="Output Options">
++        <Property name="DMFArrayName" />
++        <Property name="FiltrArrayName" />
++      </PropertyGroup>
++
++      <!-- DEBUG -->
++      ${DEBUG_WIDGETS}
++
++      <!-- MENU CATEGORY -->
++      <Hints>
++        <ShowInMenu category="TTK - Scalar Data" />
++      </Hints>
++    </SourceProxy>
++  </ProxyGroup>
++</ServerManagerConfiguration>
+diff --git c/paraview/xmls/EireneWriter.xml w/paraview/xmls/EireneWriter.xml
+new file mode 100644
+index 000000000..ab140554e
+--- /dev/null
++++ w/paraview/xmls/EireneWriter.xml
+@@ -0,0 +1,42 @@
++<ServerManagerConfiguration>
++
++  <ProxyGroup name="writers">
++    <!-- ================================================================== -->
++    <WriterProxy
++        name="ttkEireneWriter"
++        class="ttkEireneWriter"
++        label="TTK Eirene File Format Writer">
++        <Documentation
++          long_help="Export a VTK Unstructured Grid to Eirene.jl."
++          short_help="Write an .csv file.">
++          Export a VTK Unstructured Grid into the Eirene.jl CSV Sparse Column Format.
++        </Documentation>
++        <InputProperty name="Input" command="SetInputConnection">
++          <ProxyGroupDomain name="groups">
++            <Group name="sources"/>
++            <Group name="filters"/>
++          </ProxyGroupDomain>
++          <DataTypeDomain name="input_type" composite_data_supported="0">
++            <DataType value="vtkUnstructuredGrid"/>
++          </DataTypeDomain>
++        </InputProperty>
++        <StringVectorProperty
++          name="FileName"
++          command="SetFilename"
++          number_of_elements="1">
++          <FileListDomain name="files"/>
++          <Documentation>
++              This property specifies the file name for the Eirene writer.
++          </Documentation>
++        </StringVectorProperty>
++        <Hints>
++          <Property name="Input" show="0"/>
++          <Property name="FileName" show="0"/>
++          <WriterFactory extensions="eirene"
++                file_description="Eirene.jl CSV Sparse Column Format" />
++        </Hints>
++    </WriterProxy>
++    <!-- End Writer -->
++  </ProxyGroup>
++
++</ServerManagerConfiguration>
+diff --git c/paraview/xmls/GudhiPersistenceDiagramReader.xml w/paraview/xmls/GudhiPersistenceDiagramReader.xml
+new file mode 100644
+index 000000000..09c16b35b
+--- /dev/null
++++ w/paraview/xmls/GudhiPersistenceDiagramReader.xml
+@@ -0,0 +1,32 @@
++<ServerManagerConfiguration>
++
++   <ProxyGroup name="sources">
++      <!-- ================================================================== -->
++      <SourceProxy name="ttkGudhiPersistenceDiagramReader"
++                   class="ttkGudhiPersistenceDiagramReader"
++                   label="TTK Gudhi Persistence Diagram Reader">
++         <Documentation
++            long_help="Import a Gudhi Persistence Diagram Format to a VTK Unstructured Grid."
++            short_help="Read a .gudhi file.">
++           Import an Object File Format mesh into a VTK Unstructured Grid.
++         </Documentation>
++         <StringVectorProperty
++            name="FileName"
++            animateable="0"
++            command="SetFileName"
++            number_of_elements="1">
++            <FileListDomain name="files"/>
++            <Documentation>
++               This property specifies the file name for the OFF reader.
++            </Documentation>
++         </StringVectorProperty>
++
++         <Hints>
++            <ReaderFactory extensions="gudhi"
++               file_description="Gudhi Persistence Diagram Format" />
++         </Hints>
++      </SourceProxy>
++      <!-- End Reader -->
++   </ProxyGroup>
++
++</ServerManagerConfiguration>
+diff --git c/paraview/xmls/PerseusWriter.xml w/paraview/xmls/PerseusWriter.xml
+new file mode 100644
+index 000000000..69d1e1cf2
+--- /dev/null
++++ w/paraview/xmls/PerseusWriter.xml
+@@ -0,0 +1,43 @@
++<ServerManagerConfiguration>
++
++  <ProxyGroup name="writers">
++    <!-- ================================================================== -->
++    <WriterProxy
++        name="ttkPerseusWriter"
++        class="ttkPerseusWriter"
++        label="TTK Perseus Writer">
++        <Documentation
++          long_help="Export a VTK Data Set into the Perseus format."
++          short_help="Write a .pers file.">
++          Export a VTK Data Set into the Perseus format (Cubical Grid
++          for Image Data, Simplicial Toplex for Unstructured Grids).
++        </Documentation>
++        <InputProperty name="Input" command="SetInputConnection">
++          <ProxyGroupDomain name="groups">
++            <Group name="sources"/>
++            <Group name="filters"/>
++          </ProxyGroupDomain>
++          <DataTypeDomain name="input_type" composite_data_supported="0">
++            <DataType value="vtkDataSet"/>
++          </DataTypeDomain>
++        </InputProperty>
++        <StringVectorProperty
++          name="FileName"
++          command="SetFilename"
++          number_of_elements="1">
++          <FileListDomain name="files"/>
++          <Documentation>
++              This property specifies the file name for the Perseus writer.
++          </Documentation>
++        </StringVectorProperty>
++        <Hints>
++          <Property name="Input" show="0"/>
++          <Property name="FileName" show="0"/>
++          <WriterFactory extensions="pers"
++                         file_description="Perseus File Format" />
++        </Hints>
++    </WriterProxy>
++    <!-- End Writer -->
++  </ProxyGroup>
++
++</ServerManagerConfiguration>
+diff --git c/paraview/xmls/PersistenceDiagram.xml w/paraview/xmls/PersistenceDiagram.xml
+index c24e61853..5623d5600 100644
+--- c/paraview/xmls/PersistenceDiagram.xml
++++ w/paraview/xmls/PersistenceDiagram.xml
+@@ -351,6 +351,30 @@
+         </Documentation>
+       </IntVectorProperty>
+ 
++      <IntVectorProperty
++          name="ZomoVariant"
++          label="Zomorodian Variant"
++          command="SetZomorodianVariant"
++          number_of_elements="1"
++          default_values="0" panel_visibility="advanced">
++        <EnumerationDomain name="enum">
++          <Entry value="0" text="Original PairCells"/>
++          <Entry value="1" text="PairCells + DiscreteGradient"/>
++          <Entry value="2" text="DiscreteGradient + CacheBoundaries"/>
++          <Entry value="3" text="CacheBoundaries + Sandwich"/>
++          <Entry value="4" text="Sandwich + Parallel PreCompute"/>
++        </EnumerationDomain>
++        <Hints>
++          <PropertyWidgetDecorator type="GenericDecorator"
++                                   mode="visibility"
++                                   property="BackEnd"
++                                   value="4" />
++        </Hints>
++        <Documentation>
++          Set the Zomorodian variant
++        </Documentation>
++      </IntVectorProperty>
++
+       <IntVectorProperty name="ShowInsideDomain"
+                          label="Embed in Domain"
+                          command="SetShowInsideDomain"
+@@ -368,6 +392,7 @@
+         <Property name="ForceInputOffsetScalarField"/>
+         <Property name="InputOffsetScalarFieldNameNew"/>
+         <Property name="BackEnd" />
++        <Property name="ZomoVariant" />
+         <Property name="StartingResolutionLevel" />
+         <Property name="StoppingResolutionLevel" />
+         <Property name="IsResumable" />
+diff --git c/paraview/xmls/PhatWriter.xml w/paraview/xmls/PhatWriter.xml
+new file mode 100644
+index 000000000..3819191c6
+--- /dev/null
++++ w/paraview/xmls/PhatWriter.xml
+@@ -0,0 +1,42 @@
++<ServerManagerConfiguration>
++
++  <ProxyGroup name="writers">
++    <!-- ================================================================== -->
++    <WriterProxy
++        name="ttkPhatWriter"
++        class="ttkPhatWriter"
++        label="TTK PHAT File Format Writer">
++        <Documentation
++          long_help="Export a VTK DataSet into the PHAT File Format format."
++          short_help="Write an .phat file.">
++          Export a VTK DataSet into the PHAT boundary_matrix ASCII file format.
++        </Documentation>
++        <InputProperty name="Input" command="SetInputConnection">
++          <ProxyGroupDomain name="groups">
++            <Group name="sources"/>
++            <Group name="filters"/>
++          </ProxyGroupDomain>
++          <DataTypeDomain name="input_type" composite_data_supported="0">
++            <DataType value="vtkDataSet"/>
++          </DataTypeDomain>
++        </InputProperty>
++        <StringVectorProperty
++          name="FileName"
++          command="SetFilename"
++          number_of_elements="1">
++          <FileListDomain name="files"/>
++          <Documentation>
++              This property specifies the file name for the PHAT writer.
++          </Documentation>
++        </StringVectorProperty>
++        <Hints>
++          <Property name="Input" show="0"/>
++          <Property name="FileName" show="0"/>
++          <WriterFactory extensions="phat"
++                file_description="PHAT File Format" />
++        </Hints>
++    </WriterProxy>
++    <!-- End Writer -->
++  </ProxyGroup>
++
++</ServerManagerConfiguration>
+diff --git c/paraview/xmls/SimplicialComplexWriter.xml w/paraview/xmls/SimplicialComplexWriter.xml
+new file mode 100644
+index 000000000..502bf5e96
+--- /dev/null
++++ w/paraview/xmls/SimplicialComplexWriter.xml
+@@ -0,0 +1,42 @@
++<ServerManagerConfiguration>
++
++  <ProxyGroup name="writers">
++    <!-- ================================================================== -->
++    <WriterProxy
++        name="ttkSimplicialComplexWriter"
++        class="ttkSimplicialComplexWriter"
++        label="TTK Simplicial Complex File Format Writer">
++        <Documentation
++          long_help="Export a VTU into a Simplicial Complex."
++          short_help="Write an .tsc file.">
++          Export a VTK Unstructured Grid into an ad-hoc Simplicial Complex format.
++        </Documentation>
++        <InputProperty name="Input" command="SetInputConnection">
++          <ProxyGroupDomain name="groups">
++            <Group name="sources"/>
++            <Group name="filters"/>
++          </ProxyGroupDomain>
++          <DataTypeDomain name="input_type" composite_data_supported="0">
++            <DataType value="vtkUnstructuredGrid"/>
++          </DataTypeDomain>
++        </InputProperty>
++        <StringVectorProperty
++          name="FileName"
++          command="SetFilename"
++          number_of_elements="1">
++          <FileListDomain name="files"/>
++          <Documentation>
++              This property specifies the file name for the Simplicial Complex writer.
++          </Documentation>
++        </StringVectorProperty>
++        <Hints>
++          <Property name="Input" show="0"/>
++          <Property name="FileName" show="0"/>
++          <WriterFactory extensions="tsc"
++                file_description="TTK Simplicial Complex File Format" />
++        </Hints>
++    </WriterProxy>
++    <!-- End Writer -->
++  </ProxyGroup>
++
++</ServerManagerConfiguration>
+diff --git c/standalone/PersistenceDiagram/main.cpp w/standalone/PersistenceDiagram/main.cpp
+index 491b2910e..edc6ca8c6 100644
+--- c/standalone/PersistenceDiagram/main.cpp
++++ w/standalone/PersistenceDiagram/main.cpp
+@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
+   std::vector<std::string> inputArrayNames;
+   std::string outputPathPrefix{"output"};
+   int backEnd = 2;
++  int variant = 0;
+   int startingRL = 0;
+   int stoppingRL = -1;
+   double tl = 0.0;
+@@ -50,6 +51,11 @@ int main(int argc, char **argv) {
+       "Method (0: FTM, 1: progressive, 2: DiscreteMorseSandwich, 3: "
+       "approximation, 4: persistent simplex)",
+       true);
++    parser.setArgument(
++      "V", &variant,
++      "Zomorodian Variant (0: Original, 1: +DiscreteGradient, "
++      "2: +CacheBoundaries, 3: +Sandwich, 4: +ParallelPreCompute)",
++      true);
+     parser.setArgument("S", &startingRL,
+                        "Starting Resolution Level for progressive "
+                        "multiresolution scheme (-1: finest level)",
+@@ -148,6 +154,9 @@ int main(int argc, char **argv) {
+   // Execute ttkPersistenceDiagram filter
+   // ---------------------------------------------------------------------------
+   persistenceDiagram->SetBackEnd(backEnd);
++  if(backEnd == 4) {
++    persistenceDiagram->SetZomorodianVariant(variant);
++  }
+   persistenceDiagram->SetTimeLimit(tl);
+   persistenceDiagram->SetStartingResolutionLevel(startingRL);
+   persistenceDiagram->SetStoppingResolutionLevel(stoppingRL);
