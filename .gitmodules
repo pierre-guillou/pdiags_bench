@@ -25,9 +25,9 @@
 [submodule "paraview-ttk"]
 	path = backends_src/paraview-ttk
 	url = https://github.com/pierre-guillou/paraview-ttk
-[submodule "AlexanderSandwich"]
+[submodule "DiscreteMorseSandwich"]
 	path = backends_src/DiscreteMorseSandwich
-	url = git@github.com:pierre-guillou/ttk-guillou
+	url = https://github.com/topology-tool-kit/ttk
 	branch = dev
 [submodule "backends_src/ripser"]
 	path = backends_src/ripser
