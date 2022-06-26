@@ -204,6 +204,16 @@ def main():
                 pv_ver,
                 ["-DPARAVIEW_USE_QT=OFF", "-DVTK_Group_ENABLE_Rendering=NO"],
             )
+            # apply DiscreteMorseSandwich patch
+            subprocess.run(
+                [
+                    "git",
+                    "apply",
+                    "../../patches/DiscreteMorseSandwich_filters.patch",
+                ],
+                cwd=soft_src,
+                check=True,
+            )
             # prep env variable
             create_dir(builddir)
             env = clean_env()
