@@ -5,7 +5,7 @@ import os
 
 import requests
 
-URL = "https://klacansky.com/open-scivis-datasets/data_sets.json"
+URL = "https://klacansky.com/open-scivis-datasets/datasets.json"
 SIZE_LIMIT_MB = 1024
 
 
