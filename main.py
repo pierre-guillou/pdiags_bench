@@ -42,6 +42,11 @@ def prepare_datasets(args):
     for field in ["elevation", "random"]:
         gen_random.main(192, field, "raws")
 
+    if not args.only_cubes and not args.only_slices and not args.only_lines:
+        args.only_cubes = True
+        args.only_slices = True
+        args.only_lines = True
+
     create_dir("datasets")
     for dataset in sorted(glob.glob("raws/*.raw") + glob.glob("raws/*.vti")):
         # reduce RAM usage by isolating datasets manipulation in
@@ -422,7 +427,6 @@ def compute_dipha(fname, times, backend):
         prec = round(read_time + write_time, 3)
         pers = round(run_time - prec, 3)
         return prec, pers
-
 
     def dipha_mem_peak(dipha_output):
         mem_pat = r"^Global peak mem \(MB\): (\d+.\d+|\d+)$"
