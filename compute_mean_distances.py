@@ -1,16 +1,15 @@
 import pathlib
 import sys
 
-sys.path.append("..")
-
 import compare_diags
+from main import set_env_and_run
 
 
 def main():
     backend_ref = "TTK-Sandwich"
     cpx = "expl"
 
-    p = pathlib.Path("../diagrams")
+    p = pathlib.Path("diagrams")
     backends = set()
     for diag_ref in sorted(p.glob(f"*{cpx}_{backend_ref}*")):
         ds_root = "_".join(diag_ref.stem.split("_")[:-1])
@@ -24,9 +23,6 @@ def main():
     dists = {}
 
     for bk in backends:
-        if bk in ["PersistenceCycles"]:
-            # not working yet
-            continue
         for diag_ref in sorted(p.glob(f"*{cpx}_{backend_ref}*")):
             ds_root = "_".join(diag_ref.stem.split("_")[:-1])
             ds_bk = f"{ds_root}_{bk}"
@@ -42,4 +38,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import psutil
+
+    if psutil.Process().parent().cmdline()[1:] == sys.argv:
+        main()
+    else:
+        set_env_and_run()
