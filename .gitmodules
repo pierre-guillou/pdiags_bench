@@ -29,6 +29,6 @@
 	path = backends_src/DiscreteMorseSandwich
 	url = https://github.com/topology-tool-kit/ttk
 	branch = dev
-[submodule "backends_src/ripser"]
+[submodule "ripser"]
 	path = backends_src/ripser
 	url = https://github.com/Ripser/ripser
