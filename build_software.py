@@ -93,6 +93,7 @@ def main():
 
     # 1. Fetch submodules
     subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
+    subprocess.run(["git", "submodule", "foreach", "git", "checkout", "."], check=True)
 
     # 2. Build each library
     create_dir("build_dirs")
