@@ -1,0 +1,147 @@
+From 171b6f4cb2eeef729be7edd1ebf2a695a1840dd7 Mon Sep 17 00:00:00 2001
+From: Pierre Guillou <pierre.guillou@lip6.fr>
+Date: Thu, 6 Oct 2022 17:11:11 +0200
+Subject: [PATCH] New example file for simplicial complexes
+
+---
+ CMakeLists.txt                 |   5 ++
+ examples/oineus_filtration.cpp | 114 +++++++++++++++++++++++++++++++++
+ 2 files changed, 119 insertions(+)
+ create mode 100644 examples/oineus_filtration.cpp
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9ff96b1..702bc02 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,3 +32,8 @@ if (Catch2_FOUND)
+     add_subdirectory(tests)
+ endif()
+ 
++add_executable(oineus_filtration examples/oineus_filtration.cpp)
++target_compile_options(oineus_filtration PRIVATE -Wall -Wextra -pedantic)
++target_include_directories(oineus_filtration PRIVATE include extern)
++target_compile_definitions(oineus_filtration PRIVATE -DOINEUS_USE_SPDLOG)
++target_link_libraries(oineus_filtration PUBLIC ${libraries})
+diff --git a/examples/oineus_filtration.cpp b/examples/oineus_filtration.cpp
+new file mode 100644
+index 0000000..366daa8
+--- /dev/null
++++ b/examples/oineus_filtration.cpp
+@@ -0,0 +1,114 @@
++#include <oineus/oineus.h>
++#include <opts/opts.h>
++
++/**
++ * @brief Write diagram to disk in the Gudhi ASCII format
++ */
++template <typename DiagramType>
++void write_diagram(std::ofstream &out, const DiagramType &diag) {
++
++  for (const auto &dim_points : diag.diagram_in_dimension_) {
++    const auto points{dim_points.second};
++    if (points.empty())
++      continue;
++
++    auto dim = dim_points.first;
++    for (const auto &pt : points) {
++      out << dim << ' ' << pt.birth << ' ' << pt.death << '\n';
++    }
++  }
++
++  spd::info("Diagram written to disk");
++}
++
++template <typename T> void readBin(std::ifstream &stream, T &res) {
++  stream.read(reinterpret_cast<char *>(&res), sizeof(res));
++}
++
++/**
++ * @brief Read input file into filtration
++ */
++oineus::Filtration<int, double> fill_filtration(std::ifstream &in) {
++
++  spd::info("Reading file");
++
++  std::vector<std::vector<oineus::Simplex<int, double>>> filtration(4);
++
++  std::array<int64_t, 4> nSimplicesPerDim{};
++  for (auto &el : nSimplicesPerDim) {
++    readBin<int64_t>(in, el);
++  }
++
++  for (size_t i = 0; i < nSimplicesPerDim.size(); ++i) {
++    for (int64_t j = 0; j < nSimplicesPerDim[i]; ++j) {
++      std::vector<int> simplices(i + 1, -1);
++      double val{};
++      for (size_t k = 0; k <= i; ++k) {
++        int64_t id{};
++        readBin<int64_t>(in, id);
++        simplices[k] = id;
++      }
++      readBin<double>(in, val);
++      filtration[i].emplace_back(simplices, val);
++    }
++  }
++
++  spd::info("File read");
++
++  return {std::move(filtration), false};
++}
++
++/**
++ * @brief Main entry point
++ */
++int main(int argc, char *argv[]) {
++  spdlog::set_level(spdlog::level::info);
++
++  opts::Options ops;
++
++  std::string fname_in, fname_dgm;
++  unsigned int max_dim = 1;
++
++  bool help;
++  bool bdry_matrix_only{false};
++
++  oineus::Params params;
++  ops >> opts::Option('d', "dim", max_dim, "top dimension") >>
++      opts::Option('c', "chunk-size", params.chunk_size, "chunk_size") >>
++      opts::Option('t', "threads", params.n_threads, "number of threads") >>
++      opts::Option('s', "sort", params.sort_dgms, "sort diagrams") >>
++      opts::Option("clear", params.clearing_opt, "clearing optimization") >>
++      opts::Option("acq-rel", params.acq_rel,
++                   "use acquire-release memory orders") >>
++      opts::Option('m', "matrix-only", bdry_matrix_only,
++                   "read boundary matrix w/o filtration") >>
++      opts::Option('h', "help", help, "show help message");
++
++  if (!ops.parse(argc, argv) || help || !(ops >> opts::PosOption(fname_in))) {
++    std::cout << "Usage: " << argv[0] << " [options] INFILE\n\n";
++    std::cout << ops << std::endl;
++    return 1;
++  }
++
++  std::ifstream stream{fname_in, std::ios::in | std::ios::binary};
++
++  if (!stream.is_open()) {
++    spd::error("Could not read input file");
++    return 1;
++  }
++
++  const auto filtr{fill_filtration(stream)};
++  auto bm = filtr.boundary_matrix_full();
++
++  spd::info("Boundary matrix extracted");
++
++  bm.reduce_parallel(params);
++
++  spd::info("Diagram computed");
++
++  const auto diag = bm.diagram(filtr);
++  std::ofstream out{"diag.gudhi"};
++  write_diagram(out, diag);
++
++  return 0;
++}
+-- 
+2.38.0
+
