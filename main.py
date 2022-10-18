@@ -195,6 +195,7 @@ class SoftBackend(enum.Enum):
     DIONYSUS = "Dionysus"
     RIPSER = "Ripser"
     OINEUS = "Oineus"
+    OINEUS_SIMPL = "Oineus"
     DIAMORSE = "Diamorse"
     EIRENE = "Eirene.jl"
     JAVAPLEX = "JavaPlex"
@@ -214,6 +215,7 @@ class SoftBackend(enum.Enum):
             SoftBackend.DIONYSUS: compute_gudhi_dionysus,
             SoftBackend.RIPSER: compute_gudhi_dionysus,
             SoftBackend.OINEUS: compute_oineus,
+            SoftBackend.OINEUS_SIMPL: compute_oineus_simpl,
             SoftBackend.DIAMORSE: compute_diamorse,
             SoftBackend.EIRENE: compute_eirene,
             SoftBackend.JAVAPLEX: compute_javaplex,
@@ -234,6 +236,7 @@ class FileType(enum.Enum):
     NETCDF = enum.auto()
     EIRENE_CSV = enum.auto()
     PHAT_ASCII = enum.auto()
+    OIN = enum.auto()
     UNDEFINED = enum.auto()
 
     # pylint: disable=R0911
@@ -264,6 +267,8 @@ class FileType(enum.Enum):
             return cls.EIRENE_CSV
         if ext == "phat":
             return cls.PHAT_ASCII
+        if ext == "oin":
+            return cls.OIN
 
         return cls.UNDEFINED
 
@@ -303,6 +308,8 @@ class FileType(enum.Enum):
             return [SoftBackend.EIRENE]
         if self == FileType.PHAT_ASCII:
             return [SoftBackend.PHAT]
+        if self == FileType.OIN:
+            return [SoftBackend.OINEUS_SIMPL]
 
         return []
 
@@ -542,6 +549,39 @@ def compute_oineus(fname, times, backend, num_threads=1):
         "mem": mem,
         "#threads": num_threads,
     }
+    res.update(get_pairs_number(outp))
+    times[dataset].setdefault(backend.value, {}).update(
+        {("seq" if num_threads == 1 else "para"): res}
+    )
+
+    return elapsed
+
+
+@parallel_decorator
+def compute_oineus_simpl(fname, times, backend, num_threads=1):
+    dataset = dataset_name(fname)
+    outp = f"diagrams/{dataset}_{backend.value}.gudhi"
+
+    def oineus_compute_time(oineus_output):
+        pat = r".*elapsed = (\d+.\d+|\d+) sec"
+        pers_time = re.search(pat, oineus_output).group(1)
+        return round(float(pers_time), 3)
+
+    # launch with subprocess to capture stdout from the C++ library
+    cmd = ["build_dirs/oineus/oineus_filtration", fname]
+    if num_threads > 1:
+        cmd.extend(["-t", str(num_threads)])
+
+    out, err = launch_process(cmd)
+    pers = oineus_compute_time(out)
+    elapsed, mem = get_time_mem(err)
+    res = {
+        "prec": round(elapsed - pers, 3),
+        "pers": pers,
+        "mem": mem,
+        "#threads": num_threads,
+    }
+    os.rename("diag.gudhi", outp)
     res.update(get_pairs_number(outp))
     times[dataset].setdefault(backend.value, {}).update(
         {("seq" if num_threads == 1 else "para"): res}

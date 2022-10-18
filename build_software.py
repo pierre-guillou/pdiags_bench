@@ -245,6 +245,16 @@ def main():
                     cwd=soft_src,
                     check=True,
                 )
+            elif soft == "oineus":
+                subprocess.run(
+                    [
+                        "git",
+                        "apply",
+                        "../../patches/oineus_0001-New-example-file-for-simplicial-complexes.patch",
+                    ],
+                    cwd=soft_src,
+                    check=True,
+                )
             create_dir(builddir)
             subprocess.check_call(
                 ["cmake", "-S", soft_src, "-B", builddir, "-DCMAKE_BUILD_TYPE=Release"]

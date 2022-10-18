@@ -31,6 +31,8 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".eirene", proxy=outp)
         # PHAT ASCII boundary_matrix file format
         simple.SaveData(fname + ".phat", proxy=outp)
+        # Oineus Custom Simplicial Complex Format
+        simple.SaveData(fname + ".oin", proxy=outp)
     else:
         # vtkImageData (TTK)
         simple.SaveData(fname + ".vti", proxy=outp)
