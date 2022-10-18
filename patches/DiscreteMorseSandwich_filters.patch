@@ -1,8 +1,8 @@
 diff --git c/core/base/discreteGradient/DiscreteGradient.h w/core/base/discreteGradient/DiscreteGradient.h
-index 85dde8e84..3992344c7 100644
+index 893af7ae3..9776da0b8 100644
 --- c/core/base/discreteGradient/DiscreteGradient.h
 +++ w/core/base/discreteGradient/DiscreteGradient.h
-@@ -458,6 +458,22 @@ in the gradient.
+@@ -463,6 +463,22 @@ in the gradient.
                                const triangulationType &triangulation,
                                bool isReverse = false) const;
  
@@ -455,11 +455,264 @@ index 000000000..a334b7cb9
 +
 +  return res;
 +}
+diff --git c/core/base/discreteMorseSandwich/DiscreteMorseSandwich.h w/core/base/discreteMorseSandwich/DiscreteMorseSandwich.h
+index e04b54c36..407a9d91c 100644
+--- c/core/base/discreteMorseSandwich/DiscreteMorseSandwich.h
++++ w/core/base/discreteMorseSandwich/DiscreteMorseSandwich.h
+@@ -310,7 +310,10 @@ namespace ttk {
+                                   std::vector<bool> &onBoundary,
+                                   std::vector<Container> &s2Boundaries,
+                                   const std::vector<SimplexId> &s2Mapping,
+-                                  const std::vector<SimplexId> &partners,
++                                  const std::vector<SimplexId> &s1Mapping,
++                                  std::vector<SimplexId> &partners,
++                                  std::vector<Lock> &s1Locks,
++                                  std::vector<Lock> &s2Locks,
+                                   const triangulationType &triangulation) const;
+ 
+     /**
+@@ -405,6 +408,7 @@ namespace ttk {
+         this->edgeTrianglePartner_.resize(triangulation.getNumberOfEdges(), -1);
+         this->onBoundary_.resize(triangulation.getNumberOfEdges(), false);
+         this->s2Mapping_.resize(triangulation.getNumberOfTriangles(), -1);
++        this->s1Mapping_.resize(triangulation.getNumberOfEdges(), -1);
+       }
+       for(int i = 0; i < dim + 1; ++i) {
+         this->pairedCritCells_[i].resize(
+@@ -424,6 +428,7 @@ namespace ttk {
+       this->firstRepMax_ = {};
+       this->edgeTrianglePartner_ = {};
+       this->s2Mapping_ = {};
++      this->s1Mapping_ = {};
+       this->critEdges_ = {};
+       this->pairedCritCells_ = {};
+       this->onBoundary_ = {};
+@@ -436,7 +441,7 @@ namespace ttk {
+ 
+     // factor memory allocations outside computation loops
+     mutable std::vector<SimplexId> firstRepMin_{}, firstRepMax_{},
+-      edgeTrianglePartner_{}, s2Mapping_{};
++      edgeTrianglePartner_{}, s2Mapping_{}, s1Mapping_{};
+     mutable std::vector<EdgeSimplex> critEdges_{};
+     mutable std::array<std::vector<bool>, 4> pairedCritCells_{};
+     mutable std::vector<bool> onBoundary_{};
+@@ -691,7 +696,10 @@ SimplexId ttk::DiscreteMorseSandwich::eliminateBoundariesSandwich(
+   std::vector<bool> &onBoundary,
+   std::vector<Container> &s2Boundaries,
+   const std::vector<SimplexId> &s2Mapping,
+-  const std::vector<SimplexId> &partners,
++  const std::vector<SimplexId> &s1Mapping,
++  std::vector<SimplexId> &partners,
++  std::vector<Lock> &s1Locks,
++  std::vector<Lock> &s2Locks,
+   const triangulationType &triangulation) const {
+ 
+   auto &boundaryIds{s2Boundaries[s2Mapping[s2]]};
+@@ -706,6 +714,11 @@ SimplexId ttk::DiscreteMorseSandwich::eliminateBoundariesSandwich(
+       onBoundary[e] = false;
+     }
+   };
++  const auto clearOnBoundary = [&boundaryIds, &onBoundary]() {
++    for(const auto e : boundaryIds) {
++      onBoundary[e] = false;
++    }
++  };
+ 
+   if(!boundaryIds.empty()) {
+     // restore previously computed s2 boundary
+@@ -721,6 +734,8 @@ SimplexId ttk::DiscreteMorseSandwich::eliminateBoundariesSandwich(
+     }
+   }
+ 
++  s2Locks[s2Mapping[s2]].lock();
++
+   while(!boundaryIds.empty()) {
+     // tau: youngest edge on boundary
+     const auto tau{*boundaryIds.begin()};
+@@ -729,29 +744,80 @@ SimplexId ttk::DiscreteMorseSandwich::eliminateBoundariesSandwich(
+     bool critical{false};
+     if(pTau == -1) {
+       // maybe tau is critical and paired to a critical triangle
+-      pTau = partners[tau];
++      do {
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp atomic read
++#endif // TTK_ENABLE_OPENMP
++        pTau = partners[tau];
++        if(pTau == -1 || s2Boundaries[s2Mapping[pTau]].empty()) {
++          break;
++        }
++      } while(*s2Boundaries[s2Mapping[pTau]].begin() != tau);
++
+       critical = true;
+     }
+     if(pTau == -1) {
+       // tau is critical and not paired
+-      return tau;
+-    }
+-    // expand boundary
+-    if(critical && s2Mapping[pTau] != -1) { // pTau is a non-paired 2-saddle
+-      // merge pTau boundary into s2 boundary
+-      for(const auto e : s2Boundaries[s2Mapping[pTau]]) {
+-        addBoundary(e);
++
++      // compare-and-swap with locks! (OpenMP compatibility)
++      s1Locks[s1Mapping[tau]].lock();
++      const auto cap = partners[tau];
++      if(partners[tau] == -1) {
++        partners[tau] = s2;
+       }
+-    } else { // pTau is a regular triangle
+-      // add pTau triangle boundary (3 edges)
+-      for(SimplexId i = 0; i < 3; ++i) {
+-        SimplexId e{};
+-        triangulation.getTriangleEdge(pTau, i, e);
+-        addBoundary(e);
++      s1Locks[s1Mapping[tau]].unlock();
++
++      clearOnBoundary();
++      s2Locks[s2Mapping[s2]].unlock();
++      if(cap == -1) {
++        return tau;
++      } else {
++        return this->eliminateBoundariesSandwich(
++          s2, onBoundary, s2Boundaries, s2Mapping, s1Mapping, partners, s1Locks,
++          s2Locks, triangulation);
++      }
++    } else {
++      // expand boundary
++      if(critical && s2Mapping[pTau] != -1) {
++        if(s2Mapping[pTau] < s2Mapping[s2]) {
++          // pTau is an already-paired 2-saddle
++          // merge pTau boundary into s2 boundary
++          s2Locks[s2Mapping[pTau]].lock();
++          for(const auto e : s2Boundaries[s2Mapping[pTau]]) {
++            addBoundary(e);
++          }
++          s2Locks[s2Mapping[pTau]].unlock();
++        } else if(s2Mapping[pTau] > s2Mapping[s2]) {
++
++          // compare-and-swap with locks! (OpenMP compatibility)
++          s1Locks[s1Mapping[tau]].lock();
++          const auto cap = partners[tau];
++          if(partners[tau] == pTau) {
++            partners[tau] = s2;
++          }
++          s1Locks[s1Mapping[tau]].unlock();
++
++          if(cap == pTau) {
++            clearOnBoundary();
++            s2Locks[s2Mapping[s2]].unlock();
++            return this->eliminateBoundariesSandwich(
++              pTau, onBoundary, s2Boundaries, s2Mapping, s1Mapping, partners,
++              s1Locks, s2Locks, triangulation);
++          }
++        }
++      } else { // pTau is a regular triangle
++        // add pTau triangle boundary (3 edges)
++        for(SimplexId i = 0; i < 3; ++i) {
++          SimplexId e{};
++          triangulation.getTriangleEdge(pTau, i, e);
++          addBoundary(e);
++        }
+       }
+     }
+   }
+ 
++  clearOnBoundary();
++  s2Locks[s2Mapping[s2]].unlock();
+   return -1;
+ }
+ 
+@@ -799,6 +865,7 @@ void ttk::DiscreteMorseSandwich::getSaddleSaddlePairs(
+       };
+   using Container = std::set<SimplexId, decltype(cmpEdges)>;
+   std::vector<Container> s2Boundaries(saddles2.size(), Container(cmpEdges));
++
+   // unpaired critical triangle id -> index in saddle2 vector
+   auto &s2Mapping{this->s2Mapping_};
+ #ifdef TTK_ENABLE_OPENMP
+@@ -808,8 +875,22 @@ void ttk::DiscreteMorseSandwich::getSaddleSaddlePairs(
+     s2Mapping[saddles2[i]] = i;
+   }
+ 
+-  // first parallel pass to pre-determine the boundary of every
+-  // unpaired 2-saddle to the first unpaired 1-saddle on its wall
++  // unpaired critical edge id -> index in saddle1 vector
++  auto &s1Mapping{this->s1Mapping_};
++#ifdef TTK_ENABLE_OPENMP
++#pragma omp parallel for num_threads(threadNumber_)
++#endif // TTK_ENABLE_OPENMP
++  for(size_t i = 0; i < saddles1.size(); ++i) {
++    s1Mapping[saddles1[i]] = i;
++  }
++
++  // one lock per 1-saddle
++  std::vector<Lock> s1Locks(saddles1.size());
++  // one lock per 2-saddle
++  std::vector<Lock> s2Locks(saddles2.size());
++
++  // compute 2-saddles boundaries in parallel
++
+ #ifdef TTK_ENABLE_OPENMP
+ #pragma omp parallel for num_threads(threadNumber_) schedule(dynamic) \
+   firstprivate(onBoundary)
+@@ -818,44 +899,21 @@ void ttk::DiscreteMorseSandwich::getSaddleSaddlePairs(
+     // 2-saddles sorted in increasing order
+     const auto s2 = saddles2[i];
+     this->eliminateBoundariesSandwich(s2, onBoundary, s2Boundaries, s2Mapping,
+-                                      edgeTrianglePartner, triangulation);
+-    // reset onBoundary to false
+-    for(const auto e : s2Boundaries[i]) {
+-      onBoundary[e] = false;
+-    }
++                                      s1Mapping, edgeTrianglePartner, s1Locks,
++                                      s2Locks, triangulation);
+   }
+ 
+-  this->printMsg("Precomputed 2-saddle boundaries", 1.0, tmpar.getElapsedTime(),
+-                 this->threadNumber_, debug::LineMode::NEW,
+-                 debug::Priority::DETAIL);
+-
+   Timer tmseq{};
+ 
++  // extract saddle-saddle pairs from computed boundaries
+   for(size_t i = 0; i < saddles2.size(); ++i) {
+-    // 2-saddles sorted in increasing order
+-    const auto s2 = saddles2[i];
+-    SimplexId s1{-1};
+-
+-    if(!s2Boundaries[i].empty()
+-       && edgeTrianglePartner[*s2Boundaries[i].begin()] == -1) {
+-      // use shortcut if first 1-saddle on wall is non-paired
+-      s1 = *s2Boundaries[i].begin();
+-    } else {
+-      s1 = this->eliminateBoundariesSandwich(s2, onBoundary, s2Boundaries,
+-                                             s2Mapping, edgeTrianglePartner,
+-                                             triangulation);
+-    }
+-
+-    if(s1 != -1) {
++    if(!s2Boundaries[i].empty()) {
++      const auto s2 = saddles2[i];
++      const auto s1 = *s2Boundaries[i].begin();
+       // we found a pair
+       pairs.emplace_back(s1, s2, 1);
+       paired1Saddles[s1] = true;
+       paired2Saddles[s2] = true;
+-      edgeTrianglePartner[s1] = s2;
+-      // reset onBoundary to false
+-      for(const auto e : s2Boundaries[i]) {
+-        onBoundary[e] = false;
+-      }
+     }
+   }
+ 
 diff --git c/core/base/persistenceDiagram/PersistenceDiagram.h w/core/base/persistenceDiagram/PersistenceDiagram.h
-index dd82c0b7c..b8e407639 100644
+index a506703eb..1a30a8e3c 100644
 --- c/core/base/persistenceDiagram/PersistenceDiagram.h
 +++ w/core/base/persistenceDiagram/PersistenceDiagram.h
-@@ -136,6 +136,10 @@ namespace ttk {
+@@ -221,6 +221,10 @@ namespace ttk {
                                     const scalarType *inputScalars,
                                     const triangulationType *triangulation);
  
@@ -3287,6 +3540,273 @@ index 000000000..8dfd3fa56
 +  VTK::IOLegacy
 +PRIVATE_DEPENDS
 +  VTK::CommonCore
+diff --git c/core/vtk/ttkOineusWriter/CMakeLists.txt w/core/vtk/ttkOineusWriter/CMakeLists.txt
+new file mode 100644
+index 000000000..73e96de09
+--- /dev/null
++++ w/core/vtk/ttkOineusWriter/CMakeLists.txt
+@@ -0,0 +1 @@
++ttk_add_vtk_module()
+diff --git c/core/vtk/ttkOineusWriter/ttk.module w/core/vtk/ttkOineusWriter/ttk.module
+new file mode 100644
+index 000000000..96a889dae
+--- /dev/null
++++ w/core/vtk/ttkOineusWriter/ttk.module
+@@ -0,0 +1,8 @@
++NAME
++  ttkOineusWriter
++SOURCES
++  ttkOineusWriter.cpp
++HEADERS
++  ttkOineusWriter.h
++DEPENDS
++  ttkAlgorithm
+diff --git c/core/vtk/ttkOineusWriter/ttkOineusWriter.cpp w/core/vtk/ttkOineusWriter/ttkOineusWriter.cpp
+new file mode 100644
+index 000000000..3951d1f26
+--- /dev/null
++++ w/core/vtk/ttkOineusWriter/ttkOineusWriter.cpp
+@@ -0,0 +1,181 @@
++#include <Triangulation.h>
++#include <ttkOineusWriter.h>
++#include <ttkUtils.h>
++
++#include <array>
++
++#include <vtkDataArray.h>
++#include <vtkExecutive.h>
++#include <vtkImageData.h>
++#include <vtkInformation.h>
++#include <vtkObjectFactory.h>
++#include <vtkPointData.h>
++#include <vtkUnstructuredGrid.h>
++
++vtkStandardNewMacro(ttkOineusWriter);
++
++ttkOineusWriter::ttkOineusWriter() {
++  this->SetNumberOfInputPorts(1);
++  this->setDebugMsgPrefix("OineusWriter");
++  this->SetDebugLevel(3);
++}
++
++int ttkOineusWriter::FillInputPortInformation(int port, vtkInformation *info) {
++  if(port == 0) {
++    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
++    return 1;
++  }
++  return 0;
++}
++
++int ttkOineusWriter::OpenFile() {
++
++  std::ofstream f(Filename, ios::out | ios::binary);
++
++  if(!f.fail()) {
++    Stream = std::move(f);
++  } else {
++    return -1;
++  }
++
++  return 0;
++}
++
++template <typename T>
++void writeBin(std::ofstream &stream, const T var) {
++  stream.write(reinterpret_cast<const char *>(&var), sizeof(var));
++}
++
++vtkDataArray *getValidArray(vtkPointData *const pd) {
++  if(pd == nullptr) {
++    return {};
++  }
++
++  // get first data array of input point data that is not generated by
++  // Resample to Image
++  vtkDataArray *arr{};
++
++  // avoid "vtkGhostType" arrays generated by Resample to Image
++  std::string ghost{vtkDataSetAttributes::GhostArrayName()};
++  std::string ptmask{"vtkValidPointMask"};
++
++  for(int i = 0; i < pd->GetNumberOfArrays(); ++i) {
++    arr = pd->GetArray(i);
++    if(arr != nullptr && arr->GetName() != ghost && arr->GetName() != ptmask) {
++      break;
++    }
++  }
++  if(arr == nullptr || arr->GetName() == ghost || arr->GetName() == ptmask) {
++    return {};
++  }
++
++  return arr;
++}
++
++int ttkOineusWriter::writeUnstructuredGrid(vtkDataObject *input) {
++  const auto dataSet = vtkUnstructuredGrid::SafeDownCast(input);
++
++  if(dataSet == nullptr) {
++    this->printErr("Requesting a vtkUnstructuredGrid");
++    return 0;
++  }
++
++  if(this->OpenFile() == -1) {
++    this->printErr("Could not open file `" + std::string{Filename} + "' :(");
++    return 0;
++  }
++
++  auto triangulation = ttkAlgorithm::GetTriangulation(dataSet);
++  if(triangulation == nullptr) {
++    this->printErr("Missing triangulation");
++    return 0;
++  }
++  const auto dim = triangulation->getDimensionality();
++  // precondition triangulation
++  triangulation->preconditionEdges();
++  if(dim > 2) {
++    triangulation->preconditionTriangles();
++  }
++
++  const auto nVerts = triangulation->getNumberOfVertices();
++  const auto nEdges = triangulation->getNumberOfEdges();
++  const auto nTri = (dim > 1) ? triangulation->getNumberOfTriangles() : 0;
++  const auto nTetra = (dim > 2) ? triangulation->getNumberOfCells() : 0;
++
++  writeBin<int64_t>(Stream, nVerts);
++  writeBin<int64_t>(Stream, nEdges);
++  writeBin<int64_t>(Stream, nTri);
++  writeBin<int64_t>(Stream, nTetra);
++
++  // actual data (first data array)
++  const auto arr = getValidArray(dataSet->GetPointData());
++  if(arr == nullptr) {
++    return 0;
++  }
++
++  const auto buf = ttkUtils::GetPointer<ttk::SimplexId>(arr);
++
++  for(ttk::SimplexId i = 0; i < nVerts; ++i) {
++    writeBin<int64_t>(Stream, i);
++    writeBin<double>(Stream, buf[i]);
++  }
++  for(ttk::SimplexId i = 0; i < nEdges; ++i) {
++    ttk::SimplexId v0{}, v1{};
++    triangulation->getEdgeVertex(i, 0, v0);
++    triangulation->getEdgeVertex(i, 1, v1);
++    writeBin<int64_t>(Stream, v0);
++    writeBin<int64_t>(Stream, v1);
++    writeBin<double>(Stream, std::max(buf[v0], buf[v1]));
++  }
++  for(ttk::SimplexId i = 0; i < nTri; ++i) {
++    ttk::SimplexId v0{}, v1{}, v2{};
++    triangulation->getTriangleVertex(i, 0, v0);
++    triangulation->getTriangleVertex(i, 1, v1);
++    triangulation->getTriangleVertex(i, 2, v2);
++    writeBin<int64_t>(Stream, v0);
++    writeBin<int64_t>(Stream, v1);
++    writeBin<int64_t>(Stream, v2);
++    writeBin<double>(Stream, std::max(std::max(buf[v0], buf[v1]), buf[v2]));
++  }
++  for(ttk::SimplexId i = 0; i < nTetra; ++i) {
++    ttk::SimplexId v0{}, v1{}, v2{}, v3{};
++    triangulation->getCellVertex(i, 0, v0);
++    triangulation->getCellVertex(i, 1, v1);
++    triangulation->getCellVertex(i, 2, v2);
++    triangulation->getCellVertex(i, 3, v3);
++    writeBin<int64_t>(Stream, v0);
++    writeBin<int64_t>(Stream, v1);
++    writeBin<int64_t>(Stream, v2);
++    writeBin<int64_t>(Stream, v3);
++    writeBin<double>(
++      Stream, std::max(std::max(buf[v0], buf[v1]), std::max(buf[v2], buf[v3])));
++  }
++
++  return 1;
++}
++
++int ttkOineusWriter::Write() {
++  ttk::Timer tm{};
++
++  const auto dataset = this->GetInput();
++  int ret{};
++  if(dataset->IsA("vtkUnstructuredGrid")) {
++    ret = writeUnstructuredGrid(dataset);
++  }
++
++  this->printMsg("Wrote file", 1.0, tm.getElapsedTime(), 1);
++  return ret;
++}
++
++vtkDataObject *ttkOineusWriter::GetInput() {
++  // copied from ParaView's vtkWriter::GetInput()
++  if(this->GetNumberOfInputConnections(0) < 1) {
++    return nullptr;
++  }
++  return this->GetExecutive()->GetInputData(0, 0);
++}
++
++void ttkOineusWriter::SetInputData(vtkDataObject *input) {
++  // copied from ParaView's vtkWriter::SetInputData()
++  this->SetInputDataInternal(0, input);
++}
+diff --git c/core/vtk/ttkOineusWriter/ttkOineusWriter.h w/core/vtk/ttkOineusWriter/ttkOineusWriter.h
+new file mode 100644
+index 000000000..69ec6485d
+--- /dev/null
++++ w/core/vtk/ttkOineusWriter/ttkOineusWriter.h
+@@ -0,0 +1,43 @@
++/// \ingroup vtk
++/// \class ttkOineusWriter
++/// \author Pierre Guillou <pierre.guillou@lip6.fr>
++/// \date October 2022
++/// \brief ttkOineusWriter - Oineus Format Writer
++
++#pragma once
++
++#include <ttkAlgorithm.h>
++#include <ttkOineusWriterModule.h>
++
++#include <fstream>
++
++class TTKOINEUSWRITER_EXPORT ttkOineusWriter : public ttkAlgorithm {
++
++public:
++  vtkTypeMacro(ttkOineusWriter, ttkAlgorithm);
++
++  static ttkOineusWriter *New();
++
++  vtkSetStringMacro(Filename);
++  vtkGetStringMacro(Filename);
++
++  // expose vtkWriter methods (duck-typing)
++  int Write();
++  vtkDataObject *GetInput();
++  void SetInputData(vtkDataObject *input);
++
++protected:
++  // Regular writer management.
++  ttkOineusWriter();
++  int FillInputPortInformation(int port, vtkInformation *info) override;
++  int writeUnstructuredGrid(vtkDataObject *);
++
++  int OpenFile();
++
++  char *Filename{};
++  std::ofstream Stream{};
++
++private:
++  ttkOineusWriter(const ttkOineusWriter &) = delete;
++  void operator=(const ttkOineusWriter &) = delete;
++};
+diff --git c/core/vtk/ttkOineusWriter/vtk.module w/core/vtk/ttkOineusWriter/vtk.module
+new file mode 100644
+index 000000000..f739c26ee
+--- /dev/null
++++ w/core/vtk/ttkOineusWriter/vtk.module
+@@ -0,0 +1,4 @@
++NAME
++ ttkOineusWriter
++DEPENDS
++  ttkAlgorithm
 diff --git c/core/vtk/ttkPerseusWriter/CMakeLists.txt w/core/vtk/ttkPerseusWriter/CMakeLists.txt
 new file mode 100644
 index 000000000..73e96de09
@@ -3595,10 +4115,10 @@ index 000000000..9be003959
 +DEPENDS
 + ttkAlgorithm
 diff --git c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp
-index c7102da04..653d97c16 100644
+index c84c643be..395c40c8c 100644
 --- c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp
 +++ w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.cpp
-@@ -89,6 +89,8 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
+@@ -94,6 +94,8 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
                                         vtkInformationVector **inputVector,
                                         vtkInformationVector *outputVector) {
  
@@ -3607,7 +4127,7 @@ index c7102da04..653d97c16 100644
    vtkDataSet *input = vtkDataSet::GetData(inputVector[0]);
    vtkUnstructuredGrid *outputCTPersistenceDiagram
      = vtkUnstructuredGrid::GetData(outputVector, 0);
-@@ -101,8 +103,14 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
+@@ -106,8 +108,14 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
    }
  #endif
  
@@ -3622,7 +4142,7 @@ index c7102da04..653d97c16 100644
    vtkDataArray *inputScalars = this->GetInputArrayToProcess(0, inputVector);
  #ifndef TTK_ENABLE_KAMIKAZE
    if(!inputScalars) {
-@@ -144,6 +152,8 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
+@@ -149,6 +157,8 @@ int ttkPersistenceDiagram::RequestData(vtkInformation *ttkNotUsed(request),
    outputScalars->DeepCopy(inputScalars);
    outputScalars->SetName("Cropped");
  
@@ -3632,10 +4152,10 @@ index c7102da04..653d97c16 100644
    ttkVtkTemplateMacro(
      inputScalars->GetDataType(), triangulation->getType(),
 diff --git c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h
-index 1aea2b39d..f01a18cb4 100644
+index b5a8dd324..2998570c1 100644
 --- c/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h
 +++ w/core/vtk/ttkPersistenceDiagram/ttkPersistenceDiagram.h
-@@ -153,6 +153,12 @@ public:
+@@ -181,6 +181,12 @@ public:
    ttkSetEnumMacro(BackEnd, BACKEND);
    vtkGetEnumMacro(BackEnd, BACKEND);
  
@@ -4532,6 +5052,54 @@ index 000000000..09c16b35b
 +   </ProxyGroup>
 +
 +</ServerManagerConfiguration>
+diff --git c/paraview/xmls/OineusWriter.xml w/paraview/xmls/OineusWriter.xml
+new file mode 100644
+index 000000000..86d8e1141
+--- /dev/null
++++ w/paraview/xmls/OineusWriter.xml
+@@ -0,0 +1,42 @@
++<ServerManagerConfiguration>
++
++  <ProxyGroup name="writers">
++    <!-- ================================================================== -->
++    <WriterProxy
++        name="ttkOineusWriter"
++        class="ttkOineusWriter"
++        label="TTK Custom File Format Writer for Oineus">
++        <Documentation
++          long_help="Export a VTK DataSet for Oineus."
++          short_help="Write an .oin file.">
++          Export a VTK DataSet for Oineus.
++        </Documentation>
++        <InputProperty name="Input" command="SetInputConnection">
++          <ProxyGroupDomain name="groups">
++            <Group name="sources"/>
++            <Group name="filters"/>
++          </ProxyGroupDomain>
++          <DataTypeDomain name="input_type" composite_data_supported="0">
++            <DataType value="vtkDataSet"/>
++          </DataTypeDomain>
++        </InputProperty>
++        <StringVectorProperty
++          name="FileName"
++          command="SetFilename"
++          number_of_elements="1">
++          <FileListDomain name="files"/>
++          <Documentation>
++              This property specifies the file name for the Oineus writer.
++          </Documentation>
++        </StringVectorProperty>
++        <Hints>
++          <Property name="Input" show="0"/>
++          <Property name="FileName" show="0"/>
++          <WriterFactory extensions="oin"
++                file_description="Oineus Filtration File Format" />
++        </Hints>
++    </WriterProxy>
++    <!-- End Writer -->
++  </ProxyGroup>
++
++</ServerManagerConfiguration>
 diff --git c/paraview/xmls/PerseusWriter.xml w/paraview/xmls/PerseusWriter.xml
 new file mode 100644
 index 000000000..69d1e1cf2
@@ -4582,10 +5150,10 @@ index 000000000..69d1e1cf2
 +
 +</ServerManagerConfiguration>
 diff --git c/paraview/xmls/PersistenceDiagram.xml w/paraview/xmls/PersistenceDiagram.xml
-index c24e61853..5623d5600 100644
+index 622438d24..7d627db69 100644
 --- c/paraview/xmls/PersistenceDiagram.xml
 +++ w/paraview/xmls/PersistenceDiagram.xml
-@@ -351,6 +351,30 @@
+@@ -476,6 +476,30 @@
          </Documentation>
        </IntVectorProperty>
  
@@ -4616,7 +5184,7 @@ index c24e61853..5623d5600 100644
        <IntVectorProperty name="ShowInsideDomain"
                           label="Embed in Domain"
                           command="SetShowInsideDomain"
-@@ -368,6 +392,7 @@
+@@ -512,6 +536,7 @@
          <Property name="ForceInputOffsetScalarField"/>
          <Property name="InputOffsetScalarFieldNameNew"/>
          <Property name="BackEnd" />
