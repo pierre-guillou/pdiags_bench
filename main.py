@@ -177,8 +177,9 @@ def launch_process(cmd, *args, **kwargs):
             raise te
 
 
-def store_log(log, ds_name, app):
-    file_name = f"logs/{ds_name}.{app}.log"
+def store_log(log, ds_name, app, nthreads=None):
+    thrs = f".{nthreads}T" if nthreads is not None else ""
+    file_name = f"logs/{ds_name}.{app}{thrs}.log"
     with open(file_name, "w") as dst:
         dst.write(log)
 
@@ -398,7 +399,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
         {("seq" if num_threads == 1 else "para"): res}
     )
 
-    store_log(out, dataset, bs)
+    store_log(out, dataset, bs, num_threads)
 
     try:
         os.remove("morse.dipha")
@@ -453,7 +454,7 @@ def compute_dipha(fname, times, backend):
     times[dataset].setdefault(b, {}).update(
         {("seq" if num_threads == 1 else "para"): res}
     )
-    store_log(out, dataset, "dipha")
+    store_log(out, dataset, "dipha", num_threads)
     return elapsed
 
 
