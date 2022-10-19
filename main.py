@@ -362,7 +362,7 @@ def compute_ttk(fname, times, backend, num_threads=1):
 
     def ttk_compute_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
-        time_re = r"\[PersistenceDiagram\] Complete.*\[(\d+\.\d+|\d+)s"
+        time_re = r"\[PersistenceDiagram.*\] Complete.*\[(\d+\.\d+|\d+)s"
         cpt_time = float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
         overhead = ttk_overhead_time(ttk_output, backend)
         return cpt_time - overhead
@@ -370,16 +370,16 @@ def compute_ttk(fname, times, backend, num_threads=1):
     def ttk_prec_time(ttk_output):
         ttk_output = escape_ansi_chars(ttk_output)
         prec_re = (
-            r"\[PersistenceDiagram\] Precondition triangulation.*\[(\d+\.\d+|\d+)s"
+            r"\[PersistenceDiagram.*\] Precondition triangulation.*\[(\d+\.\d+|\d+)s"
         )
         prec_time = float(re.search(prec_re, ttk_output, re.MULTILINE).group(1))
         return prec_time
 
     def ttk_overhead_time(ttk_output, backend):
         if backend == SoftBackend.DISCRETE_MORSE_SANDWICH:
-            time_re = r"\[DiscreteGradient\] Memory allocations.*\[(\d+\.\d+|\d+)s"
+            time_re = r"\[DiscreteGradient.*\] Memory allocations.*\[(\d+\.\d+|\d+)s"
         elif backend == SoftBackend.TTK_FTM:
-            time_re = r"\[FTMTree\] alloc.*\[(\d+\.\d+|\d+)s"
+            time_re = r"\[FTMTree.*\] alloc.*\[(\d+\.\d+|\d+)s"
         try:
             return float(re.search(time_re, ttk_output, re.MULTILINE).group(1))
         except AttributeError:
