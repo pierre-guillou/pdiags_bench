@@ -6,7 +6,7 @@ from main import set_env_and_run
 
 
 def main():
-    backend_ref = "TTK-Sandwich"
+    backend_ref = "DiscreteMorseSandwich"
     cpx = "expl"
 
     p = pathlib.Path("diagrams")
