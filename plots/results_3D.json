@@ -90,9 +90,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.72,
-                "pers": 4.52,
-                "mem": 13095,
+                "prec": 13.32,
+                "pers": 3.889,
+                "mem": 13260,
                 "#threads": 16,
                 "#Min-saddle": 1643,
                 "#Saddle-saddle": 7535,
@@ -100,9 +100,9 @@
                 "#Total pairs": 28065
             },
             "seq": {
-                "prec": 19.24,
-                "pers": 22.861,
-                "mem": 12638,
+                "prec": 16.62,
+                "pers": 20.286,
+                "mem": 12805,
                 "#threads": 1,
                 "#Min-saddle": 1643,
                 "#Saddle-saddle": 7535,
@@ -212,9 +212,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.149,
-                "pers": 6.642,
-                "mem": 6179,
+                "prec": 0.737,
+                "pers": 5.733,
+                "mem": 6373,
                 "#threads": 16,
                 "#Min-saddle": 928,
                 "#Saddle-saddle": 10617,
@@ -222,9 +222,9 @@
                 "#Total pairs": 29304
             },
             "seq": {
-                "prec": 2.299,
-                "pers": 39.639,
-                "mem": 5614,
+                "prec": 1.914,
+                "pers": 34.821,
+                "mem": 5809,
                 "#threads": 1,
                 "#Min-saddle": 928,
                 "#Saddle-saddle": 10617,
@@ -346,9 +346,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.222,
-                "pers": 8.16,
-                "mem": 13130,
+                "prec": 13.129,
+                "pers": 5.682,
+                "mem": 13296,
                 "#threads": 16,
                 "#Min-saddle": 176850,
                 "#Saddle-saddle": 313747,
@@ -356,9 +356,9 @@
                 "#Total pairs": 728357
             },
             "seq": {
-                "prec": 19.389,
-                "pers": 42.891,
-                "mem": 12829,
+                "prec": 16.572,
+                "pers": 38.843,
+                "mem": 13013,
                 "#threads": 1,
                 "#Min-saddle": 176850,
                 "#Saddle-saddle": 313747,
@@ -477,9 +477,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.131,
-                "pers": 12.085,
-                "mem": 6204,
+                "prec": 0.726,
+                "pers": 8.008,
+                "mem": 6399,
                 "#threads": 16,
                 "#Min-saddle": 118756,
                 "#Saddle-saddle": 427486,
@@ -487,9 +487,9 @@
                 "#Total pairs": 723934
             },
             "seq": {
-                "prec": 2.281,
-                "pers": 62.323,
-                "mem": 5881,
+                "prec": 1.911,
+                "pers": 57.517,
+                "mem": 6094,
                 "#threads": 1,
                 "#Min-saddle": 118756,
                 "#Saddle-saddle": 427486,
@@ -619,9 +619,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.11,
-                "pers": 5.318,
-                "mem": 13124,
+                "prec": 13.091,
+                "pers": 4.268,
+                "mem": 13292,
                 "#threads": 16,
                 "#Min-saddle": 21615,
                 "#Saddle-saddle": 55525,
@@ -629,9 +629,9 @@
                 "#Total pairs": 119112
             },
             "seq": {
-                "prec": 20.213,
-                "pers": 28.882,
-                "mem": 12637,
+                "prec": 16.584,
+                "pers": 27.742,
+                "mem": 12808,
                 "#threads": 1,
                 "#Min-saddle": 21615,
                 "#Saddle-saddle": 55525,
@@ -731,9 +731,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.139,
-                "pers": 8.414,
-                "mem": 6182,
+                "prec": 0.736,
+                "pers": 6.23,
+                "mem": 6376,
                 "#threads": 16,
                 "#Min-saddle": 17719,
                 "#Saddle-saddle": 66858,
@@ -741,9 +741,9 @@
                 "#Total pairs": 124129
             },
             "seq": {
-                "prec": 2.281,
-                "pers": 45.867,
-                "mem": 5649,
+                "prec": 1.914,
+                "pers": 42.875,
+                "mem": 5848,
                 "#threads": 1,
                 "#Min-saddle": 17719,
                 "#Saddle-saddle": 66858,
@@ -865,9 +865,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.362,
-                "pers": 5.067,
-                "mem": 13093,
+                "prec": 13.102,
+                "pers": 4.153,
+                "mem": 13260,
                 "#threads": 16,
                 "#Min-saddle": 7751,
                 "#Saddle-saddle": 24775,
@@ -875,9 +875,9 @@
                 "#Total pairs": 47573
             },
             "seq": {
-                "prec": 18.95,
-                "pers": 27.452,
-                "mem": 12638,
+                "prec": 16.601,
+                "pers": 24.699,
+                "mem": 12805,
                 "#threads": 1,
                 "#Min-saddle": 7751,
                 "#Saddle-saddle": 24775,
@@ -996,9 +996,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.172,
-                "pers": 6.759,
-                "mem": 6179,
+                "prec": 0.738,
+                "pers": 5.88,
+                "mem": 6373,
                 "#threads": 16,
                 "#Min-saddle": 4965,
                 "#Saddle-saddle": 28433,
@@ -1006,9 +1006,9 @@
                 "#Total pairs": 44871
             },
             "seq": {
-                "prec": 2.293,
-                "pers": 41.722,
-                "mem": 5623,
+                "prec": 1.916,
+                "pers": 39.248,
+                "mem": 5822,
                 "#threads": 1,
                 "#Min-saddle": 4965,
                 "#Saddle-saddle": 28433,
@@ -1130,9 +1130,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.735,
-                "pers": 11.612,
-                "mem": 13130,
+                "prec": 13.192,
+                "pers": 6.112,
+                "mem": 13298,
                 "#threads": 16,
                 "#Min-saddle": 361259,
                 "#Saddle-saddle": 458007,
@@ -1140,9 +1140,9 @@
                 "#Total pairs": 1160807
             },
             "seq": {
-                "prec": 19.054,
-                "pers": 48.081,
-                "mem": 12926,
+                "prec": 16.59,
+                "pers": 43.783,
+                "mem": 13115,
                 "#threads": 1,
                 "#Min-saddle": 361259,
                 "#Saddle-saddle": 458007,
@@ -1261,9 +1261,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.134,
-                "pers": 14.392,
-                "mem": 6218,
+                "prec": 0.732,
+                "pers": 8.944,
+                "mem": 6414,
                 "#threads": 16,
                 "#Min-saddle": 245606,
                 "#Saddle-saddle": 709075,
@@ -1271,9 +1271,9 @@
                 "#Total pairs": 1183251
             },
             "seq": {
-                "prec": 2.287,
-                "pers": 71.919,
-                "mem": 6058,
+                "prec": 1.909,
+                "pers": 64.907,
+                "mem": 6284,
                 "#threads": 1,
                 "#Min-saddle": 245606,
                 "#Saddle-saddle": 709075,
@@ -1395,9 +1395,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.108,
-                "pers": 15.514,
-                "mem": 13267,
+                "prec": 13.108,
+                "pers": 7.38,
+                "mem": 13450,
                 "#threads": 16,
                 "#Min-saddle": 474050,
                 "#Saddle-saddle": 663666,
@@ -1405,9 +1405,9 @@
                 "#Total pairs": 1585307
             },
             "seq": {
-                "prec": 18.986,
-                "pers": 56.298,
-                "mem": 13188,
+                "prec": 16.582,
+                "pers": 51.713,
+                "mem": 13378,
                 "#threads": 1,
                 "#Min-saddle": 474050,
                 "#Saddle-saddle": 663666,
@@ -1518,9 +1518,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.145,
-                "pers": 26.794,
-                "mem": 6439,
+                "prec": 0.727,
+                "pers": 10.208,
+                "mem": 6654,
                 "#threads": 16,
                 "#Min-saddle": 337215,
                 "#Saddle-saddle": 906557,
@@ -1528,9 +1528,9 @@
                 "#Total pairs": 1561536
             },
             "seq": {
-                "prec": 2.299,
-                "pers": 82.78,
-                "mem": 6341,
+                "prec": 1.92,
+                "pers": 74.822,
+                "mem": 6562,
                 "#threads": 1,
                 "#Min-saddle": 337215,
                 "#Saddle-saddle": 906557,
@@ -1652,9 +1652,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.109,
-                "pers": 4.62,
-                "mem": 13092,
+                "prec": 13.104,
+                "pers": 4.273,
+                "mem": 13260,
                 "#threads": 16,
                 "#Min-saddle": 3128,
                 "#Saddle-saddle": 8840,
@@ -1662,9 +1662,9 @@
                 "#Total pairs": 17135
             },
             "seq": {
-                "prec": 19.175,
-                "pers": 24.319,
-                "mem": 12638,
+                "prec": 16.546,
+                "pers": 22.248,
+                "mem": 12805,
                 "#threads": 1,
                 "#Min-saddle": 3128,
                 "#Saddle-saddle": 8840,
@@ -1783,9 +1783,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.152,
-                "pers": 6.463,
-                "mem": 6177,
+                "prec": 0.734,
+                "pers": 5.791,
+                "mem": 6372,
                 "#threads": 16,
                 "#Min-saddle": 1715,
                 "#Saddle-saddle": 11672,
@@ -1793,9 +1793,9 @@
                 "#Total pairs": 17555
             },
             "seq": {
-                "prec": 2.303,
-                "pers": 38.91,
-                "mem": 5614,
+                "prec": 1.912,
+                "pers": 37.349,
+                "mem": 5809,
                 "#threads": 1,
                 "#Min-saddle": 1715,
                 "#Saddle-saddle": 11672,
@@ -1917,9 +1917,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.195,
-                "pers": 3.863,
-                "mem": 13093,
+                "prec": 13.016,
+                "pers": 3.307,
+                "mem": 13260,
                 "#threads": 16,
                 "#Min-saddle": 1,
                 "#Saddle-saddle": 0,
@@ -1927,9 +1927,9 @@
                 "#Total pairs": 1
             },
             "seq": {
-                "prec": 19.913,
-                "pers": 19.95,
-                "mem": 12637,
+                "prec": 16.585,
+                "pers": 18.399,
+                "mem": 12805,
                 "#threads": 1,
                 "#Min-saddle": 1,
                 "#Saddle-saddle": 0,
@@ -2056,9 +2056,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.144,
-                "pers": 5.931,
-                "mem": 6177,
+                "prec": 0.74,
+                "pers": 5.175,
+                "mem": 6371,
                 "#threads": 16,
                 "#Min-saddle": 1,
                 "#Saddle-saddle": 0,
@@ -2066,9 +2066,9 @@
                 "#Total pairs": 1
             },
             "seq": {
-                "prec": 2.295,
-                "pers": 36.77,
-                "mem": 5603,
+                "prec": 1.914,
+                "pers": 34.941,
+                "mem": 5797,
                 "#threads": 1,
                 "#Min-saddle": 1,
                 "#Saddle-saddle": 0,
@@ -2190,9 +2190,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.723,
-                "pers": 6.422,
-                "mem": 13126,
+                "prec": 13.158,
+                "pers": 5.413,
+                "mem": 13293,
                 "#threads": 16,
                 "#Min-saddle": 81207,
                 "#Saddle-saddle": 207287,
@@ -2200,9 +2200,9 @@
                 "#Total pairs": 367246
             },
             "seq": {
-                "prec": 19.021,
-                "pers": 39.048,
-                "mem": 12724,
+                "prec": 16.634,
+                "pers": 36.799,
+                "mem": 12901,
                 "#threads": 1,
                 "#Min-saddle": 81207,
                 "#Saddle-saddle": 207287,
@@ -2321,9 +2321,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.137,
-                "pers": 9.379,
-                "mem": 6187,
+                "prec": 0.797,
+                "pers": 7.149,
+                "mem": 6383,
                 "#threads": 16,
                 "#Min-saddle": 70265,
                 "#Saddle-saddle": 163472,
@@ -2331,9 +2331,9 @@
                 "#Total pairs": 302926
             },
             "seq": {
-                "prec": 2.305,
-                "pers": 55.956,
-                "mem": 5717,
+                "prec": 1.919,
+                "pers": 52.284,
+                "mem": 5918,
                 "#threads": 1,
                 "#Min-saddle": 70265,
                 "#Saddle-saddle": 163472,
@@ -2455,9 +2455,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.614,
-                "pers": 6.357,
-                "mem": 13126,
+                "prec": 13.088,
+                "pers": 5.054,
+                "mem": 13294,
                 "#threads": 16,
                 "#Min-saddle": 81576,
                 "#Saddle-saddle": 128196,
@@ -2465,9 +2465,9 @@
                 "#Total pairs": 315652
             },
             "seq": {
-                "prec": 19.053,
-                "pers": 32.545,
-                "mem": 12682,
+                "prec": 16.663,
+                "pers": 29.748,
+                "mem": 12859,
                 "#threads": 1,
                 "#Min-saddle": 81576,
                 "#Saddle-saddle": 128196,
@@ -2586,9 +2586,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.158,
-                "pers": 9.971,
-                "mem": 6188,
+                "prec": 0.781,
+                "pers": 7.055,
+                "mem": 6384,
                 "#threads": 16,
                 "#Min-saddle": 64041,
                 "#Saddle-saddle": 177181,
@@ -2596,9 +2596,9 @@
                 "#Total pairs": 328097
             },
             "seq": {
-                "prec": 2.298,
-                "pers": 48.441,
-                "mem": 5711,
+                "prec": 1.91,
+                "pers": 45.797,
+                "mem": 5917,
                 "#threads": 1,
                 "#Min-saddle": 64041,
                 "#Saddle-saddle": 177181,
@@ -2720,9 +2720,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.686,
-                "pers": 4.179,
-                "mem": 13092,
+                "prec": 13.047,
+                "pers": 4.085,
+                "mem": 13262,
                 "#threads": 16,
                 "#Min-saddle": 111,
                 "#Saddle-saddle": 572,
@@ -2730,9 +2730,9 @@
                 "#Total pairs": 760
             },
             "seq": {
-                "prec": 20.443,
-                "pers": 19.333,
-                "mem": 12638,
+                "prec": 16.671,
+                "pers": 18.942,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 111,
                 "#Saddle-saddle": 572,
@@ -2861,9 +2861,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.149,
-                "pers": 6.819,
-                "mem": 6178,
+                "prec": 0.785,
+                "pers": 5.364,
+                "mem": 6374,
                 "#threads": 16,
                 "#Min-saddle": 108,
                 "#Saddle-saddle": 214,
@@ -2871,9 +2871,9 @@
                 "#Total pairs": 397
             },
             "seq": {
-                "prec": 2.285,
-                "pers": 35.623,
-                "mem": 5610,
+                "prec": 1.911,
+                "pers": 33.334,
+                "mem": 5804,
                 "#threads": 1,
                 "#Min-saddle": 108,
                 "#Saddle-saddle": 214,
@@ -2995,9 +2995,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.254,
-                "pers": 5.233,
-                "mem": 13093,
+                "prec": 13.052,
+                "pers": 4.647,
+                "mem": 13261,
                 "#threads": 16,
                 "#Min-saddle": 2163,
                 "#Saddle-saddle": 5661,
@@ -3005,9 +3005,9 @@
                 "#Total pairs": 9436
             },
             "seq": {
-                "prec": 18.952,
-                "pers": 24.365,
-                "mem": 12638,
+                "prec": 16.624,
+                "pers": 24.641,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 2163,
                 "#Saddle-saddle": 5661,
@@ -3107,9 +3107,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.147,
-                "pers": 7.611,
-                "mem": 6178,
+                "prec": 0.737,
+                "pers": 5.779,
+                "mem": 6373,
                 "#threads": 16,
                 "#Min-saddle": 1875,
                 "#Saddle-saddle": 4935,
@@ -3117,9 +3117,9 @@
                 "#Total pairs": 8201
             },
             "seq": {
-                "prec": 2.279,
-                "pers": 39.66,
-                "mem": 5612,
+                "prec": 1.913,
+                "pers": 37.429,
+                "mem": 5807,
                 "#threads": 1,
                 "#Min-saddle": 1875,
                 "#Saddle-saddle": 4935,
@@ -3241,9 +3241,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.704,
-                "pers": 12.163,
-                "mem": 13151,
+                "prec": 13.29,
+                "pers": 7.325,
+                "mem": 13319,
                 "#threads": 16,
                 "#Min-saddle": 497773,
                 "#Saddle-saddle": 575144,
@@ -3251,9 +3251,9 @@
                 "#Total pairs": 1567356
             },
             "seq": {
-                "prec": 20.068,
-                "pers": 50.046,
-                "mem": 13054,
+                "prec": 16.622,
+                "pers": 48.041,
+                "mem": 13245,
                 "#threads": 1,
                 "#Min-saddle": 497773,
                 "#Saddle-saddle": 575144,
@@ -3372,9 +3372,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.146,
-                "pers": 20.535,
-                "mem": 6389,
+                "prec": 0.793,
+                "pers": 9.687,
+                "mem": 6605,
                 "#threads": 16,
                 "#Min-saddle": 333333,
                 "#Saddle-saddle": 996838,
@@ -3382,9 +3382,9 @@
                 "#Total pairs": 1661744
             },
             "seq": {
-                "prec": 2.302,
-                "pers": 78.977,
-                "mem": 6291,
+                "prec": 1.911,
+                "pers": 71.274,
+                "mem": 6514,
                 "#threads": 1,
                 "#Min-saddle": 333333,
                 "#Saddle-saddle": 996838,
@@ -3506,9 +3506,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.779,
-                "pers": 7.701,
-                "mem": 13130,
+                "prec": 13.277,
+                "pers": 6.032,
+                "mem": 13297,
                 "#threads": 16,
                 "#Min-saddle": 44384,
                 "#Saddle-saddle": 458949,
@@ -3516,9 +3516,9 @@
                 "#Total pairs": 550981
             },
             "seq": {
-                "prec": 20.428,
-                "pers": 44.992,
-                "mem": 12846,
+                "prec": 16.628,
+                "pers": 42.201,
+                "mem": 13029,
                 "#threads": 1,
                 "#Min-saddle": 44384,
                 "#Saddle-saddle": 458949,
@@ -3637,9 +3637,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.135,
-                "pers": 8.473,
-                "mem": 6183,
+                "prec": 0.791,
+                "pers": 7.022,
+                "mem": 6380,
                 "#threads": 16,
                 "#Min-saddle": 40743,
                 "#Saddle-saddle": 97282,
@@ -3647,9 +3647,9 @@
                 "#Total pairs": 182126
             },
             "seq": {
-                "prec": 2.29,
-                "pers": 57.138,
-                "mem": 5698,
+                "prec": 1.911,
+                "pers": 53.107,
+                "mem": 5900,
                 "#threads": 1,
                 "#Min-saddle": 40743,
                 "#Saddle-saddle": 97282,
@@ -3771,9 +3771,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.812,
-                "pers": 11.843,
-                "mem": 13150,
+                "prec": 13.142,
+                "pers": 7.38,
+                "mem": 13335,
                 "#threads": 16,
                 "#Min-saddle": 538171,
                 "#Saddle-saddle": 606177,
@@ -3781,9 +3781,9 @@
                 "#Total pairs": 1598252
             },
             "seq": {
-                "prec": 19.669,
-                "pers": 54.573,
-                "mem": 13075,
+                "prec": 16.611,
+                "pers": 51.686,
+                "mem": 13265,
                 "#threads": 1,
                 "#Min-saddle": 538171,
                 "#Saddle-saddle": 606177,
@@ -3902,9 +3902,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.132,
-                "pers": 20.006,
-                "mem": 6375,
+                "prec": 0.79,
+                "pers": 10.216,
+                "mem": 6593,
                 "#threads": 16,
                 "#Min-saddle": 376905,
                 "#Saddle-saddle": 998303,
@@ -3912,9 +3912,9 @@
                 "#Total pairs": 1682933
             },
             "seq": {
-                "prec": 2.278,
-                "pers": 83.136,
-                "mem": 6279,
+                "prec": 1.912,
+                "pers": 75.795,
+                "mem": 6505,
                 "#threads": 1,
                 "#Min-saddle": 376905,
                 "#Saddle-saddle": 998303,
@@ -4036,9 +4036,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.819,
-                "pers": 12.303,
-                "mem": 13154,
+                "prec": 13.062,
+                "pers": 7.044,
+                "mem": 13322,
                 "#threads": 16,
                 "#Min-saddle": 582944,
                 "#Saddle-saddle": 680329,
@@ -4046,9 +4046,9 @@
                 "#Total pairs": 1770220
             },
             "seq": {
-                "prec": 19.994,
-                "pers": 54.425,
-                "mem": 13063,
+                "prec": 16.566,
+                "pers": 51.457,
+                "mem": 13242,
                 "#threads": 1,
                 "#Min-saddle": 582944,
                 "#Saddle-saddle": 680329,
@@ -4167,9 +4167,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.149,
-                "pers": 19.189,
-                "mem": 6354,
+                "prec": 0.784,
+                "pers": 9.854,
+                "mem": 6573,
                 "#threads": 16,
                 "#Min-saddle": 397639,
                 "#Saddle-saddle": 1079862,
@@ -4177,9 +4177,9 @@
                 "#Total pairs": 1819239
             },
             "seq": {
-                "prec": 2.295,
-                "pers": 82.156,
-                "mem": 6259,
+                "prec": 1.912,
+                "pers": 75.23,
+                "mem": 6483,
                 "#threads": 1,
                 "#Min-saddle": 397639,
                 "#Saddle-saddle": 1079862,
@@ -4301,9 +4301,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.871,
-                "pers": 5.326,
-                "mem": 13093,
+                "prec": 13.032,
+                "pers": 4.6,
+                "mem": 13262,
                 "#threads": 16,
                 "#Min-saddle": 385,
                 "#Saddle-saddle": 7413,
@@ -4311,9 +4311,9 @@
                 "#Total pairs": 7827
             },
             "seq": {
-                "prec": 20.072,
-                "pers": 35.807,
-                "mem": 12638,
+                "prec": 16.584,
+                "pers": 34.125,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 385,
                 "#Saddle-saddle": 7413,
@@ -4413,9 +4413,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.146,
-                "pers": 6.854,
-                "mem": 6176,
+                "prec": 0.736,
+                "pers": 6.158,
+                "mem": 6374,
                 "#threads": 16,
                 "#Min-saddle": 384,
                 "#Saddle-saddle": 333,
@@ -4423,9 +4423,9 @@
                 "#Total pairs": 746
             },
             "seq": {
-                "prec": 2.296,
-                "pers": 49.553,
-                "mem": 5609,
+                "prec": 1.912,
+                "pers": 46.946,
+                "mem": 5806,
                 "#threads": 1,
                 "#Min-saddle": 384,
                 "#Saddle-saddle": 333,
@@ -4547,9 +4547,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.212,
-                "pers": 9.429,
-                "mem": 13128,
+                "prec": 13.062,
+                "pers": 6.368,
+                "mem": 13299,
                 "#threads": 16,
                 "#Min-saddle": 303295,
                 "#Saddle-saddle": 444979,
@@ -4557,9 +4557,9 @@
                 "#Total pairs": 999052
             },
             "seq": {
-                "prec": 19.697,
-                "pers": 51.075,
-                "mem": 12909,
+                "prec": 16.583,
+                "pers": 48.226,
+                "mem": 13085,
                 "#threads": 1,
                 "#Min-saddle": 303295,
                 "#Saddle-saddle": 444979,
@@ -4678,9 +4678,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.12,
-                "pers": 13.193,
-                "mem": 6210,
+                "prec": 0.783,
+                "pers": 8.612,
+                "mem": 6406,
                 "#threads": 16,
                 "#Min-saddle": 246133,
                 "#Saddle-saddle": 551918,
@@ -4688,9 +4688,9 @@
                 "#Total pairs": 996624
             },
             "seq": {
-                "prec": 2.295,
-                "pers": 73.776,
-                "mem": 5975,
+                "prec": 1.914,
+                "pers": 67.469,
+                "mem": 6189,
                 "#threads": 1,
                 "#Min-saddle": 246133,
                 "#Saddle-saddle": 551918,
@@ -4812,9 +4812,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.225,
-                "pers": 12.005,
-                "mem": 13170,
+                "prec": 13.111,
+                "pers": 7.203,
+                "mem": 13358,
                 "#threads": 16,
                 "#Min-saddle": 352681,
                 "#Saddle-saddle": 657051,
@@ -4822,9 +4822,9 @@
                 "#Total pairs": 1335516
             },
             "seq": {
-                "prec": 19.749,
-                "pers": 56.848,
-                "mem": 13092,
+                "prec": 16.581,
+                "pers": 53.941,
+                "mem": 13283,
                 "#threads": 1,
                 "#Min-saddle": 352681,
                 "#Saddle-saddle": 657051,
@@ -4943,9 +4943,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.133,
-                "pers": 16.972,
-                "mem": 6217,
+                "prec": 0.783,
+                "pers": 9.172,
+                "mem": 6435,
                 "#threads": 16,
                 "#Min-saddle": 290971,
                 "#Saddle-saddle": 681081,
@@ -4953,9 +4953,9 @@
                 "#Total pairs": 1238130
             },
             "seq": {
-                "prec": 2.29,
-                "pers": 78.185,
-                "mem": 6124,
+                "prec": 1.914,
+                "pers": 71.347,
+                "mem": 6344,
                 "#threads": 1,
                 "#Min-saddle": 290971,
                 "#Saddle-saddle": 681081,
@@ -5077,9 +5077,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.777,
-                "pers": 4.557,
-                "mem": 13093,
+                "prec": 13.127,
+                "pers": 4.43,
+                "mem": 13261,
                 "#threads": 16,
                 "#Min-saddle": 895,
                 "#Saddle-saddle": 2894,
@@ -5087,9 +5087,9 @@
                 "#Total pairs": 4067
             },
             "seq": {
-                "prec": 20.524,
-                "pers": 26.753,
-                "mem": 12638,
+                "prec": 16.596,
+                "pers": 27.215,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 895,
                 "#Saddle-saddle": 2894,
@@ -5208,9 +5208,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.138,
-                "pers": 6.452,
-                "mem": 6178,
+                "prec": 0.754,
+                "pers": 5.781,
+                "mem": 6374,
                 "#threads": 16,
                 "#Min-saddle": 890,
                 "#Saddle-saddle": 1325,
@@ -5218,9 +5218,9 @@
                 "#Total pairs": 2490
             },
             "seq": {
-                "prec": 2.284,
-                "pers": 41.507,
-                "mem": 5610,
+                "prec": 1.912,
+                "pers": 38.747,
+                "mem": 5806,
                 "#threads": 1,
                 "#Min-saddle": 890,
                 "#Saddle-saddle": 1325,
@@ -5342,9 +5342,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.319,
-                "pers": 11.051,
-                "mem": 13130,
+                "prec": 13.266,
+                "pers": 7.001,
+                "mem": 13297,
                 "#threads": 16,
                 "#Min-saddle": 171807,
                 "#Saddle-saddle": 489906,
@@ -5352,9 +5352,9 @@
                 "#Total pairs": 827884
             },
             "seq": {
-                "prec": 20.058,
-                "pers": 45.972,
-                "mem": 13003,
+                "prec": 16.866,
+                "pers": 46.509,
+                "mem": 13186,
                 "#threads": 1,
                 "#Min-saddle": 171807,
                 "#Saddle-saddle": 489906,
@@ -5473,9 +5473,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.152,
-                "pers": 14.353,
-                "mem": 6200,
+                "prec": 0.79,
+                "pers": 8.209,
+                "mem": 6397,
                 "#threads": 16,
                 "#Min-saddle": 149287,
                 "#Saddle-saddle": 350491,
@@ -5483,9 +5483,9 @@
                 "#Total pairs": 643000
             },
             "seq": {
-                "prec": 2.302,
-                "pers": 64.103,
-                "mem": 5959,
+                "prec": 1.911,
+                "pers": 58.465,
+                "mem": 6169,
                 "#threads": 1,
                 "#Min-saddle": 149287,
                 "#Saddle-saddle": 350491,
@@ -5607,9 +5607,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.895,
-                "pers": 4.529,
-                "mem": 13093,
+                "prec": 13.457,
+                "pers": 4.64,
+                "mem": 13260,
                 "#threads": 16,
                 "#Min-saddle": 153,
                 "#Saddle-saddle": 697,
@@ -5617,9 +5617,9 @@
                 "#Total pairs": 1005
             },
             "seq": {
-                "prec": 20.065,
-                "pers": 28.398,
-                "mem": 12638,
+                "prec": 16.956,
+                "pers": 29.02,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 153,
                 "#Saddle-saddle": 697,
@@ -5738,9 +5738,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.14,
-                "pers": 6.498,
-                "mem": 6177,
+                "prec": 0.809,
+                "pers": 5.786,
+                "mem": 6374,
                 "#threads": 16,
                 "#Min-saddle": 152,
                 "#Saddle-saddle": 372,
@@ -5748,9 +5748,9 @@
                 "#Total pairs": 679
             },
             "seq": {
-                "prec": 2.289,
-                "pers": 40.792,
-                "mem": 5610,
+                "prec": 1.916,
+                "pers": 38.359,
+                "mem": 5805,
                 "#threads": 1,
                 "#Min-saddle": 152,
                 "#Saddle-saddle": 372,
@@ -5872,9 +5872,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.413,
-                "pers": 13.569,
-                "mem": 13223,
+                "prec": 13.252,
+                "pers": 7.732,
+                "mem": 13408,
                 "#threads": 16,
                 "#Min-saddle": 299800,
                 "#Saddle-saddle": 654025,
@@ -5882,9 +5882,9 @@
                 "#Total pairs": 1228299
             },
             "seq": {
-                "prec": 19.985,
-                "pers": 53.251,
-                "mem": 13142,
+                "prec": 16.902,
+                "pers": 53.851,
+                "mem": 13332,
                 "#threads": 1,
                 "#Min-saddle": 299800,
                 "#Saddle-saddle": 654025,
@@ -6003,9 +6003,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.144,
-                "pers": 14.468,
-                "mem": 6212,
+                "prec": 0.782,
+                "pers": 8.733,
+                "mem": 6410,
                 "#threads": 16,
                 "#Min-saddle": 240245,
                 "#Saddle-saddle": 570498,
@@ -6013,9 +6013,9 @@
                 "#Total pairs": 1030785
             },
             "seq": {
-                "prec": 2.292,
-                "pers": 69.922,
-                "mem": 6080,
+                "prec": 1.913,
+                "pers": 64.309,
+                "mem": 6292,
                 "#threads": 1,
                 "#Min-saddle": 240245,
                 "#Saddle-saddle": 570498,
@@ -6137,9 +6137,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.691,
-                "pers": 9.625,
-                "mem": 13137,
+                "prec": 13.119,
+                "pers": 6.662,
+                "mem": 13306,
                 "#threads": 16,
                 "#Min-saddle": 361868,
                 "#Saddle-saddle": 466740,
@@ -6147,9 +6147,9 @@
                 "#Total pairs": 1186371
             },
             "seq": {
-                "prec": 19.024,
-                "pers": 47.689,
-                "mem": 12941,
+                "prec": 19.32,
+                "pers": 50.394,
+                "mem": 13131,
                 "#threads": 1,
                 "#Min-saddle": 361868,
                 "#Saddle-saddle": 466740,
@@ -6268,9 +6268,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.137,
-                "pers": 17.204,
-                "mem": 6220,
+                "prec": 0.791,
+                "pers": 8.717,
+                "mem": 6415,
                 "#threads": 16,
                 "#Min-saddle": 254561,
                 "#Saddle-saddle": 709235,
@@ -6278,9 +6278,9 @@
                 "#Total pairs": 1214792
             },
             "seq": {
-                "prec": 2.285,
-                "pers": 71.769,
-                "mem": 6081,
+                "prec": 1.92,
+                "pers": 65.374,
+                "mem": 6306,
                 "#threads": 1,
                 "#Min-saddle": 254561,
                 "#Saddle-saddle": 709235,
@@ -6402,9 +6402,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.802,
-                "pers": 11.282,
-                "mem": 13137,
+                "prec": 13.246,
+                "pers": 6.621,
+                "mem": 13284,
                 "#threads": 16,
                 "#Min-saddle": 391185,
                 "#Saddle-saddle": 463091,
@@ -6412,9 +6412,9 @@
                 "#Total pairs": 1227947
             },
             "seq": {
-                "prec": 19.073,
-                "pers": 48.794,
-                "mem": 12941,
+                "prec": 16.553,
+                "pers": 46.148,
+                "mem": 13131,
                 "#threads": 1,
                 "#Min-saddle": 391185,
                 "#Saddle-saddle": 463091,
@@ -6514,9 +6514,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.128,
-                "pers": 14.886,
-                "mem": 6221,
+                "prec": 0.83,
+                "pers": 9.535,
+                "mem": 6426,
                 "#threads": 16,
                 "#Min-saddle": 264829,
                 "#Saddle-saddle": 762616,
@@ -6524,9 +6524,9 @@
                 "#Total pairs": 1282097
             },
             "seq": {
-                "prec": 2.499,
-                "pers": 73.311,
-                "mem": 6107,
+                "prec": 1.872,
+                "pers": 66.25,
+                "mem": 6335,
                 "#threads": 1,
                 "#Min-saddle": 264829,
                 "#Saddle-saddle": 762616,
@@ -6648,9 +6648,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.066,
-                "pers": 30.007,
-                "mem": 13716,
+                "prec": 13.164,
+                "pers": 10.037,
+                "mem": 13910,
                 "#threads": 16,
                 "#Min-saddle": 696294,
                 "#Saddle-saddle": 796112,
@@ -6658,9 +6658,9 @@
                 "#Total pairs": 2163126
             },
             "seq": {
-                "prec": 19.894,
-                "pers": 75.247,
-                "mem": 13627,
+                "prec": 16.631,
+                "pers": 74.267,
+                "mem": 13830,
                 "#threads": 1,
                 "#Min-saddle": 696294,
                 "#Saddle-saddle": 796112,
@@ -6763,9 +6763,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.138,
-                "pers": 50.768,
-                "mem": 7239,
+                "prec": 0.794,
+                "pers": 14.641,
+                "mem": 7478,
                 "#threads": 16,
                 "#Min-saddle": 477658,
                 "#Saddle-saddle": 1380065,
@@ -6773,9 +6773,9 @@
                 "#Total pairs": 2315562
             },
             "seq": {
-                "prec": 2.289,
-                "pers": 116.166,
-                "mem": 7129,
+                "prec": 1.913,
+                "pers": 102.337,
+                "mem": 7380,
                 "#threads": 1,
                 "#Min-saddle": 477658,
                 "#Saddle-saddle": 1380065,
@@ -6905,9 +6905,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.99,
-                "pers": 4.276,
-                "mem": 13094,
+                "prec": 13.455,
+                "pers": 3.677,
+                "mem": 13262,
                 "#threads": 16,
                 "#Min-saddle": 145,
                 "#Saddle-saddle": 1024,
@@ -6915,9 +6915,9 @@
                 "#Total pairs": 1274
             },
             "seq": {
-                "prec": 20.792,
-                "pers": 19.172,
-                "mem": 12638,
+                "prec": 16.65,
+                "pers": 18.409,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 145,
                 "#Saddle-saddle": 1024,
@@ -7036,9 +7036,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.137,
-                "pers": 6.369,
-                "mem": 6177,
+                "prec": 0.764,
+                "pers": 5.44,
+                "mem": 6373,
                 "#threads": 16,
                 "#Min-saddle": 145,
                 "#Saddle-saddle": 253,
@@ -7046,9 +7046,9 @@
                 "#Total pairs": 503
             },
             "seq": {
-                "prec": 2.288,
-                "pers": 35.418,
-                "mem": 5610,
+                "prec": 1.922,
+                "pers": 32.944,
+                "mem": 5805,
                 "#threads": 1,
                 "#Min-saddle": 145,
                 "#Saddle-saddle": 253,
@@ -7170,9 +7170,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.716,
-                "pers": 4.65,
-                "mem": 13093,
+                "prec": 13.278,
+                "pers": 4.142,
+                "mem": 13262,
                 "#threads": 16,
                 "#Min-saddle": 190,
                 "#Saddle-saddle": 496,
@@ -7180,9 +7180,9 @@
                 "#Total pairs": 806
             },
             "seq": {
-                "prec": 20.577,
-                "pers": 29.605,
-                "mem": 12637,
+                "prec": 16.642,
+                "pers": 28.907,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 190,
                 "#Saddle-saddle": 496,
@@ -7301,9 +7301,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.145,
-                "pers": 7.215,
-                "mem": 6178,
+                "prec": 0.778,
+                "pers": 5.894,
+                "mem": 6373,
                 "#threads": 16,
                 "#Min-saddle": 187,
                 "#Saddle-saddle": 502,
@@ -7311,9 +7311,9 @@
                 "#Total pairs": 806
             },
             "seq": {
-                "prec": 2.294,
-                "pers": 43.886,
-                "mem": 5611,
+                "prec": 1.911,
+                "pers": 41.181,
+                "mem": 5806,
                 "#threads": 1,
                 "#Min-saddle": 187,
                 "#Saddle-saddle": 502,
@@ -7435,9 +7435,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.703,
-                "pers": 8.024,
-                "mem": 13127,
+                "prec": 13.217,
+                "pers": 5.925,
+                "mem": 13296,
                 "#threads": 16,
                 "#Min-saddle": 193777,
                 "#Saddle-saddle": 277309,
@@ -7445,9 +7445,9 @@
                 "#Total pairs": 660398
             },
             "seq": {
-                "prec": 19.194,
-                "pers": 54.571,
-                "mem": 12790,
+                "prec": 16.633,
+                "pers": 44.126,
+                "mem": 12971,
                 "#threads": 1,
                 "#Min-saddle": 193777,
                 "#Saddle-saddle": 277309,
@@ -7558,9 +7558,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.137,
-                "pers": 11.922,
-                "mem": 6200,
+                "prec": 0.79,
+                "pers": 8.146,
+                "mem": 6397,
                 "#threads": 16,
                 "#Min-saddle": 151860,
                 "#Saddle-saddle": 378098,
@@ -7568,9 +7568,9 @@
                 "#Total pairs": 678936
             },
             "seq": {
-                "prec": 2.285,
-                "pers": 70.001,
-                "mem": 5845,
+                "prec": 1.916,
+                "pers": 63.577,
+                "mem": 6060,
                 "#threads": 1,
                 "#Min-saddle": 151860,
                 "#Saddle-saddle": 378098,
@@ -7692,9 +7692,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.202,
-                "pers": 4.492,
-                "mem": 13093,
+                "prec": 13.115,
+                "pers": 3.775,
+                "mem": 13261,
                 "#threads": 16,
                 "#Min-saddle": 13903,
                 "#Saddle-saddle": 19831,
@@ -7702,9 +7702,9 @@
                 "#Total pairs": 50002
             },
             "seq": {
-                "prec": 19.888,
-                "pers": 21.213,
-                "mem": 12638,
+                "prec": 16.644,
+                "pers": 20.101,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 13903,
                 "#Saddle-saddle": 19831,
@@ -7823,9 +7823,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.142,
-                "pers": 6.506,
-                "mem": 6178,
+                "prec": 0.808,
+                "pers": 5.713,
+                "mem": 6375,
                 "#threads": 16,
                 "#Min-saddle": 10485,
                 "#Saddle-saddle": 30745,
@@ -7833,9 +7833,9 @@
                 "#Total pairs": 54509
             },
             "seq": {
-                "prec": 2.295,
-                "pers": 36.907,
-                "mem": 5623,
+                "prec": 1.911,
+                "pers": 36.117,
+                "mem": 5825,
                 "#threads": 1,
                 "#Min-saddle": 10485,
                 "#Saddle-saddle": 30745,
@@ -7957,9 +7957,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.068,
-                "pers": 6.811,
-                "mem": 13126,
+                "prec": 15.32,
+                "pers": 5.711,
+                "mem": 13294,
                 "#threads": 16,
                 "#Min-saddle": 34361,
                 "#Saddle-saddle": 141558,
@@ -7967,9 +7967,9 @@
                 "#Total pairs": 259088
             },
             "seq": {
-                "prec": 19.3,
-                "pers": 40.364,
-                "mem": 12681,
+                "prec": 16.636,
+                "pers": 33.743,
+                "mem": 12855,
                 "#threads": 1,
                 "#Min-saddle": 34361,
                 "#Saddle-saddle": 141558,
@@ -8088,9 +8088,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.142,
-                "pers": 11.007,
-                "mem": 6186,
+                "prec": 0.791,
+                "pers": 6.888,
+                "mem": 6381,
                 "#threads": 16,
                 "#Min-saddle": 24070,
                 "#Saddle-saddle": 128975,
@@ -8098,9 +8098,9 @@
                 "#Total pairs": 227280
             },
             "seq": {
-                "prec": 2.284,
-                "pers": 54.171,
-                "mem": 5683,
+                "prec": 1.918,
+                "pers": 49.581,
+                "mem": 5884,
                 "#threads": 1,
                 "#Min-saddle": 24070,
                 "#Saddle-saddle": 128975,
@@ -8222,9 +8222,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.722,
-                "pers": 7.336,
-                "mem": 13127,
+                "prec": 13.203,
+                "pers": 5.067,
+                "mem": 13295,
                 "#threads": 16,
                 "#Min-saddle": 160583,
                 "#Saddle-saddle": 239080,
@@ -8232,9 +8232,9 @@
                 "#Total pairs": 552256
             },
             "seq": {
-                "prec": 19.068,
-                "pers": 41.484,
-                "mem": 12764,
+                "prec": 16.644,
+                "pers": 33.777,
+                "mem": 12946,
                 "#threads": 1,
                 "#Min-saddle": 160583,
                 "#Saddle-saddle": 239080,
@@ -8353,9 +8353,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.147,
-                "pers": 9.469,
-                "mem": 6196,
+                "prec": 0.754,
+                "pers": 7.453,
+                "mem": 6391,
                 "#threads": 16,
                 "#Min-saddle": 118920,
                 "#Saddle-saddle": 308368,
@@ -8363,9 +8363,9 @@
                 "#Total pairs": 541961
             },
             "seq": {
-                "prec": 2.285,
-                "pers": 55.453,
-                "mem": 5801,
+                "prec": 1.912,
+                "pers": 51.36,
+                "mem": 6015,
                 "#threads": 1,
                 "#Min-saddle": 118920,
                 "#Saddle-saddle": 308368,
@@ -8487,9 +8487,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.221,
-                "pers": 6.819,
-                "mem": 13126,
+                "prec": 13.241,
+                "pers": 5.075,
+                "mem": 13294,
                 "#threads": 16,
                 "#Min-saddle": 84894,
                 "#Saddle-saddle": 106660,
@@ -8497,9 +8497,9 @@
                 "#Total pairs": 222200
             },
             "seq": {
-                "prec": 21.16,
-                "pers": 42.866,
-                "mem": 12672,
+                "prec": 19.317,
+                "pers": 45.142,
+                "mem": 12845,
                 "#threads": 1,
                 "#Min-saddle": 84894,
                 "#Saddle-saddle": 106660,
@@ -8599,9 +8599,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.135,
-                "pers": 10.652,
-                "mem": 6185,
+                "prec": 0.745,
+                "pers": 7.301,
+                "mem": 6381,
                 "#threads": 16,
                 "#Min-saddle": 62614,
                 "#Saddle-saddle": 164925,
@@ -8609,9 +8609,9 @@
                 "#Total pairs": 248037
             },
             "seq": {
-                "prec": 2.552,
-                "pers": 60.746,
-                "mem": 5701,
+                "prec": 1.918,
+                "pers": 57.192,
+                "mem": 5902,
                 "#threads": 1,
                 "#Min-saddle": 62614,
                 "#Saddle-saddle": 164925,
@@ -8733,9 +8733,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.907,
-                "pers": 7.091,
-                "mem": 13125,
+                "prec": 13.18,
+                "pers": 5.192,
+                "mem": 13294,
                 "#threads": 16,
                 "#Min-saddle": 76463,
                 "#Saddle-saddle": 134418,
@@ -8743,9 +8743,9 @@
                 "#Total pairs": 280358
             },
             "seq": {
-                "prec": 19.665,
-                "pers": 43.237,
-                "mem": 12716,
+                "prec": 16.646,
+                "pers": 40.786,
+                "mem": 12893,
                 "#threads": 1,
                 "#Min-saddle": 76463,
                 "#Saddle-saddle": 134418,
@@ -8864,9 +8864,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.138,
-                "pers": 10.419,
-                "mem": 6187,
+                "prec": 0.788,
+                "pers": 7.363,
+                "mem": 6383,
                 "#threads": 16,
                 "#Min-saddle": 72086,
                 "#Saddle-saddle": 166751,
@@ -8874,9 +8874,9 @@
                 "#Total pairs": 303927
             },
             "seq": {
-                "prec": 2.297,
-                "pers": 61.4,
-                "mem": 5745,
+                "prec": 1.913,
+                "pers": 57.62,
+                "mem": 5947,
                 "#threads": 1,
                 "#Min-saddle": 72086,
                 "#Saddle-saddle": 166751,
@@ -8998,9 +8998,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 17.225,
-                "pers": 9.273,
-                "mem": 13129,
+                "prec": 13.153,
+                "pers": 5.973,
+                "mem": 13298,
                 "#threads": 16,
                 "#Min-saddle": 244787,
                 "#Saddle-saddle": 344148,
@@ -9008,9 +9008,9 @@
                 "#Total pairs": 831188
             },
             "seq": {
-                "prec": 20.24,
-                "pers": 45.454,
-                "mem": 12879,
+                "prec": 16.789,
+                "pers": 41.719,
+                "mem": 13063,
                 "#threads": 1,
                 "#Min-saddle": 244787,
                 "#Saddle-saddle": 344148,
@@ -9129,9 +9129,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.141,
-                "pers": 13.426,
-                "mem": 6206,
+                "prec": 0.792,
+                "pers": 8.328,
+                "mem": 6405,
                 "#threads": 16,
                 "#Min-saddle": 199857,
                 "#Saddle-saddle": 489044,
@@ -9139,9 +9139,9 @@
                 "#Total pairs": 887731
             },
             "seq": {
-                "prec": 2.295,
-                "pers": 66.562,
-                "mem": 5956,
+                "prec": 1.911,
+                "pers": 62.201,
+                "mem": 6169,
                 "#threads": 1,
                 "#Min-saddle": 199857,
                 "#Saddle-saddle": 489044,
@@ -9263,9 +9263,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 16.713,
-                "pers": 5.259,
-                "mem": 13124,
+                "prec": 13.087,
+                "pers": 4.29,
+                "mem": 13293,
                 "#threads": 16,
                 "#Min-saddle": 55077,
                 "#Saddle-saddle": 60527,
@@ -9273,9 +9273,9 @@
                 "#Total pairs": 173304
             },
             "seq": {
-                "prec": 19.219,
-                "pers": 29.597,
-                "mem": 12638,
+                "prec": 16.603,
+                "pers": 26.856,
+                "mem": 12806,
                 "#threads": 1,
                 "#Min-saddle": 55077,
                 "#Saddle-saddle": 60527,
@@ -9394,9 +9394,9 @@
         },
         "DiscreteMorseSandwich": {
             "para": {
-                "prec": 1.143,
-                "pers": 8.076,
-                "mem": 6183,
+                "prec": 0.791,
+                "pers": 6.431,
+                "mem": 6379,
                 "#threads": 16,
                 "#Min-saddle": 34696,
                 "#Saddle-saddle": 101821,
@@ -9404,9 +9404,9 @@
                 "#Total pairs": 173945
             },
             "seq": {
-                "prec": 2.293,
-                "pers": 45.274,
-                "mem": 5651,
+                "prec": 1.916,
+                "pers": 42.836,
+                "mem": 5852,
                 "#threads": 1,
                 "#Min-saddle": 34696,
                 "#Saddle-saddle": 101821,

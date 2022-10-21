@@ -9,14 +9,11 @@ def main(json0, json1, dry_run=True):
         data1 = json.load(src)
 
     for k in data1.keys():
-        # datasets
-        if "impl" in k:
-            continue
         # backends
         print(
-            f'{data0[k]["Dipha"]["para"]["mem"]} <- {data1[k]["Dipha"]["para"]["mem"]}'
+            f'{data0[k]["DiscreteMorseSandwich"]} <- {data1[k]["DiscreteMorseSandwich"]}'
         )
-        data0[k]["Dipha"]["para"]["mem"] = data1[k]["Dipha"]["para"]["mem"]
+        data0[k]["DiscreteMorseSandwich"] = data1[k]["DiscreteMorseSandwich"]
 
     if not dry_run:
         with open(json0, "w") as dst:
