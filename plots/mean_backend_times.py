@@ -71,7 +71,8 @@ def main():
                 val = res["seq"]["pers"] / res["para"]["pers"]
                 speedups.append(val)
                 # print(ds, bk, val)
-        print("  parallel speedup:", sum(speedups) / len(speedups))
+        speedup = sum(speedups) / len(speedups)
+        print("  parallel speedup:", speedup)
         print("  parallel efficiency (16 threads):", speedup / 16)
 
     # with open("mean_res.json", "w") as dst:
