@@ -2,6 +2,7 @@ import json
 import os
 import pathlib
 import re
+import statistics
 
 
 def escape_ansi_chars(txt):
@@ -23,7 +24,10 @@ regexp_map = {
 
 
 def ttk_time(ttk_output, regexp):
-    return float(re.search(regexp, ttk_output, re.MULTILINE).group(1))
+    try:
+        return float(re.search(regexp, ttk_output, re.MULTILINE).group(1))
+    except AttributeError:
+        return 0.0
 
 
 def parse_logs():
@@ -33,14 +37,55 @@ def parse_logs():
         ds, _, nt = log.stem.split(".")
         nt = int(nt[:-1])
         dsname = "_".join(ds.split("_")[:-2])
+        triangl = ds.split("_")[-1]
         if dsname not in res:
             res[dsname] = []
-        res[dsname].append({"num_threads": nt})
+        res[dsname].append({"num_threads": nt, "triangl": triangl})
         with open(log, "r") as src:
             ttk_output = escape_ansi_chars(src.read())
             for k, v in regexp_map.items():
                 res[dsname][-1][k] = ttk_time(ttk_output, v)
 
+    return res
+
+
+def compute_stats(data, seq, expl):
+    res = {"dg": 0.0, "minSad": 0.0, "sadMax": 0.0, "sadSad": 0.0}
+    if not seq and expl:
+        sid = 0
+    elif seq and expl:
+        sid = 1
+    elif not seq and not expl:
+        sid = 2
+    elif seq and not expl:
+        sid = 3
+
+    total = []
+    size = list(data)[0].split("_")[-1]
+    if size.endswith("x1x1"):
+        dim = "1D"
+    elif size.endswith("x1"):
+        dim = "2D"
+    else:
+        dim = "3D"
+
+    for v in data.values():
+        for kk, vv in v[sid].items():
+            if kk in res:
+                res[kk] += vv
+        total.append(v[sid]["total"])
+
+    for k, v in res.items():
+        res[k] = v / len(data)
+    res |= {
+        "total_mean": statistics.mean(total),
+        "total_min": min(total),
+        "total_max": max(total),
+        "total_stdev": statistics.stdev(total),
+        "dim": dim,
+        "sequential": seq,
+        "explicit": expl,
+    }
     return res
 
 
@@ -67,7 +112,12 @@ def main():
     # print in JSON format
     print(json.dumps(res, indent=4))
 
-    print_tex_array(res)
+    # print_tex_array(res)
+
+    for seq in [True, False]:
+        for expl in [True, False]:
+            stats = compute_stats(res, seq, expl)
+            print(json.dumps(stats, indent=4))
 
 
 if __name__ == "__main__":
