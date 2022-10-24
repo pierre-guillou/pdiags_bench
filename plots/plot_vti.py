@@ -105,6 +105,8 @@ def generate_plot(data, backends, dim):
                 coords.append(f"({n_pairs}, {val})")
             coords.append("};")
             plot.append(" ".join(coords))
+            if backend == "DiscreteMorseSandwich":
+                backend = "DMS"
             plot.append(r"\addlegendentry{" + backend + "}")
 
         except KeyError:
@@ -117,28 +119,18 @@ def generate_plot(data, backends, dim):
 
 def sort_backends(data, cpx="expl"):
     backends = {
-        "DiscreteMorseSandwich": None,
-        "Dipha": None,
-        "Gudhi": None,
-        "TTK-FTM": None,
-        "PersistenceCycles": None,
-        "Oineus": None,
-        "CubicalRipser": None,
-        "Diamorse": None,
-        "Perseus": None,
+        "DiscreteMorseSandwich": "curve1",
+        "TTK-FTM": "curve5",
+        "Dipha": "curve2",
+        "PersistenceCycles": "curve4",
+        "Gudhi": "curve6",
+        "Oineus": "curve10",
+        "Diamorse": "curve7",
+        "Perseus": "curve8",
+        "CubicalRipser": "curve9",
     }
-    for d in data:
-        for ds, res in d.items():
-            if cpx not in ds:
-                continue
-            for backend in res.keys():
-                if backend == "#Vertices":
-                    continue
-                backends[backend] = None
 
-    return dict(
-        zip(backends.keys(), ["curve" + str(i + 1) for i in range(len(backends))])
-    )
+    return backends
 
 
 def main():
@@ -146,7 +138,7 @@ def main():
     cpx = "impl"
     backends = sort_backends(data, cpx)
 
-    legend_pos = r"""\node at (plots c2r1.east)[inner sep=0pt, xshift=8ex]
+    legend_pos = r"""\node at (plots c1r1.north east)[inner sep=0pt, xshift=-2ex, yshift=2ex]
 {\pgfplotslegendfromname{grouplegend}};"""
 
 
@@ -157,7 +149,7 @@ def main():
                 generate_plot({k: v for k, v in data[i].items() if cpx in k}, backends, i)
             )
 
-        plots_utils.output_tex_file(res, f"plot_{cpx}_{mode}", False, False, "", legend_pos)
+        plots_utils.output_tex_file(res, f"plot_{cpx}_{mode}", False, False, legend_pos)
 
 
 if __name__ == "__main__":

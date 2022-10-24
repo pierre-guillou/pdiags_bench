@@ -81,6 +81,8 @@ def generate_plot(data, backends, dim, mode="seq"):
                 coords.append(f"({n_pairs}, {val})")
             coords.append("};")
             plot.append(" ".join(coords))
+            if backend == "DiscreteMorseSandwich":
+                backend = "DMS"
             plot.append(r"\addlegendentry{" + backend + "}")
 
         except KeyError:
@@ -91,27 +93,25 @@ def generate_plot(data, backends, dim, mode="seq"):
     return plot
 
 
-def sort_backends(data, cpx="expl"):
+def sort_backends():
     backends = {
-        "DiscreteMorseSandwich": None,
-        "Dipha": None,
-        "Gudhi": None,
-        "TTK-FTM": None,
-        "PersistenceCycles": None,
-        "PHAT": None,
-        "Eirene.jl": None,
-        "JavaPlex": None,
-        "Dionysus": None,
+        "DiscreteMorseSandwich": "curve1",
+        "Dipha": "curve2",
+        "Gudhi": "curve6",
+        "TTK-FTM": "curve5",
+        "PersistenceCycles": "curve4",
+        "PHAT": "curve3",
+        "Eirene.jl": "curve7",
+        "JavaPlex": "curve8",
+        "Dionysus": "curve9",
     }
-    return dict(
-        zip(backends.keys(), ["curve" + str(i + 1) for i in range(len(backends))])
-    )
+    return backends
 
 
 def main():
     data = load_data()
     cpx = "expl"
-    backends = sort_backends(data, cpx)
+    backends = sort_backends()
 
     legend_pos = r"""\node at (plots c3r1.north east)[inner sep=0pt, xshift=-2ex, yshift=2ex]
 {\pgfplotslegendfromname{grouplegend}};"""
@@ -125,9 +125,7 @@ def main():
                 )
             )
 
-        plots_utils.output_tex_file(
-            res, f"plot_{cpx}_{mode}", False, False, legend_pos
-        )
+        plots_utils.output_tex_file(res, f"plot_{cpx}_{mode}", False, False, legend_pos)
 
 
 if __name__ == "__main__":
