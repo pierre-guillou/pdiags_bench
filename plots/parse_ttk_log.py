@@ -49,7 +49,7 @@ def parse_logs():
     return res
 
 
-def compute_stats(data, seq, expl):
+def compute_stats(data, seq, expl, dim):
     res = {"dg": 0.0, "minSad": 0.0, "sadMax": 0.0, "sadSad": 0.0}
     if not seq and expl:
         sid = 0
@@ -61,22 +61,46 @@ def compute_stats(data, seq, expl):
         sid = 3
 
     total = []
-    size = list(data)[0].split("_")[-1]
-    if size.endswith("x1x1"):
-        dim = "1D"
-    elif size.endswith("x1"):
-        dim = "2D"
-    else:
-        dim = "3D"
 
-    for v in data.values():
-        for kk, vv in v[sid].items():
+    def has_correct_dim(ds):
+        size = ds.split("_")[-1]
+        if dim == "3D":
+            return not size.endswith("x1")
+        if dim == "2D":
+            return size.endswith("x1") and not size.endswith("x1x1")
+        if dim == "1D":
+            return size.endswith("x1x1")
+        return False
+
+    def has_correct_threads(val):
+        if seq:
+            return val["num_threads"] == 1
+        return val["num_threads"] == 16
+
+    def has_correct_triangl(val):
+        if expl:
+            return val["triangl"] == "expl"
+        return val["triangl"] == "impl"
+
+    data_filtr = {}
+    for k, v in data.items():
+        if not has_correct_dim(k):
+            continue
+        for el in v:
+            if not has_correct_threads(el):
+                continue
+            if not has_correct_triangl(el):
+                continue
+            data_filtr[k] = el
+
+    for v in data_filtr.values():
+        for kk, vv in v.items():
             if kk in res:
                 res[kk] += vv
-        total.append(v[sid]["total"])
+        total.append(v["total"])
 
     for k, v in res.items():
-        res[k] = v / len(data)
+        res[k] = v / len(data_filtr)
     res |= {
         "total_mean": statistics.mean(total),
         "total_min": min(total),
@@ -114,10 +138,16 @@ def main():
 
     # print_tex_array(res)
 
-    for seq in [True, False]:
-        for expl in [True, False]:
-            stats = compute_stats(res, seq, expl)
-            print(json.dumps(stats, indent=4))
+    stats = []
+    for dim in ["1D", "2D", "3D"]:
+        for seq in [True, False]:
+            for expl in [True, False]:
+                # no implicit grids in 1D
+                if dim == "1D" and not expl:
+                    continue
+
+                stats.append(compute_stats(res, seq, expl, dim))
+    print(json.dumps(stats, indent=4))
 
 
 if __name__ == "__main__":
