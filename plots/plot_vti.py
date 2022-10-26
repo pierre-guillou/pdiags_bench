@@ -43,7 +43,7 @@ def transpose_data(data, dim):
                 val = perfs["timeout"]
             else:
                 continue
-            backend_ds_res.setdefault(backend, {}).update({dsname: n_simplices / val})
+            backend_ds_res.setdefault(backend, {}).update({dsname: val})
 
     return backend_ds_res
 
