@@ -128,7 +128,7 @@ def aggregate_backend_nthreads(res, dim=3):
             if i > 0:
                 mtime = time / i
                 mspeed = speed / i
-                aggr[bk][nthreads] = mspeed
+                aggr[bk][nthreads] = mtime
                 print(
                     f"{bk} {nthreads} threads ({i} datasets): {mtime:.3f} s, {mspeed:.1f} #simplices/s"
                 )
