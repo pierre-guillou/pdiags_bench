@@ -45,22 +45,16 @@ def parse_logs():
             ttk_output = escape_ansi_chars(src.read())
             for k, v in regexp_map.items():
                 res[dsname][-1][k] = ttk_time(ttk_output, v)
+            res[dsname][-1]["D1"] = res[dsname][-1].pop("sadSad")
+            res[dsname][-1]["D0+D2"] = (
+                res[dsname][-1]["minSad"] + res[dsname][-1]["sadMax"]
+            )
 
     return res
 
 
 def compute_stats(data, seq, expl, dim):
-    res = {"dg": 0.0, "minSad": 0.0, "sadMax": 0.0, "sadSad": 0.0}
-    if not seq and expl:
-        sid = 0
-    elif seq and expl:
-        sid = 1
-    elif not seq and not expl:
-        sid = 2
-    elif seq and not expl:
-        sid = 3
-
-    total = []
+    res = {"dg": [], "D0+D2": [], "D1": [], "total": []}
 
     def has_correct_dim(ds):
         size = ds.split("_")[-1]
@@ -96,26 +90,28 @@ def compute_stats(data, seq, expl, dim):
     for v in data_filtr.values():
         for kk, vv in v.items():
             if kk in res:
-                res[kk] += vv
-        total.append(v["total"])
+                res[kk].append(vv)
 
     for k, v in res.items():
-        res[k] = v / len(data_filtr)
+        res[k] = {
+            "mean": statistics.mean(v),
+            "min": min(v),
+            "max": max(v),
+            "stdev": statistics.stdev(v),
+        }
+
     res |= {
-        "total_mean": statistics.mean(total),
-        "total_min": min(total),
-        "total_max": max(total),
-        "total_stdev": statistics.stdev(total),
         "dim": dim,
         "sequential": seq,
         "explicit": expl,
     }
+
     return res
 
 
 def print_tex_array(data):
     # print in LaTeX array format
-    arrays = ["dg", "minSad", "sadMax", "sadSad", "total"]
+    arrays = ["dg", "D0+D2", "D1", "total"]
     arrs = " & ".join(arrays)
     print(rf"Data-set & size & {arrs} & {arrs} \\")
     for k, v in data.items():
