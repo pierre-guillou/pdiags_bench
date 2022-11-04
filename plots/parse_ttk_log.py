@@ -126,6 +126,49 @@ def print_tex_array(data):
         print(rf"{dsname} & {size} & {vals} \\")
 
 
+# output table:
+# cols: seq para
+# cols: min mean max stdev
+# rows: 1D 2D 3D
+# rows: dg D0+D2 D1 total
+def print_table(stats, expl):
+    print(r"\begin{tabular}[ht]{ll|rrrr|rrrr|}")
+    print(r"\toprule")
+    print(r"& & \multicolumn{4}{c}{Sequential} & \multicolumn{4}{c}{Parallel} \\")
+    print(r"& & min & mean & max & stdev & min & mean & max & stdev \\")
+    print(r"\midrule")
+
+    for dim in ["1D", "2D", "3D"]:
+        if not expl and dim == "1D":
+            continue
+        for key in ["dg", "D0+D2", "D1", "total"]:
+            row = []
+            if key == "dg":
+                row.append(rf"\multirow{{4}}{{*}}{{{dim}}} & {key}")
+            else:
+                row.append(f"& {key}")
+            for sequential in [True, False]:
+                data = next(
+                    d
+                    for d in stats
+                    if d["explicit"] == expl
+                    and d["dim"] == dim
+                    and d["sequential"] == sequential
+                )
+                row.extend(
+                    [
+                        round(data[key]["min"], 3),
+                        round(data[key]["mean"], 3),
+                        round(data[key]["max"], 3),
+                        round(data[key]["stdev"], 3),
+                    ]
+                )
+            row = " & ".join(str(v) for v in row)
+            print(rf"{row} \\")
+        print(r"\midrule" if dim != "3D" else r"\bottomrule")
+    print(r"\end{tabular}")
+
+
 def main():
     res = parse_logs()
 
