@@ -54,7 +54,7 @@ def parse_logs():
 
 
 def compute_stats(data, seq, expl, dim):
-    res = {"dg": [], "D0+D2": [], "D1": [], "total": []}
+    res = {"dg": [], "sort": [], "D0+D2": [], "D1": [], "total": []}
 
     def has_correct_dim(ds):
         size = ds.split("_")[-1]
@@ -141,7 +141,7 @@ def print_table(stats, expl):
     for dim in ["1D", "2D", "3D"]:
         if not expl and dim == "1D":
             continue
-        for key in ["dg", "D0+D2", "D1", "total"]:
+        for key in ["dg", "sort", "D0+D2", "D1", "total"]:
             row = []
             if key == "dg":
                 row.append(rf"\multirow{{4}}{{*}}{{{dim}}} & {key}")
