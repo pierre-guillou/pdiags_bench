@@ -200,7 +200,8 @@ class SoftBackend(enum.Enum):
     DIAMORSE = "Diamorse"
     EIRENE = "Eirene.jl"
     JAVAPLEX = "JavaPlex"
-    PHAT = "PHAT"
+    PHAT_SPECTR_SEQ = "PHAT_spectral_sequence"
+    PHAT_CHUNK = "PHAT_chunk"
     PERSCYCL = "PersistenceCycles"
 
     def get_compute_function(self):
@@ -220,7 +221,8 @@ class SoftBackend(enum.Enum):
             SoftBackend.DIAMORSE: compute_diamorse,
             SoftBackend.EIRENE: compute_eirene,
             SoftBackend.JAVAPLEX: compute_javaplex,
-            SoftBackend.PHAT: compute_phat,
+            SoftBackend.PHAT_SPECTR_SEQ: compute_phat,
+            SoftBackend.PHAT_CHUNK: compute_phat,
             SoftBackend.PERSCYCL: compute_persistenceCycles,
         }
         return dispatcher[self]
@@ -308,7 +310,7 @@ class FileType(enum.Enum):
         if self == FileType.EIRENE_CSV:
             return [SoftBackend.EIRENE]
         if self == FileType.PHAT_ASCII:
-            return [SoftBackend.PHAT]
+            return [SoftBackend.PHAT_SPECTR_SEQ, SoftBackend.PHAT_CHUNK]
         if self == FileType.OIN:
             return [SoftBackend.OINEUS_SIMPL]
 
@@ -698,6 +700,8 @@ def compute_phat(fname, times, backend, num_threads=1):
     dataset = dataset_name(fname)
     outp = f"diagrams/{dataset}_{backend.value}.gudhi"
     cmd = [sys.executable, "phat2gudhi.py", "-o", outp, fname, "-t", str(num_threads)]
+    if backend == SoftBackend.PHAT_CHUNK:
+        cmd += ["-b", "chunk"]
 
     out, err = launch_process(cmd)
 
