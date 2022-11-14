@@ -6,7 +6,7 @@ import subprocess
 import time
 
 
-def main(input_dataset, output_diagram, phat_exec, thread_number):
+def main(input_dataset, output_diagram, phat_exec, backend, thread_number):
     # call PHAT on input dataset
     phat_diag = "diagram.phat"
 
@@ -14,7 +14,7 @@ def main(input_dataset, output_diagram, phat_exec, thread_number):
     env["OMP_NUM_THREADS"] = str(thread_number)
 
     subprocess.check_call(
-        [phat_exec, "--verbose", "--ascii", "--spectral_sequence"]
+        [phat_exec, "--verbose", "--ascii", f"--{backend}"]
         + [input_dataset, phat_diag],
         env=env,
     )
@@ -84,6 +84,13 @@ if __name__ == "__main__":
         default="build_dirs/phat/phat",
     )
     parser.add_argument(
+        "-b",
+        "--backend",
+        type=str,
+        help="Backend: spectral_sequence or chunk",
+        default="spectral_sequence",
+    )
+    parser.add_argument(
         "-t",
         "--thread_number",
         type=int,
@@ -92,4 +99,10 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    main(args.input_dataset, args.output_diagram, args.phat_exec, args.thread_number)
+    main(
+        args.input_dataset,
+        args.output_diagram,
+        args.phat_exec,
+        args.backend,
+        args.thread_number,
+    )
