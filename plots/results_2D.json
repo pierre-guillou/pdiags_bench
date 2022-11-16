@@ -140,6 +140,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 270.494,
+                "pers": 4.0,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
+            },
+            "seq": {
+                "prec": 264.874,
+                "pers": 4.7,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 470,
+                "#Saddle-max": 613,
+                "#Total pairs": 1083
+            }
         }
     },
     "aneurism_4096x4096x1_order_impl": {
@@ -408,6 +428,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "backpack_4096x4096x1_order_impl": {
@@ -666,6 +689,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "bonsai_4096x4096x1_order_impl": {
@@ -934,6 +960,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 281.412,
+                "pers": 12.4,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 5575,
+                "#Saddle-max": 6261,
+                "#Total pairs": 11836
+            },
+            "seq": {
+                "prec": 270.3,
+                "pers": 7.0,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 5575,
+                "#Saddle-max": 6261,
+                "#Total pairs": 11836
+            }
         }
     },
     "boston_teapot_4096x4096x1_order_impl": {
@@ -1172,6 +1218,9 @@
             }
         },
         "PersistenceCycles": {
+            "timeout": 900
+        },
+        "PHAT_chunk": {
             "timeout": 900
         }
     },
@@ -1448,6 +1497,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "christmas_tree_4096x4096x1_order_impl": {
@@ -1715,6 +1767,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 281.271,
+                "pers": 12.3,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 1027,
+                "#Saddle-max": 1180,
+                "#Total pairs": 2207
+            },
+            "seq": {
+                "prec": 268.116,
+                "pers": 6.3,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 1027,
+                "#Saddle-max": 1180,
+                "#Total pairs": 2207
             }
         }
     },
@@ -1991,6 +2063,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 276.509,
+                "pers": 3.4,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            },
+            "seq": {
+                "prec": 262.174,
+                "pers": 4.3,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 1,
+                "#Saddle-max": 0,
+                "#Total pairs": 1
+            }
         }
     },
     "elevation_4096x4096x1_order_impl": {
@@ -2251,6 +2343,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "engine_4096x4096x1_order_impl": {
@@ -2518,6 +2613,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "foot_4096x4096x1_order_impl": {
@@ -2792,6 +2890,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 277.386,
+                "pers": 3.7,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
+            },
+            "seq": {
+                "prec": 265.57,
+                "pers": 4.7,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 151,
+                "#Saddle-max": 151,
+                "#Total pairs": 302
             }
         }
     },
@@ -3068,6 +3186,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 280.358,
+                "pers": 7.0,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            },
+            "seq": {
+                "prec": 265.952,
+                "pers": 5.8,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 181,
+                "#Saddle-max": 119,
+                "#Total pairs": 300
+            }
         }
     },
     "hydrogen_atom_4096x4096x1_order_impl": {
@@ -3336,6 +3474,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 286.197,
+                "pers": 7.1,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 55928,
+                "#Saddle-max": 55954,
+                "#Total pairs": 111882
+            },
+            "seq": {
+                "prec": 270.936,
+                "pers": 11.3,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 55928,
+                "#Saddle-max": 55954,
+                "#Total pairs": 111882
+            }
         }
     },
     "kingsnake_4096x4096x1_order_impl": {
@@ -3579,6 +3737,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 285.426,
+                "pers": 6.6,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 34144,
+                "#Saddle-max": 34538,
+                "#Total pairs": 68682
+            },
+            "seq": {
+                "prec": 271.646,
+                "pers": 10.1,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 34144,
+                "#Saddle-max": 34538,
+                "#Total pairs": 68682
             }
         }
     },
@@ -3838,6 +4016,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "magnetic_reconnection_4096x4096x1_order_impl": {
@@ -4086,6 +4267,9 @@
             }
         },
         "PersistenceCycles": {
+            "timeout": 900
+        },
+        "PHAT_chunk": {
             "timeout": 900
         }
     },
@@ -4362,6 +4546,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "marschner_lobb_4096x4096x1_order_impl": {
@@ -4630,6 +4817,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 285.993,
+                "pers": 5.9,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 48091,
+                "#Saddle-max": 45237,
+                "#Total pairs": 93328
+            },
+            "seq": {
+                "prec": 275.731,
+                "pers": 14.1,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 48090,
+                "#Saddle-max": 45238,
+                "#Total pairs": 93328
+            }
         }
     },
     "mri_ventricles_4096x4096x1_order_impl": {
@@ -4890,6 +5097,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "mrt_angio_4096x4096x1_order_impl": {
@@ -5147,6 +5357,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 283.555,
+                "pers": 5.1,
+                "mem": 10402,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
+            },
+            "seq": {
+                "prec": 273.906,
+                "pers": 6.5,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 180,
+                "#Saddle-max": 212,
+                "#Total pairs": 392
             }
         }
     },
@@ -5423,6 +5653,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "neocortical_layer_1_axons_4096x4096x1_order_impl": {
@@ -5691,6 +5924,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 286.997,
+                "pers": 23.1,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 426,
+                "#Saddle-max": 435,
+                "#Total pairs": 861
+            },
+            "seq": {
+                "prec": 274.321,
+                "pers": 7.8,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 426,
+                "#Saddle-max": 435,
+                "#Total pairs": 861
+            }
         }
     },
     "nucleon_4096x4096x1_order_impl": {
@@ -5958,6 +6211,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "pancreas_4096x4096x1_order_impl": {
@@ -6226,6 +6482,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 289.982,
+                "pers": 8.0,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 108172,
+                "#Saddle-max": 87690,
+                "#Total pairs": 195862
+            },
+            "seq": {
+                "prec": 276.415,
+                "pers": 18.1,
+                "mem": 10398,
+                "#threads": 16,
+                "#Min-saddle": 108172,
+                "#Saddle-max": 87690,
+                "#Total pairs": 195862
+            }
         }
     },
     "present_4096x4096x1_order_impl": {
@@ -6469,6 +6745,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 286.578,
+                "pers": 7.2,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 54846,
+                "#Saddle-max": 53727,
+                "#Total pairs": 108573
+            },
+            "seq": {
+                "prec": 270.321,
+                "pers": 11.2,
+                "mem": 10401,
+                "#threads": 16,
+                "#Min-saddle": 54846,
+                "#Saddle-max": 53727,
+                "#Total pairs": 108573
             }
         }
     },
@@ -6728,6 +7024,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "random_4096x4096x1_order_impl": {
@@ -6994,6 +7293,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 283.739,
+                "pers": 3.8,
+                "mem": 10397,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
+            },
+            "seq": {
+                "prec": 272.398,
+                "pers": 6.9,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 423,
+                "#Saddle-max": 568,
+                "#Total pairs": 991
             }
         }
     },
@@ -7263,6 +7582,26 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 288.395,
+                "pers": 11.3,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 632,
+                "#Saddle-max": 969,
+                "#Total pairs": 1601
+            },
+            "seq": {
+                "prec": 278.425,
+                "pers": 12.0,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 632,
+                "#Saddle-max": 969,
+                "#Total pairs": 1601
+            }
         }
     },
     "silicium_4096x4096x1_order_impl": {
@@ -7523,6 +7862,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "skull_4096x4096x1_order_impl": {
@@ -7797,6 +8139,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 288.371,
+                "pers": 6.6,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 9055,
+                "#Saddle-max": 8817,
+                "#Total pairs": 17872
+            },
+            "seq": {
+                "prec": 271.653,
+                "pers": 7.7,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 9055,
+                "#Saddle-max": 8817,
+                "#Total pairs": 17872
             }
         }
     },
@@ -8073,6 +8435,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "statue_leg_4096x4096x1_order_impl": {
@@ -8340,6 +8705,26 @@
                 "#Saddle-saddle": 0,
                 "#Saddle-max": 0,
                 "#Total pairs": 0
+            }
+        },
+        "PHAT_chunk": {
+            "para": {
+                "prec": 288.852,
+                "pers": 9.8,
+                "mem": 10399,
+                "#threads": 16,
+                "#Min-saddle": 28140,
+                "#Saddle-max": 29514,
+                "#Total pairs": 57654
+            },
+            "seq": {
+                "prec": 271.157,
+                "pers": 8.7,
+                "mem": 10400,
+                "#threads": 16,
+                "#Min-saddle": 28140,
+                "#Saddle-max": 29514,
+                "#Total pairs": 57654
             }
         }
     },
@@ -8616,6 +9001,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "tacc_turbulence_4096x4096x1_order_impl": {
@@ -8867,6 +9255,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "tooth_4096x4096x1_order_impl": {
@@ -9127,6 +9518,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "vertebra_4096x4096x1_order_impl": {
@@ -9402,6 +9796,9 @@
                 "#Saddle-max": 0,
                 "#Total pairs": 0
             }
+        },
+        "PHAT_chunk": {
+            "timeout": 900
         }
     },
     "zeiss_4096x4096x1_order_impl": {
