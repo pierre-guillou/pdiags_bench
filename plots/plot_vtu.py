@@ -83,6 +83,10 @@ def generate_plot(data, backends, dim, mode="seq"):
             plot.append(" ".join(coords))
             if backend == "DiscreteMorseSandwich":
                 backend = "DMS"
+            if backend == "PHAT_spectral_sequence":
+                backend = r"PHAT (spectral\_sequence)"
+            if backend == "PHAT_chunk":
+                backend = "PHAT (chunk)"
             plot.append(r"\addlegendentry{" + backend + "}")
 
         except KeyError:
@@ -100,7 +104,8 @@ def sort_backends():
         "Gudhi": "curve6",
         "TTK-FTM": "curve5",
         "PersistenceCycles": "curve4",
-        "PHAT": "curve3",
+        "PHAT_spectral_sequence": "curve3",
+        "PHAT_chunk": "curve10",
         "Eirene.jl": "curve7",
         "JavaPlex": "curve8",
         "Dionysus": "curve9",
