@@ -26,7 +26,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 481.243,
                 "pers": 8.4,
@@ -285,7 +285,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 471.183,
                 "pers": 10.3,
@@ -553,7 +553,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 472.205,
                 "pers": 10.1,
@@ -810,7 +810,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 473.727,
                 "pers": 10.8,
@@ -1078,7 +1078,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 480.127,
                 "pers": 14.8,
@@ -1346,7 +1346,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 483.832,
                 "pers": 15.5,
@@ -1625,7 +1625,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 477.539,
                 "pers": 9.6,
@@ -1912,7 +1912,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 468.35,
                 "pers": 8.7,
@@ -2207,7 +2207,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 476.795,
                 "pers": 11.1,
@@ -2475,7 +2475,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 472.24,
                 "pers": 9.6,
@@ -2743,7 +2743,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 472.549,
                 "pers": 11.2,
@@ -3040,7 +3040,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 473.734,
                 "pers": 11.3,
@@ -3308,7 +3308,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 469.865,
                 "pers": 15.7,
@@ -3576,7 +3576,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 483.321,
                 "pers": 18.9,
@@ -3844,7 +3844,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 467.354,
                 "pers": 16.6,
@@ -4131,7 +4131,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 487.479,
                 "pers": 14.1,
@@ -4418,7 +4418,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 463.199,
                 "pers": 10.1,
@@ -4667,7 +4667,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 474.353,
                 "pers": 13.2,
@@ -4954,7 +4954,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 480.629,
                 "pers": 15.6,
@@ -5222,7 +5222,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 470.743,
                 "pers": 9.3,
@@ -5509,7 +5509,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 475.567,
                 "pers": 16.3,
@@ -5777,7 +5777,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 474.59,
                 "pers": 12.9,
@@ -6045,7 +6045,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 484.986,
                 "pers": 14.6,
@@ -6313,7 +6313,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 482.002,
                 "pers": 15.3,
@@ -6581,7 +6581,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 476.672,
                 "pers": 15.5,
@@ -6849,7 +6849,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 487.941,
                 "pers": 28.6,
@@ -7120,7 +7120,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 466.741,
                 "pers": 9.1,
@@ -7415,7 +7415,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 480.518,
                 "pers": 14.7,
@@ -7702,7 +7702,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 478.252,
                 "pers": 11.5,
@@ -7962,7 +7962,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 469.178,
                 "pers": 8.4,
@@ -8249,7 +8249,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 484.481,
                 "pers": 10.4,
@@ -8517,7 +8517,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 467.232,
                 "pers": 10.3,
@@ -8785,7 +8785,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 467.155,
                 "pers": 10.8,
@@ -9053,7 +9053,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 471.566,
                 "pers": 12.5,
@@ -9321,7 +9321,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 469.312,
                 "pers": 12.9,
@@ -9589,7 +9589,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 471.564,
                 "pers": 9.8,

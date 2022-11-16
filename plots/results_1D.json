@@ -15,7 +15,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.026,
                 "pers": 0.2,
@@ -135,7 +135,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.943,
                 "pers": 0.2,
@@ -255,7 +255,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.984,
                 "pers": 0.2,
@@ -375,7 +375,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 9.52,
                 "pers": 0.2,
@@ -502,7 +502,7 @@
                 "#Total pairs": 219
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.885,
                 "pers": 0.2,
@@ -612,7 +612,7 @@
                 "#Total pairs": 154
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.946,
                 "pers": 0.2,
@@ -732,7 +732,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 7.768,
                 "pers": 0.2,
@@ -852,7 +852,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.897,
                 "pers": 0.2,
@@ -972,7 +972,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.012,
                 "pers": 0.2,
@@ -1092,7 +1092,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.0,
                 "pers": 0.2,
@@ -1212,7 +1212,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.019,
                 "pers": 0.2,
@@ -1332,7 +1332,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 8.724,
                 "pers": 0.3,
@@ -1459,7 +1459,7 @@
                 "#Total pairs": 301
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.901,
                 "pers": 0.2,
@@ -1579,7 +1579,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.122,
                 "pers": 0.2,
@@ -1706,7 +1706,7 @@
                 "#Total pairs": 136
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.062,
                 "pers": 0.2,
@@ -1833,7 +1833,7 @@
                 "#Total pairs": 348
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.909,
                 "pers": 0.1,
@@ -1953,7 +1953,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.251,
                 "pers": 0.2,
@@ -2080,7 +2080,7 @@
                 "#Total pairs": 114
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.991,
                 "pers": 0.2,
@@ -2207,7 +2207,7 @@
                 "#Total pairs": 190
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.837,
                 "pers": 0.2,
@@ -2327,7 +2327,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.977,
                 "pers": 0.2,
@@ -2454,7 +2454,7 @@
                 "#Total pairs": 452
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.913,
                 "pers": 0.2,
@@ -2574,7 +2574,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.214,
                 "pers": 0.2,
@@ -2694,7 +2694,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 7.439,
                 "pers": 0.2,
@@ -2821,7 +2821,7 @@
                 "#Total pairs": 226
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.743,
                 "pers": 0.2,
@@ -2948,7 +2948,7 @@
                 "#Total pairs": 217
             }
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.801,
                 "pers": 0.2,
@@ -3068,7 +3068,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 11.092,
                 "pers": 0.4,
@@ -3188,7 +3188,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.337,
                 "pers": 0.2,
@@ -3308,7 +3308,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.126,
                 "pers": 0.2,
@@ -3428,7 +3428,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.184,
                 "pers": 0.2,
@@ -3548,7 +3548,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 8.736,
                 "pers": 0.1,
@@ -3668,7 +3668,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 5.986,
                 "pers": 0.2,
@@ -3788,7 +3788,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 9.427,
                 "pers": 0.2,
@@ -3908,7 +3908,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 8.845,
                 "pers": 0.2,
@@ -4028,7 +4028,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.486,
                 "pers": 0.2,
@@ -4148,7 +4148,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 12.962,
                 "pers": 0.3,
@@ -4268,7 +4268,7 @@
         "Eirene.jl": {
             "timeout": 900
         },
-        "PHAT": {
+        "PHAT_spectral_sequence": {
             "para": {
                 "prec": 6.039,
                 "pers": 0.2,
