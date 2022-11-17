@@ -1,5 +1,7 @@
+import json
 import os
 import pathlib
+import re
 import subprocess
 
 from paraview import simple
@@ -65,24 +67,69 @@ def compute_persistence(file):
         return (proc.stdout.read(), proc.stderr.read())
 
 
-def store_log(log, ds_name, app, nthreads=None):
-    thrs = f".{nthreads}T" if nthreads is not None else ""
-    file_name = f"logs/{ds_name}.{app}{thrs}.log"
-    with open(file_name, "w") as dst:
-        dst.write(log)
+def escape_ansi_chars(txt):
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    return ansi_escape.sub("", txt)
 
 
-def main():
+regexp_map = {
+    "dg_mem": r"\[DiscreteGradient.*\] Initialized discrete gradient memory.*\[(\d+\.\d+|\d+)s",
+    "dg": r"\[DiscreteGradient.*\] Built discrete gradient.*\[(\d+\.\d+|\d+)s",
+    "alloc": r"\[DiscreteMorseSandwich.*\] Memory allocations.*\[(\d+\.\d+|\d+)s",
+    "sort": r"\[DiscreteMorseSandwich.*\] Extracted & sorted critical cells.*\[(\d+\.\d+|\d+)s",
+    "minSad": r"\[DiscreteMorseSandwich.*\] Computed .* min-saddle pairs.*\[(\d+\.\d+|\d+)s",
+    "sadMax": r"\[DiscreteMorseSandwich.*\] Computed .* saddle-max pairs.*\[(\d+\.\d+|\d+)s",
+    "sadSad": r"\[DiscreteMorseSandwich.*\] Computed .* saddle-saddle pairs.*\[(\d+\.\d+|\d+)s",
+    "pairs": r"\[DiscreteMorseSandwich.*\] Computed .* persistence pairs.*\[(\d+\.\d+|\d+)s",
+    "total": r"\[PersistenceDiagram.*\] Complete.*\[(\d+\.\d+|\d+)s",
+}
+
+
+def ttk_time(ttk_output, regexp):
+    try:
+        return float(re.search(regexp, ttk_output, re.MULTILINE).group(1))
+    except AttributeError:
+        return 0.0
+
+
+def parse_log(log):
+    res = {}
+    ttk_output = escape_ansi_chars(log)
+    for k, v in regexp_map.items():
+        res[k] = ttk_time(ttk_output, v)
+    res["D1"] = res.pop("sadSad")
+    res["D0+D2"] = res["minSad"] + res["sadMax"]
+    return res
+
+
+def process():
     destdir = "random_scalability"
     try:
         os.mkdir(destdir)
     except FileExistsError:
         pass
 
+    res = {}
+
     for size in [8, 16, 32, 64, 128, 256]:
         file = gen_random(size, destdir)
         out, _ = compute_persistence(file)
-        store_log(out, file.stem, "DiscreteMorseSandwich", 16)
+        res[file.stem] = parse_log(out)
+
+    with open("random_scalability.json", "w") as dst:
+        json.dump(res, dst, indent=4)
+
+
+def gen_table():
+    with open("random_scalability.json") as src:
+        data = json.load(src)
+
+    print(json.dumps(data, indent=4))
+
+
+def main():
+    # process()
+    gen_table()
 
 
 if __name__ == "__main__":
