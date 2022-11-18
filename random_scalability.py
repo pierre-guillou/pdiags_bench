@@ -128,8 +128,27 @@ def gen_table():
     with open("random_scalability.json") as src:
         data = json.load(src)
 
-    print(json.dumps(data, indent=4))
+    n_simplices = []
+    for el in data.values():
+        n_simplices.append(0)
+        for simp in ["nverts", "nedges", "ntri", "ntetra"]:
+            n_simplices[-1] += int(el[simp])
 
+    res = {"dg": [], "sort": [], "D0+D2": [], "D1": [], "total": []}
+    for el in data.values():
+        for k, v in res.items():
+            v.append(float(el.get(k, 0)))
+
+    print(json.dumps(res, indent=4))
+
+
+    for k, v in res.items():
+        coords = []
+        for x, y in zip(n_simplices, v):
+            coords.append(f"({x}, {y})")
+        coords = " ".join(coords)
+        plot = rf"\addplot[] coordinates{{{coords}}};" "\n" rf"\addlegendentry{{{k}}}"
+        print(plot)
 
 def main():
     # process()
