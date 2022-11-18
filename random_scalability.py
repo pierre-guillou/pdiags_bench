@@ -73,6 +73,10 @@ def escape_ansi_chars(txt):
 
 
 regexp_map = {
+    "nverts": r"\[DiscreteGradient\] #Vertices.*: (\d*)",
+    "nedges": r"\[DiscreteGradient\] #Edges.*: (\d*)",
+    "ntri": r"\[DiscreteGradient\] #Triangles.*: (\d*)",
+    "ntetra": r"\[DiscreteGradient\] #Tetras.*: (\d*)",
     "dg_mem": r"\[DiscreteGradient.*\] Initialized discrete gradient memory.*\[(\d+\.\d+|\d+)s",
     "dg": r"\[DiscreteGradient.*\] Built discrete gradient.*\[(\d+\.\d+|\d+)s",
     "alloc": r"\[DiscreteMorseSandwich.*\] Memory allocations.*\[(\d+\.\d+|\d+)s",
