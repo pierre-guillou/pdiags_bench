@@ -59,7 +59,7 @@ def transpose_data(data, dim, mode="seq"):
                 val = perfs["timeout"]
             else:
                 continue
-            backend_ds_res.setdefault(backend, {}).update({dsname: val})
+            backend_ds_res.setdefault(backend, {}).update({dsname: n_simplices / val})
 
     return backend_ds_res
 
@@ -130,7 +130,7 @@ def main():
                 )
             )
 
-        plots_utils.output_tex_file(res, f"plot_{cpx}_{mode}", False, False, legend_pos)
+        plots_utils.output_tex_file(res, f"plot_{cpx}_{mode}", True, True, legend_pos)
 
 
 if __name__ == "__main__":
