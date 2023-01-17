@@ -98,7 +98,7 @@ def output_tex_file(
         dst.write(txt)
 
     if standalone and gen_pdf:
-        subprocess.check_call(["tectonic", f"{fname}.tex"])
+        subprocess.check_call(["latexmk", "--pdf", f"{fname}.tex"])
 
 
 def compute_n_simplices(dim):
