@@ -81,6 +81,26 @@ read using any text editor:
 $ less results-*timestamp*.json
 ```
 
+Python scripts inside the `plots` subfolder can generate LaTeX and/or
+corresponding PDFs files that are reused in the "Discrete Morse
+Sandwich: Fast Computation of Persistence Diagrams for Scalar Data –
+An Algorithm and A Benchmark" TVCG article. In particular, Fig. 18 and
+Fig. 19 can be generated with:
+
+```sh
+cd plots
+python plot_vtu.py
+```
+
+This will generate two LaTeX files and the corresponding PDFs files
+built with `latexmk`. These files are named `plot_expl_seq.pdf` for
+the sequential results and `plots_expl_para.pdf` for the parallel
+results (same names for the LaTeX source files).
+
+Input data (result timings) is stored inside the `.json` files in the
+same subfolder. Overwrite these and re-run the script to update the
+PDFs.
+
 ### 6. Compute distances between diagrams
 
 The script [./compute_mean_distances.py](compute_mean_distances.py) is
