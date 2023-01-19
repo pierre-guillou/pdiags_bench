@@ -93,8 +93,9 @@ python plot_vtu.py
 ```
 
 This will generate two LaTeX files and the corresponding PDFs files
-built with `latexmk`. These files are named `plot_expl_seq.pdf` for
-the sequential results and `plots_expl_para.pdf` for the parallel
+built with `latexmk`. These files are named `plot_expl_seq.pdf` (Fig. 18 of the
+paper) for
+the sequential results and `plots_expl_para.pdf` (Fig. 19 of the paper) for the parallel
 results (same names for the LaTeX source files).
 
 Input data (result timings) is stored inside the `.json` files in the
