@@ -71,6 +71,10 @@ A whole run can up to 150h of computation time. To reduce it, the
 flags `-1`, `-2` or `-3` can be used to specify the dimension of the
 input dataset.
 
+A default timeout of 1800s (30min) is set at every diagram computation
+to avoid spending too much time. This timeout can be reduced using the
+`-t` flag. For instance, a timeout of 10 minutes is set with `-t 600`.
+
 ## 5. Observe the results
 
 Once the previous step has been completed, timings results are stored
