@@ -15,9 +15,6 @@ Benchmark suite for Persistence Diagrams Libraries
 * [PersistentCycles](https://github.com/IuricichF/PersistenceCycles)
 * [PHAT](https://bitbucket.org/phat-code/phat)
 
-This project uses [Poetry](https://python-poetry.org/) to manage the
-Python dependencies.
-
 ## 0. Prerequisites
 
 To run the benchmark, please use a computer/virtual machine with
@@ -33,25 +30,31 @@ If those requirements are too heavy, you can
 ## 1. Installing the dependencies
 
 ```sh
-# install build dependencies
-$ sudo apt install g++ cmake python-numpy pipx python3-dev python3-venv libeigen3-dev \
+# 1. install the build dependencies
+$ sudo apt update
+$ sudo apt install g++ git python-numpy python3-dev python3-pip libeigen3-dev \
     julia default-jdk libtbb-dev libboost-dev python2-dev libopenmpi-dev libgl1-mesa-dev
-# install poetry with pipx
-$ /usr/bin/python3 -m pipx install poetry
-# install run-time dependencies
-$ ~/.local/bin/poetry install
+# 2. clone the repository
+$ git clone https://github.com/pierre-guillou/pdiags_bench
+$ cd pdiags_bench
+# 3. expand PATH
+$ export PATH=$PATH:$HOME/.local/bin
+# 4. install cmake first
+$ /usr/bin/python3 -m pip install cmake
+# 5. install run-time dependencies
+$ /usr/bin/python3 -m pip install -r requirements.txt
 ```
 
 ## 2. Building the missing software libraries
 
 ```sh
-$ ~/.local/bin/poetry run python build_software.py
+$ python3 build_software.py
 ```
 
 ## 3. Fetching the OpenSciVis datasets (raw files) & converting them to supported input formats
 
 ```sh
-$ ~/.local/bin/poetry run python main.py prepare_datasets -d
+$ python3 main.py prepare_datasets -d
 ```
 
 Use the `--max_dataset_size xxx` flag to change the number of downloaded
@@ -61,7 +64,7 @@ modify the resampled size (default 192 for a 192^3 grid)
 ## 4. Launch the Persistence Diagram computation
 
 ```sh
-$ ~/.local/bin/poetry run python main.py compute_diagrams
+$ python3 main.py compute_diagrams
 ```
 
 Use the `--sequential` key to request a sequential execution (parallel
@@ -116,7 +119,7 @@ two diagrams. The Wasserstein distance is then computed on the
 non-identical remaining pairs.
 
 ```sh
-$ ~/.local/bin/poetry run python compute_mean_distances.py
+$ python3 compute_mean_distances.py
 ```
 
 The scripts returns the mean distance aggregated per backend.
