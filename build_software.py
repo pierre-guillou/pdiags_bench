@@ -70,7 +70,9 @@ def build_paraview(prefix, vers, opts):
     )
     # double configure needed here to prevent undefined reference errors
     subprocess.check_call(["cmake", builddir])
-    subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
+    subprocess.check_call(
+        ["cmake", "--build", builddir, "--target", "install", "--parallel"]
+    )
 
 
 def main():
@@ -156,7 +158,7 @@ def main():
                 + ["-S", soft_src]
                 + ["-B", builddir]
             )
-            subprocess.check_call(["cmake", "--build", builddir])
+            subprocess.check_call(["cmake", "--build", builddir, "--parallel"])
         elif soft == "ripser":
             subprocess.run(["make"], cwd=soft_src, check=True)
         elif soft == "PersistenceCycles":
@@ -195,7 +197,9 @@ def main():
                 ],
                 env=env,
             )
-            subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
+            subprocess.check_call(
+                ["cmake", "--build", builddir, "--target", "install", "--parallel"]
+            )
         elif soft == "DiscreteMorseSandwich":
             # first build ParaView 5.10.1
             pv_ver = "v5.10.1"
@@ -233,7 +237,9 @@ def main():
                 env=env,
             )
             # build & install TTK in ParaView install prefix
-            subprocess.check_call(["cmake", "--build", builddir, "--target", "install"])
+            subprocess.check_call(
+                ["cmake", "--build", builddir, "--target", "install", "--parallel"]
+            )
         else:
             if soft == "dipha":
                 subprocess.run(
@@ -259,7 +265,7 @@ def main():
             subprocess.check_call(
                 ["cmake", "-S", soft_src, "-B", builddir, "-DCMAKE_BUILD_TYPE=Release"]
             )
-            subprocess.check_call(["cmake", "--build", builddir])
+            subprocess.check_call(["cmake", "--build", builddir, "--parallel"])
 
         end = time.time()
         print(f"Built {soft} in {int(end - start)} seconds\n")
