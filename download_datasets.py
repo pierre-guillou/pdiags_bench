@@ -23,7 +23,7 @@ def get_datasets_urls(size_limit_mb):
 
     return [
         dataset["url"]
-        for dataset in datasets_json
+        for dataset in datasets_json.values()
         if math.prod(dataset["size"]) * dtype_size[dataset["type"]]
         < (size_limit_mb * 1e6)
     ]
