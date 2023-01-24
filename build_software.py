@@ -1,3 +1,4 @@
+import argparse
 import os
 import shutil
 import subprocess
@@ -75,27 +76,35 @@ def build_paraview(prefix, vers, opts):
     )
 
 
-def main():
+def main(subset=False):
 
     softs = [
+        "dipha",
+        "gudhi",
+        "phat",
+        "DiscreteMorseSandwich",
+    ]
+
+    extended_softs = [
         "CubicalRipser_2dim",
         "CubicalRipser_3dim",
         "diamorse",
-        "dipha",
         "Eirene.jl",
-        "gudhi",
         "oineus",
         "ripser",
         "perseus",
         "JavaPlex",
-        "phat",
         "PersistenceCycles",
-        "DiscreteMorseSandwich",
     ]
+
+    if not subset:
+        softs += extended_softs
 
     # 1. Fetch submodules
     subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
-    subprocess.run(["git", "submodule", "foreach", "git", "checkout", "--", "."], check=True)
+    subprocess.run(
+        ["git", "submodule", "foreach", "git", "checkout", "--", "."], check=True
+    )
 
     # 2. Build each library
     create_dir("build_dirs")
@@ -272,4 +281,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=("Build benchmark native software"))
+    parser.add_argument(
+        "-s",
+        "--subset",
+        help="Only build the most important benchmark applications",
+        action="store_true",
+    )
+    args = parser.parse_args()
+    main(args.subset)
