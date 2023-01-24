@@ -1,6 +1,7 @@
 import argparse
 import enum
 import logging
+import pathlib
 import time
 
 from paraview import simple
@@ -17,6 +18,10 @@ def write_output(outp, fname, out_dir, explicit):
     if out_dir:
         fname = out_dir + "/" + fname
 
+    partial = pathlib.Path(".not_all_apps").exists()
+    if partial and not explicit:
+        return
+
     # Dipha Explicit Complex (Dipha) or Image Data (Dipha, CubicalRipser)
     simple.SaveData(fname + ".dipha", proxy=outp)
 
@@ -25,14 +30,15 @@ def write_output(outp, fname, out_dir, explicit):
         simple.SaveData(fname + ".vtu", proxy=outp)
         # TTK Simplicial Complex (Gudhi, Dionysus, Ripser)
         simple.SaveData(fname + ".tsc", proxy=outp)
-        # Perseus Uniform Triangulation (Perseus)
-        simple.SaveData(fname + ".pers", proxy=outp)
-        # Eirene.jl Sparse Column Format CSV
-        simple.SaveData(fname + ".eirene", proxy=outp)
         # PHAT ASCII boundary_matrix file format
         simple.SaveData(fname + ".phat", proxy=outp)
-        # Oineus Custom Simplicial Complex Format
-        simple.SaveData(fname + ".oin", proxy=outp)
+        if not partial:
+            # Perseus Uniform Triangulation (Perseus)
+            simple.SaveData(fname + ".pers", proxy=outp)
+            # Eirene.jl Sparse Column Format CSV
+            simple.SaveData(fname + ".eirene", proxy=outp)
+            # Oineus Custom Simplicial Complex Format
+            simple.SaveData(fname + ".oin", proxy=outp)
     else:
         # vtkImageData (TTK)
         simple.SaveData(fname + ".vti", proxy=outp)

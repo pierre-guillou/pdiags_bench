@@ -1,5 +1,6 @@
 import argparse
 import os
+import pathlib
 import shutil
 import subprocess
 import time
@@ -99,6 +100,11 @@ def main(subset=False):
 
     if not subset:
         softs += extended_softs
+        pathlib.Path(".not_all_apps").unlink(missing_ok=True)
+    else:
+        # use a hidden file to mark that only a part of the benchmark
+        # has been built
+        pathlib.Path(".not_all_apps").touch()
 
     # 1. Fetch submodules
     subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)

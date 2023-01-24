@@ -8,6 +8,7 @@ import json
 import logging
 import multiprocessing
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -278,15 +279,16 @@ class FileType(enum.Enum):
     def get_backends(self, slice_type):
         from convert_datasets import SliceType
 
+        partial = pathlib.Path(".not_all_apps").exists()
+
         # get backends list from file type variant and slice types
         if self in [FileType.VTI, FileType.VTU]:
             if slice_type in [SliceType.SURF, SliceType.VOL]:
                 # FTM + our algo in 2D and 3D
-                return [
-                    SoftBackend.TTK_FTM,
-                    SoftBackend.DISCRETE_MORSE_SANDWICH,
-                    SoftBackend.PERSCYCL,
-                ]
+                ret = [SoftBackend.TTK_FTM, SoftBackend.DISCRETE_MORSE_SANDWICH]
+                if not partial:
+                    ret.append(SoftBackend.PERSCYCL)
+                return ret
             return [SoftBackend.DISCRETE_MORSE_SANDWICH]  # 1D lines
         if self == FileType.DIPHA_CUB:
             return [SoftBackend.DIPHA, SoftBackend.DIPHA_MPI, SoftBackend.CUBICALRIPSER]
@@ -300,9 +302,11 @@ class FileType(enum.Enum):
             return []  # disable Perseus for simplicial complexes
             # return [SoftBackend.PERSEUS_SIM]
         if self == FileType.TSC:
-            ret = [SoftBackend.GUDHI, SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
-            if slice_type in (SliceType.SURF, SliceType.LINE):
-                return ret + [SoftBackend.RIPSER]  # Ripser only in 2D
+            ret = [SoftBackend.GUDHI]
+            if not partial:
+                ret += [SoftBackend.DIONYSUS, SoftBackend.JAVAPLEX]
+                if slice_type in (SliceType.SURF, SliceType.LINE):
+                    return ret + [SoftBackend.RIPSER]  # Ripser only in 2D
             if slice_type == SliceType.VOL:
                 return ret
         if self == FileType.NETCDF:
