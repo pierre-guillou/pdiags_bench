@@ -151,7 +151,7 @@ def get_time_mem(txt):
 
 def launch_process(cmd, *args, **kwargs):
     RES_MEAS = [
-        "python",
+        "/usr/bin/python3",
         "subprocess_wrapper.py",
         "--",
         "/usr/bin/timeout",
