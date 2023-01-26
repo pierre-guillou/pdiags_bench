@@ -33,7 +33,8 @@ If those requirements are too heavy, you can
 # 1. install the build dependencies
 $ sudo apt update
 $ sudo apt install g++ git python-numpy python3-dev python3-pip libeigen3-dev \
-    julia default-jdk libtbb-dev libboost-dev python2-dev libopenmpi-dev libgl1-mesa-dev
+    julia default-jdk libtbb-dev libboost-dev python2-dev libopenmpi-dev \
+    libgl1-mesa-dev texlive-latex-extra latexmk
 # 2. clone the repository
 $ git clone https://github.com/pierre-guillou/pdiags_bench
 $ cd pdiags_bench
@@ -109,7 +110,7 @@ Input data (result timings) is stored inside the `.json` files in the
 same subfolder. Overwrite these and re-run the script to update the
 PDFs.
 
-### 6. Compute distances between diagrams
+## 6. Compute distances between diagrams
 
 The script [./compute_mean_distances.py](compute_mean_distances.py) is
 used to compare the pairs of every computed diagrams to a reference
