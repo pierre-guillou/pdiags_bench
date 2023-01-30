@@ -32,7 +32,7 @@ For the replicability stamp, we provide below, for each section, a second set of
 * Ubuntu 20.04 (preferred)
 * at least 64GB of RAM (it might even swap)
 * at least 175GB of free disk space for storing the converted input datasets
-* at least 5h of computing time
+* at least 7h of computing time
 
 ## 1. Installing the dependencies
 
@@ -115,7 +115,7 @@ For the replicability stamp, enter this command (to only process 3D data)
 ```sh
 $ python3 main.py compute_diagrams -3 -t 600
 ```
-This step should take approximately three hours on a commodity computer.
+This step should take approximately five hours on a commodity computer.
 
 ## 5. Observe the results
 
