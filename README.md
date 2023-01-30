@@ -27,6 +27,13 @@ If those requirements are too heavy, you can
 * reduce the number of downloaded datasets (default max size: 1024MB)
 * reduce the resampling size (default: 192 for a grid of 192^3 vertices)
 
+### Replicability stamp
+For the replicability stamp, we provide below, for each section, a second set of commands which will restrict the benchmark to only a subset of the tests. This will therefore significantly reduce both storage space and computation time. For this version of the benchmark, please use a computer/virtual machine with
+* Ubuntu 20.04 (preferred)
+* at least 64GB of RAM (it might even swap)
+* at least 175GB of free disk space for storing the converted input datasets
+* at least 5h of computing time
+
 ## 1. Installing the dependencies
 
 ```sh
@@ -52,6 +59,15 @@ $ /usr/bin/python3 -m pip install -r requirements.txt
 $ python3 build_software.py
 ```
 
+### Replicability stamp
+For the replicability stamp, enter this command (to only build a restricted set of implementations)
+
+```sh
+$ python3 build_software.py -s
+```
+This step should take approximately one hour on a commodity computer.
+
+
 ## 3. Fetching the OpenSciVis datasets (raw files) & converting them to supported input formats
 
 ```sh
@@ -62,27 +78,49 @@ Use the `--max_dataset_size xxx` flag to change the number of downloaded
 datasets (default 1024MB). Use the `--max_resample_size yyy` flag to
 modify the resampled size (default 192 for a 192^3 grid)
 
-## 4. Launch the Persistence Diagram computation
+### Replicability stamp
+For the replicability stamp, enter this command (to only download a restricted set of datasets)
 
 ```sh
-$ python3 main.py compute_diagrams
+$ python3 main.py prepare_datasets -d --max_dataset_size 1
+```
+This step should take approximately forty minutes on a commodity computer.
+
+## 4. Launch the Persistence Diagram computation
+
+### 1D datasets
+```sh
+$ python3 main.py compute_diagrams -1
+```
+
+### 2D datasets
+```sh
+$ python3 main.py compute_diagrams -2
+```
+
+### 3D datasets
+```sh
+$ python3 main.py compute_diagrams -3
 ```
 
 Use the `--sequential` key to request a sequential execution (parallel
 for TTK, Dipha and Oineus by default).
 
-A whole run can up to 150h of computation time. To reduce it, the
-flags `-1`, `-2` or `-3` can be used to specify the dimension of the
-input dataset.
-
 A default timeout of 1800s (30min) is set at every diagram computation
 to avoid spending too much time. This timeout can be reduced using the
 `-t` flag. For instance, a timeout of 10 minutes is set with `-t 600`.
 
+### Replicability stamp
+For the replicability stamp, enter this command (to only process 3D data)
+```sh
+$ python3 main.py compute_diagrams -3 -t 600
+```
+This step should take approximately three hours on a commodity computer.
+
 ## 5. Observe the results
 
-Once the previous step has been completed, timings results are stored
-using the JSON format in a timestamped file. This text file can be
+Once the previous steps have been completed, timings results are stored
+using the JSON format in timestamped files (one per run). This text file can be
 read using any text editor:
 
 ```sh
@@ -90,14 +128,22 @@ $ less results-*timestamp*.json
 ```
 
 Python scripts inside the `plots` subfolder can generate LaTeX and/or
-corresponding PDFs files that are reused in the "Discrete Morse
+corresponding PDFs files.
+
+Specifically, first copy each generated JSON file to the appropriate target
+```sh
+$ cp results-*timestamp_for_the_1D_dataset_run*.json plots/results_1D.json
+$ cp results-*timestamp_for_the_2D_dataset_run*.json plots/results_2D.json
+$ cp results-*timestamp_for_the_3D_dataset_run*.json plots/results_3D.json
+```
+
+Next, the Figures 18 and 19 of the IEEE TVCG paper "Discrete Morse
 Sandwich: Fast Computation of Persistence Diagrams for Scalar Data –
-An Algorithm and A Benchmark" TVCG article. In particular, Fig. 18 and
-Fig. 19 can be generated with:
+An Algorithm and A Benchmark" can be reproduced with the following command
 
 ```sh
 cd plots
-python plot_vtu.py
+python3 plot_vtu.py
 ```
 
 This will generate two LaTeX files and the corresponding PDFs files
@@ -109,6 +155,16 @@ results (same names for the LaTeX source files).
 Input data (result timings) is stored inside the `.json` files in the
 same subfolder. Overwrite these and re-run the script to update the
 PDFs.
+
+### Replicability stamp
+For the replicability stamp, enter these commands
+
+```sh
+cp results-*timestamp_for_the_3D_dataset_run*.json plots/results_3D.json
+cd plots
+python3 plot_vtu.py
+```
+The file `plots_expl_para.pdf` replicates the Figure 19 of the paper (with fewer datasets, i.e. fewer data points).
 
 ## 6. Compute distances between diagrams
 
