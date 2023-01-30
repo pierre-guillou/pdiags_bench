@@ -137,9 +137,9 @@ $ cp results-*timestamp_for_the_2D_dataset_run*.json plots/results_2D.json
 $ cp results-*timestamp_for_the_3D_dataset_run*.json plots/results_3D.json
 ```
 
-Next, the Figures 18 and 19 of the IEEE TVCG paper "Discrete Morse
-Sandwich: Fast Computation of Persistence Diagrams for Scalar Data –
-An Algorithm and A Benchmark" can be reproduced with the following command
+Next, the Figures 18 and 19 of the [IEEE TVCG paper "Discrete Morse
+Sandwich: Fast Computation of Persistence Diagrams for Scalar Data --
+An Algorithm and A Benchmark"](https://arxiv.org/abs/2206.13932) can be reproduced with the following command
 
 ```sh
 cd plots
