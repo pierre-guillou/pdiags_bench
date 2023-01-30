@@ -53,6 +53,11 @@ def transpose_data(data, dim, mode="seq"):
                 # sequential-only backends
                 continue
 
+            if backend == "PHAT/spectral/sequence":
+                backend = "PHAT_spectral_sequence"
+            if backend == "PHAT/chunk":
+                backend = "PHAT_chunk"
+
             if mode in perfs:
                 val = perfs[mode]["pers"]
             elif "timeout" in perfs:
