@@ -164,7 +164,7 @@ cp results-*timestamp_for_the_3D_dataset_run*.json plots/results_3D.json
 cd plots
 python3 plot_vtu.py
 ```
-The file `plots_expl_para.pdf` replicates the Figure 19 of the paper (with fewer datasets, i.e. fewer data points).
+The rightmost sub-figure of the file `plots_expl_para.pdf` (i.e. 3D datasets) replicates the rightmost sub-figure of the Figure 19 of the paper (with fewer datasets, i.e. fewer data points).
 
 ## 6. Compute distances between diagrams
 
